@@ -346,6 +346,8 @@ const T = {
     filter_spec:   'All Specialties',
     filter_hosp:   'All Hospitals',
     filter_lang:   'Language',
+    nav_login:     'Login',
+    nav_dashboard: 'Dashboard',
   }
 };
 
@@ -366,9 +368,17 @@ function applyTranslations() {
     const key = el.getAttribute('data-i18n-ph');
     if (T[currentLang][key]) el.placeholder = T[currentLang][key];
   });
-  // lang attr
+  // Translate select default option text
+  document.querySelectorAll('select[data-i18n-opt-default]').forEach(sel => {
+    const key = sel.getAttribute('data-i18n-opt-default');
+    const defaultOpt = sel.querySelector('option[value=""]');
+    if (defaultOpt && T[currentLang][key]) defaultOpt.textContent = T[currentLang][key];
+    // Translate other options with data-th / data-en attributes
+    sel.querySelectorAll('option[data-th][data-en]').forEach(opt => {
+      opt.textContent = currentLang === 'en' ? opt.dataset.en : opt.dataset.th;
+    });
+  });
   document.documentElement.lang = currentLang === 'th' ? 'th' : 'en';
-  // active button
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === currentLang);
   });

@@ -11,9 +11,11 @@ import { Icon } from 'astro-icon/components';
     .topic-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:48px;}
     @media(max-width:860px){.topic-grid{grid-template-columns:repeat(3,1fr);}}
     @media(max-width:480px){.topic-grid{grid-template-columns:repeat(2,1fr);}}
-    .topic-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px 12px;text-align:center;cursor:pointer;transition:var(--t) var(--ease);text-decoration:none;}
-    .topic-card:hover,.topic-card.active{border-color:var(--secondary);background:rgba(8,145,178,.04);}
-    .topic-card [data-icon]{font-size:1.6rem;margin-bottom:8px;display:block;}
+    .topic-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px 12px;text-align:center;cursor:pointer;transition:var(--t) var(--ease);text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:0;}
+    .topic-card:hover,.topic-card.active{border-color:var(--secondary);background:rgba(8,145,178,.04);transform:translateY(-4px);box-shadow:var(--shadow-md);}
+    .topic-icon{width:60px;height:60px;border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;transition:var(--t) var(--ease);}
+    .topic-icon [data-icon]{width:1.5rem;height:1.5rem;}
+    .topic-card span{font-size:.82rem;font-weight:600;color:var(--gray-700);}
     .topic-card span{font-size:.78rem;font-weight:600;color:var(--gray-700);}
     .featured-article{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--radius-xl);padding:40px;color:#fff;margin-bottom:40px;position:relative;overflow:hidden;}
     .featured-article::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05);}
@@ -60,12 +62,30 @@ import { Icon } from 'astro-icon/components';
 
     <div class="tag reveal"><Icon name="fa6-solid:layer-group" /> หมวดหมู่ยอดนิยม</div>
     <div class="topic-grid reveal">
-      <a href="#articles" class="topic-card" onclick="filterArticles('heart',this)"><Icon name="fa6-solid:heart-pulse" style="color:#EF4444" /><span>โรคหัวใจ</span></a>
-      <a href="#articles" class="topic-card" onclick="filterArticles('cancer',this)"><Icon name="fa6-solid:ribbon" style="color:#8B5CF6" /><span>มะเร็ง</span></a>
-      <a href="#articles" class="topic-card" onclick="filterArticles('neuro',this)"><Icon name="fa6-solid:brain" style="color:#0891B2" /><span>ระบบประสาท</span></a>
-      <a href="#articles" class="topic-card" onclick="filterArticles('ortho',this)"><Icon name="fa6-solid:bone" style="color:#D97706" /><span>กระดูกและข้อ</span></a>
-      <a href="#articles" class="topic-card" onclick="filterArticles('peds',this)"><Icon name="fa6-solid:child-reaching" style="color:#10B981" /><span>สุขภาพเด็ก</span></a>
-      <a href="#articles" class="topic-card" onclick="filterArticles('women',this)"><Icon name="fa6-solid:venus" style="color:#DB2777" /><span>สุขภาพสตรี</span></a>
+      <a href="#articles" class="topic-card" onclick="filterArticles('heart',this)">
+        <div class="topic-icon" style="background:rgba(239,68,68,.1)"><Icon name="fa6-solid:heart-pulse" style="color:#EF4444" /></div>
+        <span>โรคหัวใจ</span>
+      </a>
+      <a href="#articles" class="topic-card" onclick="filterArticles('cancer',this)">
+        <div class="topic-icon" style="background:rgba(139,92,246,.1)"><Icon name="fa6-solid:ribbon" style="color:#8B5CF6" /></div>
+        <span>มะเร็ง</span>
+      </a>
+      <a href="#articles" class="topic-card" onclick="filterArticles('neuro',this)">
+        <div class="topic-icon" style="background:rgba(8,145,178,.1)"><Icon name="fa6-solid:brain" style="color:#0891B2" /></div>
+        <span>ระบบประสาท</span>
+      </a>
+      <a href="#articles" class="topic-card" onclick="filterArticles('ortho',this)">
+        <div class="topic-icon" style="background:rgba(217,119,6,.1)"><Icon name="fa6-solid:bone" style="color:#D97706" /></div>
+        <span>กระดูกและข้อ</span>
+      </a>
+      <a href="#articles" class="topic-card" onclick="filterArticles('peds',this)">
+        <div class="topic-icon" style="background:rgba(16,185,129,.1)"><Icon name="fa6-solid:child-reaching" style="color:#10B981" /></div>
+        <span>สุขภาพเด็ก</span>
+      </a>
+      <a href="#articles" class="topic-card" onclick="filterArticles('women',this)">
+        <div class="topic-icon" style="background:rgba(219,39,119,.1)"><Icon name="fa6-solid:venus" style="color:#DB2777" /></div>
+        <span>สุขภาพสตรี</span>
+      </a>
     </div>
 
     <div class="tag reveal"><Icon name="fa6-solid:magnifying-glass" /> ค้นหาโรคตามตัวอักษร</div>

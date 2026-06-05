@@ -1,0 +1,54 @@
+---
+export const prerender = false;
+import Layout from '../components/Layout.astro';
+import { createServerSupabase } from '../lib/supabase-server';
+
+const supabase = createServerSupabase(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+
+const { data: appointments } = await supabase
+  .from('appointments')
+  .select('*')
+  .eq('patient_id', user!.id)
+  .order('appointment_date', { ascending: false });
+
+const statusLabel: Record<string, string> = {
+  pending: 'รอยืนยัน',
+  confirmed: 'ยืนยันแล้ว',
+  cancelled: 'ยกเลิก',
+  completed: 'เสร็จสิ้น',
+};
+---
+<Layout title="นัดหมายของฉัน | MediThai">
+  <main class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+      <h1>นัดหมายของฉัน</h1>
+      <a href="/book" class="btn btn-primary">+ นัดหมายใหม่</a>
+    </div>
+
+    {appointments && appointments.length > 0 ? (
+      <div class="appt-list">
+        {appointments.map((appt) => (
+          <div class={`appt-item appt-${appt.status}`}>
+            <div class="appt-date">
+              <strong>{new Date(appt.appointment_date).toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+              <span>{appt.appointment_time}</span>
+            </div>
+            <div class="appt-info" style="flex:1">
+              <div class="appt-hospital" style="font-weight:600">{appt.hospital}</div>
+              {appt.doctor_name && <div>แพทย์: {appt.doctor_name}</div>}
+              <div style="color:var(--gray-500);font-size:.85rem">{appt.specialty}</div>
+              {appt.notes && <div style="font-size:.85rem;margin-top:4px">หมายเหตุ: {appt.notes}</div>}
+            </div>
+            <span class={`appt-badge appt-badge--${appt.status}`}>{statusLabel[appt.status]}</span>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state" style="text-align:center;padding:4rem">
+        <p style="font-size:1.1rem;color:var(--gray-500)">ยังไม่มีประวัตินัดหมาย</p>
+        <a href="/book" class="btn btn-primary" style="margin-top:1rem">จองนัดหมายแรก</a>
+      </div>
+    )}
+  </main>
+</Layout>

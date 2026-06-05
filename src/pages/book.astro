@@ -1,0 +1,132 @@
+---
+export const prerender = false;
+import Layout from '../components/Layout.astro';
+import { createServerSupabase } from '../lib/supabase-server';
+
+const supabase = createServerSupabase(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+const { data: profile } = await supabase.from('profiles').select('*').eq('id', user!.id).single();
+
+let success = false;
+let error = '';
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const { error: err } = await supabase.from('appointments').insert({
+    patient_id: user!.id,
+    patient_name: form.get('patient_name') as string,
+    patient_phone: form.get('patient_phone') as string,
+    hospital: form.get('hospital') as string,
+    specialty: form.get('specialty') as string,
+    doctor_name: form.get('doctor_name') as string || null,
+    appointment_date: form.get('appointment_date') as string,
+    appointment_time: form.get('appointment_time') as string,
+    notes: form.get('notes') as string || null,
+  });
+  if (err) error = err.message;
+  else success = true;
+}
+
+const hospitals = [
+  'MediThai กรุงเทพ (สำนักงานใหญ่)',
+  'MediThai หัวใจ',
+  'MediThai มะเร็ง',
+  'MediThai สมองและกระดูก',
+  'MediThai เด็ก',
+  'MediThai เชียงใหม่',
+];
+
+const specialties = [
+  'อายุรกรรมทั่วไป', 'โรคหัวใจ', 'มะเร็งวิทยา', 'ศัลยกรรมระบบประสาท',
+  'กระดูกและข้อ', 'กุมารเวชศาสตร์', 'สูติ-นรีเวชกรรม', 'จักษุวิทยา',
+  'โสต-ศอ-นาสิก', 'ผิวหนัง', 'ทันตกรรม', 'ตรวจสุขภาพ',
+];
+
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+const minDate = tomorrow.toISOString().split('T')[0];
+---
+<Layout title="จองนัดหมาย | MediThai">
+  <main class="container" style="padding-top: calc(var(--header-height) + 40px); max-width: 680px;">
+    <a href="/dashboard" style="color:var(--primary);font-size:.9rem">← กลับ</a>
+    <h1 style="margin: 16px 0 8px">จองนัดหมายแพทย์</h1>
+    <p style="color:var(--gray-500);margin-bottom:2rem">กรอกข้อมูลด้านล่างเพื่อจองนัดหมาย ทีมงานจะยืนยันภายใน 24 ชั่วโมง</p>
+
+    {success ? (
+      <div class="success-banner">
+        <h3>✅ จองนัดหมายเรียบร้อยแล้ว!</h3>
+        <p>ทีมงานจะติดต่อกลับเพื่อยืนยันนัดหมายภายใน 24 ชั่วโมง</p>
+        <div style="display:flex;gap:12px;margin-top:1rem">
+          <a href="/book" class="btn btn-primary btn-sm">จองใหม่</a>
+          <a href="/my-appointments" class="btn btn-secondary btn-sm">ดูนัดหมาย</a>
+        </div>
+      </div>
+    ) : (
+      <form method="POST" class="booking-form">
+        {error && <div class="auth-error">{error}</div>}
+
+        <div class="form-section">
+          <h3>ข้อมูลผู้ป่วย</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>ชื่อ-นามสกุล *</label>
+              <input type="text" name="patient_name" required value={profile?.full_name || ''} />
+            </div>
+            <div class="form-group">
+              <label>เบอร์โทรศัพท์ *</label>
+              <input type="tel" name="patient_phone" required value={profile?.phone || ''} />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>รายละเอียดการนัดหมาย</h3>
+          <div class="form-group">
+            <label>โรงพยาบาล *</label>
+            <select name="hospital" required>
+              <option value="">-- เลือกโรงพยาบาล --</option>
+              {hospitals.map(h => <option value={h}>{h}</option>)}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>แผนก / ความเชี่ยวชาญ *</label>
+            <select name="specialty" required>
+              <option value="">-- เลือกแผนก --</option>
+              {specialties.map(s => <option value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>แพทย์ที่ต้องการ (ถ้ามี)</label>
+            <input type="text" name="doctor_name" placeholder="ระบุชื่อแพทย์ หรือเว้นว่างไว้" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>วันที่ต้องการ *</label>
+              <input type="date" name="appointment_date" required min={minDate} />
+            </div>
+            <div class="form-group">
+              <label>ช่วงเวลา *</label>
+              <select name="appointment_time" required>
+                <option value="">-- เลือกช่วงเวลา --</option>
+                <option>08:00 - 09:00</option>
+                <option>09:00 - 10:00</option>
+                <option>10:00 - 11:00</option>
+                <option>11:00 - 12:00</option>
+                <option>13:00 - 14:00</option>
+                <option>14:00 - 15:00</option>
+                <option>15:00 - 16:00</option>
+                <option>16:00 - 17:00</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>หมายเหตุเพิ่มเติม</label>
+            <textarea name="notes" rows="3" placeholder="อาการ หรือข้อมูลที่ต้องการแจ้งล่วงหน้า"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-full">ยืนยันการจองนัดหมาย</button>
+      </form>
+    )}
+  </main>
+</Layout>

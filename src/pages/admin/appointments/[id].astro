@@ -1,0 +1,65 @@
+---
+export const prerender = false;
+import Layout from '../../../components/Layout.astro';
+import { createServerSupabase } from '../../../lib/supabase-server';
+
+const { id } = Astro.params;
+const supabase = createServerSupabase(Astro.request, Astro.cookies);
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const status = form.get('status') as string;
+  await supabase.from('appointments').update({ status, updated_at: new Date().toISOString() }).eq('id', id!);
+  return Astro.redirect('/admin/appointments');
+}
+
+const { data: appt } = await supabase.from('appointments').select('*').eq('id', id!).single();
+if (!appt) return Astro.redirect('/admin/appointments');
+
+const statusLabel: Record<string, string> = { pending: 'รอยืนยัน', confirmed: 'ยืนยันแล้ว', cancelled: 'ยกเลิก', completed: 'เสร็จสิ้น' };
+---
+<Layout title={`นัดหมาย #${id?.slice(0,8)} | Admin`}>
+  <main class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="admin-logo">MediThai Admin</div>
+      <nav class="admin-nav">
+        <a href="/admin" class="admin-nav-link">📊 ภาพรวม</a>
+        <a href="/admin/appointments" class="admin-nav-link active">📅 นัดหมายทั้งหมด</a>
+      </nav>
+    </aside>
+
+    <div class="admin-content">
+      <a href="/admin/appointments" style="color:var(--primary);font-size:.9rem">← กลับ</a>
+      <h1 class="admin-page-title" style="margin-top:1rem">รายละเอียดนัดหมาย</h1>
+
+      <div class="appt-detail-card">
+        <div class="detail-grid">
+          <div><strong>ชื่อผู้ป่วย</strong><p>{appt.patient_name}</p></div>
+          <div><strong>เบอร์โทร</strong><p>{appt.patient_phone}</p></div>
+          <div><strong>โรงพยาบาล</strong><p>{appt.hospital}</p></div>
+          <div><strong>แผนก</strong><p>{appt.specialty}</p></div>
+          {appt.doctor_name && <div><strong>แพทย์</strong><p>{appt.doctor_name}</p></div>}
+          <div><strong>วันที่</strong><p>{new Date(appt.appointment_date).toLocaleDateString('th-TH', { dateStyle: 'full' })}</p></div>
+          <div><strong>เวลา</strong><p>{appt.appointment_time}</p></div>
+          <div><strong>สถานะปัจจุบัน</strong><p><span class={`appt-badge appt-badge--${appt.status}`}>{statusLabel[appt.status]}</span></p></div>
+          {appt.notes && <div style="grid-column:1/-1"><strong>หมายเหตุ</strong><p>{appt.notes}</p></div>}
+        </div>
+
+        <div class="status-actions">
+          <h3>เปลี่ยนสถานะ</h3>
+          <form method="POST" style="display:flex;gap:12px;flex-wrap:wrap">
+            {appt.status !== 'confirmed' && (
+              <button name="status" value="confirmed" class="btn btn-primary">✅ ยืนยันนัดหมาย</button>
+            )}
+            {appt.status !== 'completed' && (
+              <button name="status" value="completed" class="btn btn-secondary">✔ เสร็จสิ้น</button>
+            )}
+            {appt.status !== 'cancelled' && (
+              <button name="status" value="cancelled" class="btn" style="background:var(--error,#EF4444);color:#fff">❌ ยกเลิก</button>
+            )}
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

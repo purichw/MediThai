@@ -1,16 +1,25 @@
 {
   "name": "medithai-network",
   "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node -e \"const fs=require('fs'),p='.vercel/output/functions/_render.func/.vc-config.json';const c=JSON.parse(fs.readFileSync(p));c.runtime='nodejs20.x';fs.writeFileSync(p,JSON.stringify(c,null,2));console.log('runtime patched to nodejs20.x');\"",
     "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "^4.16.0",
-    "astro-icon": "^1.1.5",
-    "@iconify-json/fa6-solid": "^1.2.4",
+    "@astrojs/vercel": "^10.0.8",
     "@iconify-json/fa6-brands": "^1.2.4",
-    "@iconify-json/fa6-regular": "^1.2.4"
+    "@iconify-json/fa6-regular": "^1.2.4",
+    "@iconify-json/fa6-solid": "^1.2.4",
+    "@sanity/client": "^7.22.1",
+    "@sanity/image-url": "^2.1.1",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.107.0",
+    "astro": "^6.4.4",
+    "astro-icon": "^1.1.5",
+    "ws": "^8.21.0"
   }
 }

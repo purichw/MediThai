@@ -67,6 +67,16 @@ import { Icon } from 'astro-icon/components';
         <button class="lang-btn active" data-lang="th">TH</button>
         <button class="lang-btn" data-lang="en">EN</button>
       </div>
+      <!-- Auth state: shown/hidden by client-side JS -->
+      <div id="header-auth" style="display:flex;align-items:center;gap:8px">
+        <a href="/login" id="header-login-btn" class="btn btn-outline btn-sm">เข้าสู่ระบบ</a>
+        <div id="header-user-menu" class="user-menu" style="display:none">
+          <a href="/dashboard" class="btn btn-outline btn-sm">แดชบอร์ด</a>
+          <form method="POST" action="/logout" style="display:inline">
+            <button type="submit" class="btn btn-ghost btn-sm">ออก</button>
+          </form>
+        </div>
+      </div>
       <a href="/appointments" class="btn btn-primary btn-sm" data-i18n="nav_appt">นัดหมาย</a>
     </div>
 
@@ -87,3 +97,23 @@ import { Icon } from 'astro-icon/components';
   <a href="/about" data-i18n="nav_about">เกี่ยวกับเรา <Icon name="fa6-solid:arrow-right" /></a>
   <a href="/contact" style="margin-top:12px;background:var(--primary);color:#fff;padding:14px;border-radius:12px;justify-content:center" data-i18n="nav_appt">นัดหมายออนไลน์</a>
 </nav>
+
+<script>
+  // Client-side auth state for header
+  (async () => {
+    try {
+      const { createBrowserClient } = await import('@supabase/ssr');
+      const supabase = createBrowserClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+      );
+      const { data: { user } } = await supabase.auth.getUser();
+      const loginBtn = document.getElementById('header-login-btn');
+      const userMenu = document.getElementById('header-user-menu');
+      if (user && loginBtn && userMenu) {
+        loginBtn.style.display = 'none';
+        userMenu.style.display = 'flex';
+      }
+    } catch {}
+  })();
+</script>

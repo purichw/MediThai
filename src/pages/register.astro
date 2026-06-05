@@ -1,0 +1,53 @@
+---
+export const prerender = false;
+import Layout from '../components/Layout.astro';
+import { createServerSupabase } from '../lib/supabase-server';
+
+const supabase = createServerSupabase(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+if (user) return Astro.redirect('/dashboard');
+
+let error = '';
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const email = form.get('email') as string;
+  const password = form.get('password') as string;
+  const fullName = form.get('full_name') as string;
+  const phone = form.get('phone') as string;
+  const { error: err } = await supabase.auth.signUp({
+    email, password,
+    options: { data: { full_name: fullName, phone } }
+  });
+  if (err) error = err.message;
+  else return Astro.redirect('/dashboard');
+}
+---
+<Layout title="สมัครสมาชิก | MediThai">
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-logo"><a href="/">MediThai</a></div>
+      <h1 class="auth-title">สมัครสมาชิก</h1>
+      {error && <div class="auth-error">{error}</div>}
+      <form method="POST" class="auth-form">
+        <div class="form-group">
+          <label>ชื่อ-นามสกุล</label>
+          <input type="text" name="full_name" required placeholder="สมชาย ใจดี" />
+        </div>
+        <div class="form-group">
+          <label>เบอร์โทรศัพท์</label>
+          <input type="tel" name="phone" required placeholder="08X-XXX-XXXX" />
+        </div>
+        <div class="form-group">
+          <label>อีเมล</label>
+          <input type="email" name="email" required placeholder="your@email.com" />
+        </div>
+        <div class="form-group">
+          <label>รหัสผ่าน</label>
+          <input type="password" name="password" required placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">สมัครสมาชิก</button>
+      </form>
+      <p class="auth-switch">มีบัญชีแล้ว? <a href="/login">เข้าสู่ระบบ</a></p>
+    </div>
+  </main>
+</Layout>

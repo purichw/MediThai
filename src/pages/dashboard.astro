@@ -1,0 +1,85 @@
+---
+export const prerender = false;
+import Layout from '../components/Layout.astro';
+import { createServerSupabase } from '../lib/supabase-server';
+
+const supabase = createServerSupabase(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', user!.id)
+  .single();
+
+const { data: appointments } = await supabase
+  .from('appointments')
+  .select('*')
+  .eq('patient_id', user!.id)
+  .order('appointment_date', { ascending: true })
+  .limit(3);
+---
+<Layout title="แดชบอร์ด | MediThai">
+  <main class="dashboard-page container">
+    <div class="dashboard-header">
+      <h1>สวัสดี, {profile?.full_name || user?.email} 👋</h1>
+      <a href="/book" class="btn btn-primary">นัดหมายใหม่</a>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Upcoming appointments -->
+      <section class="dash-section">
+        <h2>นัดหมายที่กำลังจะมาถึง</h2>
+        {appointments && appointments.length > 0 ? (
+          <div class="appt-list">
+            {appointments.map((appt) => (
+              <div class={`appt-item appt-${appt.status}`}>
+                <div class="appt-date">
+                  <strong>{new Date(appt.appointment_date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}</strong>
+                  <span>{appt.appointment_time}</span>
+                </div>
+                <div class="appt-info">
+                  <div class="appt-hospital">{appt.hospital}</div>
+                  {appt.doctor_name && <div class="appt-doctor">นพ. {appt.doctor_name}</div>}
+                  <div class="appt-specialty">{appt.specialty}</div>
+                </div>
+                <span class={`appt-badge appt-badge--${appt.status}`}>
+                  {appt.status === 'pending' ? 'รอยืนยัน' : appt.status === 'confirmed' ? 'ยืนยันแล้ว' : appt.status === 'cancelled' ? 'ยกเลิก' : 'เสร็จสิ้น'}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state">
+            <p>ยังไม่มีนัดหมาย</p>
+            <a href="/book" class="btn btn-secondary btn-sm">จองนัดเลย</a>
+          </div>
+        )}
+        <a href="/my-appointments" class="view-all-link">ดูทั้งหมด →</a>
+      </section>
+
+      <!-- Quick links -->
+      <section class="dash-section">
+        <h2>ลิงก์ด่วน</h2>
+        <div class="quick-links">
+          <a href="/book" class="quick-link-card">
+            <span class="ql-icon">📅</span>
+            <span>จองนัดหมาย</span>
+          </a>
+          <a href="/doctors" class="quick-link-card">
+            <span class="ql-icon">👨‍⚕️</span>
+            <span>ค้นหาแพทย์</span>
+          </a>
+          <a href="/packages" class="quick-link-card">
+            <span class="ql-icon">📋</span>
+            <span>แพ็กเกจสุขภาพ</span>
+          </a>
+          <a href="/my-appointments" class="quick-link-card">
+            <span class="ql-icon">🗓</span>
+            <span>ประวัตินัดหมาย</span>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>

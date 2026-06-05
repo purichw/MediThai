@@ -1,0 +1,95 @@
+---
+export const prerender = false;
+import Layout from '../../components/Layout.astro';
+import { createServerSupabase } from '../../lib/supabase-server';
+
+const supabase = createServerSupabase(Astro.request, Astro.cookies);
+
+const [{ count: total }, { count: pending }, { count: confirmed }, { count: today }] = await Promise.all([
+  supabase.from('appointments').select('*', { count: 'exact', head: true }),
+  supabase.from('appointments').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+  supabase.from('appointments').select('*', { count: 'exact', head: true }).eq('status', 'confirmed'),
+  supabase.from('appointments').select('*', { count: 'exact', head: true }).eq('appointment_date', new Date().toISOString().split('T')[0]),
+]);
+
+const { data: recentAppts } = await supabase
+  .from('appointments')
+  .select('*')
+  .order('created_at', { ascending: false })
+  .limit(10);
+
+const statusLabel: Record<string, string> = { pending: 'รอยืนยัน', confirmed: 'ยืนยัน', cancelled: 'ยกเลิก', completed: 'เสร็จ' };
+---
+<Layout title="Admin Dashboard | MediThai">
+  <main class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="admin-logo">MediThai Admin</div>
+      <nav class="admin-nav">
+        <a href="/admin" class="admin-nav-link active">📊 ภาพรวม</a>
+        <a href="/admin/appointments" class="admin-nav-link">📅 นัดหมายทั้งหมด</a>
+        <a href="/" class="admin-nav-link">🌐 ดูเว็บ</a>
+      </nav>
+      <form method="POST" action="/logout" style="margin-top:auto">
+        <button type="submit" class="admin-nav-link" style="width:100%;text-align:left;background:none;border:none;cursor:pointer">🚪 ออกจากระบบ</button>
+      </form>
+    </aside>
+
+    <div class="admin-content">
+      <h1 class="admin-page-title">ภาพรวมระบบ</h1>
+
+      <div class="admin-stats">
+        <div class="admin-stat-card">
+          <div class="stat-number">{total ?? 0}</div>
+          <div class="stat-label">นัดหมายทั้งหมด</div>
+        </div>
+        <div class="admin-stat-card stat-warning">
+          <div class="stat-number">{pending ?? 0}</div>
+          <div class="stat-label">รอยืนยัน</div>
+        </div>
+        <div class="admin-stat-card stat-success">
+          <div class="stat-number">{confirmed ?? 0}</div>
+          <div class="stat-label">ยืนยันแล้ว</div>
+        </div>
+        <div class="admin-stat-card stat-info">
+          <div class="stat-number">{today ?? 0}</div>
+          <div class="stat-label">นัดหมายวันนี้</div>
+        </div>
+      </div>
+
+      <h2 style="margin: 2rem 0 1rem">นัดหมายล่าสุด</h2>
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ชื่อผู้ป่วย</th>
+              <th>โรงพยาบาล</th>
+              <th>แผนก</th>
+              <th>วันที่นัด</th>
+              <th>เวลา</th>
+              <th>สถานะ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentAppts?.map(appt => (
+              <tr>
+                <td>
+                  <div>{appt.patient_name}</div>
+                  <div style="font-size:.8rem;color:var(--gray-500)">{appt.patient_phone}</div>
+                </td>
+                <td>{appt.hospital}</td>
+                <td>{appt.specialty}</td>
+                <td>{new Date(appt.appointment_date).toLocaleDateString('th-TH')}</td>
+                <td>{appt.appointment_time}</td>
+                <td><span class={`appt-badge appt-badge--${appt.status}`}>{statusLabel[appt.status]}</span></td>
+                <td>
+                  <a href={`/admin/appointments/${appt.id}`} class="btn btn-sm btn-secondary">ดู</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</Layout>

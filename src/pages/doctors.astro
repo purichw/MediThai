@@ -30,18 +30,18 @@ import { Icon } from 'astro-icon/components';
         <Icon name="fa6-solid:magnifying-glass" />
         <input type="text" id="doctor-search" class="search-input" data-i18n-ph="search_ph" placeholder="ค้นหาแพทย์ ความเชี่ยวชาญ..." />
       </div>
-      <select id="doc-spec-filter" class="filter-select">
-        <option value="">ทุกสาขา</option>
-        <option value="heart">ศูนย์หัวใจ</option>
-        <option value="cancer">ศูนย์มะเร็ง</option>
-        <option value="neuro">ศูนย์สมองและระบบประสาท</option>
-        <option value="ortho">ศูนย์กระดูกและข้อ</option>
-        <option value="peds">ศูนย์เด็ก</option>
-        <option value="obgyn">ศูนย์สตรี</option>
-        <option value="eye">ศูนย์ตา</option>
-        <option value="internal">อายุรกรรม</option>
+      <select id="doc-spec-filter" class="filter-select" data-i18n-opt-default="filter_spec">
+        <option value="">ทุกความเชี่ยวชาญ</option>
+        <option value="heart" data-th="ศูนย์หัวใจ" data-en="Heart Center">ศูนย์หัวใจ</option>
+        <option value="cancer" data-th="ศูนย์มะเร็ง" data-en="Cancer Center">ศูนย์มะเร็ง</option>
+        <option value="neuro" data-th="ศูนย์สมองและระบบประสาท" data-en="Brain & Spine">ศูนย์สมองและระบบประสาท</option>
+        <option value="ortho" data-th="ศูนย์กระดูกและข้อ" data-en="Orthopedics">ศูนย์กระดูกและข้อ</option>
+        <option value="peds" data-th="ศูนย์เด็ก" data-en="Children's">ศูนย์เด็ก</option>
+        <option value="obgyn" data-th="ศูนย์สตรี" data-en="Women's Health">ศูนย์สตรี</option>
+        <option value="eye" data-th="ศูนย์ตา" data-en="Eye Center">ศูนย์ตา</option>
+        <option value="internal" data-th="อายุรกรรม" data-en="Internal Medicine">อายุรกรรม</option>
       </select>
-      <select id="doc-hosp-filter" class="filter-select">
+      <select id="doc-hosp-filter" class="filter-select" data-i18n-opt-default="filter_hosp">
         <option value="">ทุกสาขา</option>
         <option value="bkk">MediThai กรุงเทพ</option>
         <option value="heart">MediThai หัวใจ</option>
@@ -50,9 +50,9 @@ import { Icon } from 'astro-icon/components';
         <option value="kids">MediThai เด็ก</option>
         <option value="chiang">MediThai เชียงใหม่</option>
       </select>
-      <select class="filter-select">
+      <select class="filter-select" data-i18n-opt-default="filter_lang">
         <option value="">ภาษาที่พูด</option>
-        <option value="th">ภาษาไทย</option>
+        <option value="th">ภาษาไทย / Thai</option>
         <option value="en">English</option>
         <option value="zh">中文</option>
         <option value="ja">日本語</option>

@@ -5,11 +5,19 @@
 /* ----------------------------------------------------------------
    Page Loader
    ---------------------------------------------------------------- */
+// Show loader only if page takes longer than 500ms (slow network / heavy page)
+const _loader = document.querySelector('.page-loader');
+if (_loader) _loader.style.transition = 'none'; // prevent flash on fast loads
+const _loaderTimer = setTimeout(() => {
+  if (_loader) {
+    _loader.style.transition = '';
+    _loader.style.opacity = '1';
+    _loader.style.visibility = 'visible';
+  }
+}, 500);
 window.addEventListener('load', () => {
-  setTimeout(() => {
-    const loader = document.querySelector('.page-loader');
-    if (loader) loader.classList.add('hidden');
-  }, 900);
+  clearTimeout(_loaderTimer);
+  if (_loader) _loader.classList.add('hidden');
 });
 
 /* ----------------------------------------------------------------
