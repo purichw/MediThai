@@ -1,0 +1,203 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="เกี่ยวกับเรา | MediThai Hospital Network" description="25 ปีแห่งความไว้วางใจ มาตรฐานระดับนานาชาติ"
+  extraHead={`
+    <style>
+    .timeline{position:relative;padding-left:32px;}
+    .timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--primary),var(--secondary));}
+    .timeline-item{position:relative;margin-bottom:36px;}
+    .timeline-item::before{content:'';position:absolute;left:-38px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--secondary);border:3px solid #fff;box-shadow:0 0 0 3px var(--secondary);}
+    .timeline-year{font-family:var(--font-heading);font-size:.8rem;font-weight:700;color:var(--secondary);letter-spacing:.08em;margin-bottom:4px;}
+    .timeline-title{font-size:.95rem;font-weight:600;color:var(--gray-800);margin-bottom:4px;}
+    .timeline-desc{font-size:.82rem;color:var(--gray-500);line-height:1.7;}
+    .accred-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+    @media(max-width:760px){.accred-grid{grid-template-columns:repeat(2,1fr);}}
+    .accred-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:24px 20px;text-align:center;box-shadow:var(--shadow-sm);}
+    .accred-icon{font-size:2.8rem;margin-bottom:10px;}
+    .accred-card h4{font-size:.85rem;font-weight:700;color:var(--primary);margin-bottom:4px;}
+    .accred-card p{font-size:.75rem;color:var(--gray-500);}
+    </style>
+  `}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>เกี่ยวกับเรา</span></div>
+    <h1 data-i18n="pg_about_title">เกี่ยวกับ MediThai</h1>
+    <p data-i18n="pg_about_sub">25 ปีแห่งความไว้วางใจ มาตรฐานระดับนานาชาติ</p>
+  </div>
+</section>
+
+<!-- Intro -->
+<section class="section-pad">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
+      <div class="reveal-left">
+        <div class="tag"><Icon name="fa6-solid:circle-info" /> เกี่ยวกับเรา</div>
+        <h2 class="section-heading">ดูแลทุกชีวิต ด้วยความเชี่ยวชาญระดับโลกมากว่า 25 ปี</h2>
+        <p style="color:var(--gray-600);line-height:1.9;margin-bottom:20px">เครือโรงพยาบาล MediThai ก่อตั้งในปี พ.ศ. 2544 โดยกลุ่มแพทย์และนักธุรกิจที่มีวิสัยทัศน์ในการยกระดับมาตรฐานการแพทย์ไทยสู่ระดับโลก</p>
+        <p style="color:var(--gray-600);line-height:1.9;margin-bottom:24px">ปัจจุบันเรามี 6 โรงพยาบาลเฉพาะทางทั่วประเทศ ทีมแพทย์กว่า 200 ท่าน และให้การดูแลผู้ป่วยมากกว่า 50,000 รายต่อปี โดยได้รับการรับรองมาตรฐาน JCI และ HA</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius);text-align:center">
+            <div style="font-family:var(--font-heading);font-size:2rem;font-weight:700;color:var(--primary)" data-target="25">0</div>
+            <div style="font-size:.8rem;color:var(--gray-500)">ปีแห่งประสบการณ์</div>
+          </div>
+          <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius);text-align:center">
+            <div style="font-family:var(--font-heading);font-size:2rem;font-weight:700;color:var(--primary)" data-target="200" data-suffix="+">0</div>
+            <div style="font-size:.8rem;color:var(--gray-500)">แพทย์เชี่ยวชาญ</div>
+          </div>
+          <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius);text-align:center">
+            <div style="font-family:var(--font-heading);font-size:2rem;font-weight:700;color:var(--primary)" data-target="6">0</div>
+            <div style="font-size:.8rem;color:var(--gray-500)">โรงพยาบาลในเครือ</div>
+          </div>
+          <div style="background:var(--gray-50);padding:16px;border-radius:var(--radius);text-align:center">
+            <div style="font-family:var(--font-heading);font-size:2rem;font-weight:700;color:var(--primary)" data-target="50000">0</div>
+            <div style="font-size:.8rem;color:var(--gray-500)">ผู้ป่วยต่อปี</div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal-right" style="background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:var(--radius-xl);padding:40px;color:#fff">
+        <h3 style="font-size:1.1rem;margin-bottom:24px;font-weight:600">วิสัยทัศน์ พันธกิจ และค่านิยม</h3>
+        <div style="margin-bottom:20px">
+          <div style="font-size:.75rem;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">วิสัยทัศน์</div>
+          <p style="color:rgba(255,255,255,.9);font-size:.9rem;line-height:1.7">"เป็นเครือโรงพยาบาลชั้นนำระดับเอเชีย ที่ผู้คนทุกคนสามารถเข้าถึงการรักษาที่ดีที่สุดได้"</p>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:.75rem;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">พันธกิจ</div>
+          <p style="color:rgba(255,255,255,.9);font-size:.9rem;line-height:1.7">ให้บริการทางการแพทย์ที่ได้มาตรฐานสูงสุด ด้วยเทคโนโลยีที่ทันสมัย ทีมแพทย์ผู้เชี่ยวชาญ และความใส่ใจผู้ป่วยอย่างแท้จริง</p>
+        </div>
+        <div>
+          <div style="font-size:.75rem;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">ค่านิยม</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:8px;align-items:center;font-size:.85rem;color:rgba(255,255,255,.85)"><Icon name="fa6-solid:check" style="color:var(--accent)" /> Excellence — ความเป็นเลิศทางการแพทย์</div>
+            <div style="display:flex;gap:8px;align-items:center;font-size:.85rem;color:rgba(255,255,255,.85)"><Icon name="fa6-solid:check" style="color:var(--accent)" /> Care — ดูแลด้วยหัวใจ</div>
+            <div style="display:flex;gap:8px;align-items:center;font-size:.85rem;color:rgba(255,255,255,.85)"><Icon name="fa6-solid:check" style="color:var(--accent)" /> Innovation — นวัตกรรมต่อเนื่อง</div>
+            <div style="display:flex;gap:8px;align-items:center;font-size:.85rem;color:rgba(255,255,255,.85)"><Icon name="fa6-solid:check" style="color:var(--accent)" /> Integrity — ซื่อสัตย์โปร่งใส</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mission -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:48px">
+      <div class="tag"><Icon name="fa6-solid:bullseye" /> พันธกิจของเรา</div>
+      <h2 class="section-heading">ดูแลคุณในทุกมิติของสุขภาพ</h2>
+    </div>
+    <div class="mission-grid">
+      <div class="mission-card reveal">
+        <div class="mission-icon"><Icon name="fa6-solid:magnifying-glass-plus" /></div>
+        <h3>วินิจฉัยแม่นยำ</h3>
+        <p>เทคโนโลยีการวินิจฉัยระดับโลก AI-assisted imaging, Genomics และการวิเคราะห์ที่แม่นยำ ให้คุณได้รับการรักษาที่ถูกต้องตั้งแต่ต้น</p>
+      </div>
+      <div class="mission-card reveal reveal-delay-1">
+        <div class="mission-icon"><Icon name="fa6-solid:hand-holding-heart" /></div>
+        <h3>รักษาด้วยความเอาใจใส่</h3>
+        <p>ทีมแพทย์และพยาบาลที่พร้อมดูแลคุณอย่างใกล้ชิด ด้วยความเมตตาและความเชี่ยวชาญที่ได้รับการยอมรับในระดับสากล</p>
+      </div>
+      <div class="mission-card reveal reveal-delay-2">
+        <div class="mission-icon"><Icon name="fa6-solid:rocket" /></div>
+        <h3>นวัตกรรมต่อเนื่อง</h3>
+        <p>ลงทุนในการวิจัยและพัฒนาเทคโนโลยีการแพทย์อย่างต่อเนื่อง เพื่อให้ผู้ป่วยได้รับการรักษาที่ดีที่สุดในทุกยุค</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- History Timeline + Accreditations -->
+<section class="section-pad">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start">
+      <div>
+        <div class="tag reveal"><Icon name="fa6-solid:clock-rotate-left" /> ประวัติความเป็นมา</div>
+        <h2 class="section-heading reveal">25 ปีแห่งการเติบโต</h2>
+        <div class="timeline reveal" style="margin-top:32px">
+          <div class="timeline-item">
+            <div class="timeline-year">2544 / 2001</div>
+            <div class="timeline-title">ก่อตั้งโรงพยาบาล MediThai กรุงเทพ</div>
+            <div class="timeline-desc">เปิดให้บริการในฐานะโรงพยาบาลเอกชนขนาด 200 เตียง ย่านเพชรบุรีตัดใหม่</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2550 / 2007</div>
+            <div class="timeline-title">ขยายเป็น "เครือโรงพยาบาล"</div>
+            <div class="timeline-desc">เปิด MediThai หัวใจ — โรงพยาบาลเฉพาะทางด้านโรคหัวใจแห่งแรก</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2556 / 2013</div>
+            <div class="timeline-title">ได้รับการรับรอง JCI ครั้งแรก</div>
+            <div class="timeline-desc">โรงพยาบาลเอกชนไทยลำดับที่ 3 ที่ผ่าน Joint Commission International</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2560 / 2017</div>
+            <div class="timeline-title">เปิด MediThai มะเร็ง + สมองฯ</div>
+            <div class="timeline-desc">นำหุ่นยนต์ da Vinci มาใช้เป็นรายแรกในภูมิภาค</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2565 / 2022</div>
+            <div class="timeline-title">ติด Newsweek World's Best Hospitals</div>
+            <div class="timeline-desc">ได้รับการจัดอันดับเป็น 1 ใน 10 โรงพยาบาลดีที่สุดในเอเชีย</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2569 / 2026</div>
+            <div class="timeline-title">เปิด MediThai เชียงใหม่</div>
+            <div class="timeline-desc">ขยายสู่ภาคเหนือ รองรับผู้ป่วยนานาชาติและ Medical Tourism</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="tag reveal"><Icon name="fa6-solid:award" /> รางวัลและการรับรอง</div>
+        <h2 class="section-heading reveal">มาตรฐานที่ได้รับการรับรอง</h2>
+        <div class="accred-grid reveal" style="margin-top:32px">
+          <div class="accred-card"><div class="accred-icon">🏆</div><h4>Newsweek</h4><p>World's Best Hospital<br>2024 · 2025 · 2026</p></div>
+          <div class="accred-card"><div class="accred-icon">🌐</div><h4>JCI</h4><p>Joint Commission International<br>Accredited Hospital</p></div>
+          <div class="accred-card"><div class="accred-icon">🇹🇭</div><h4>HA Thailand</h4><p>Hospital Accreditation<br>ทุก 6 สาขา</p></div>
+          <div class="accred-card"><div class="accred-icon">📋</div><h4>ISO 9001:2015</h4><p>Quality Management<br>System Certified</p></div>
+          <div class="accred-card"><div class="accred-icon">🔬</div><h4>CAP</h4><p>College of American Pathologists<br>Lab Accreditation</p></div>
+          <div class="accred-card"><div class="accred-icon">💊</div><h4>FDA Thailand</h4><p>ได้รับการรับรองจาก<br>อย. ประเทศไทย</p></div>
+          <div class="accred-card"><div class="accred-icon">🌿</div><h4>Green Hospital</h4><p>มาตรฐานโรงพยาบาล<br>สีเขียว ระดับ Gold</p></div>
+          <div class="accred-card"><div class="accred-icon">♿</div><h4>Barrier-Free</h4><p>มาตรฐานความสะดวกสำหรับ<br>ผู้พิการ ระดับ A</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Leadership -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:48px">
+      <div class="tag"><Icon name="fa6-solid:people-group" /> ทีมผู้บริหาร</div>
+      <h2 class="section-heading">ผู้นำเครือโรงพยาบาล MediThai</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card reveal">
+        <div class="team-photo"><div style="width:100%;height:100%;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);display:flex;align-items:center;justify-content:center;font-size:3rem"><Icon name="fa6-solid:user-tie" style="color:#2554A0" /></div></div>
+        <h4>ศ.นพ. วิชัย มหาสิริพงศ์</h4>
+        <p>ประธานกรรมการบริหาร (CEO)</p>
+      </div>
+      <div class="team-card reveal reveal-delay-1">
+        <div class="team-photo"><div style="width:100%;height:100%;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);display:flex;align-items:center;justify-content:center;font-size:3rem"><Icon name="fa6-solid:user-tie" style="color:#16A34A" /></div></div>
+        <h4>รศ.พญ. สุนิสา ธาราทิพย์</h4>
+        <p>ผู้อำนวยการแพทย์ (CMO)</p>
+      </div>
+      <div class="team-card reveal reveal-delay-2">
+        <div class="team-photo"><div style="width:100%;height:100%;background:linear-gradient(135deg,#FFF7ED,#FFEDD5);display:flex;align-items:center;justify-content:center;font-size:3rem"><Icon name="fa6-solid:user-tie" style="color:#D97706" /></div></div>
+        <h4>นาย ธนกฤต วิวัฒน์กุล</h4>
+        <p>ผู้อำนวยการฝ่ายปฏิบัติการ (COO)</p>
+      </div>
+      <div class="team-card reveal reveal-delay-3">
+        <div class="team-photo"><div style="width:100%;height:100%;background:linear-gradient(135deg,#FDF4FF,#F5D0FE);display:flex;align-items:center;justify-content:center;font-size:3rem"><Icon name="fa6-solid:user-tie" style="color:#9333EA" /></div></div>
+        <h4>นางสาว ปภาวรินทร์ เลิศมงคล</h4>
+        <p>ผู้อำนวยการฝ่ายการเงิน (CFO)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</Layout>

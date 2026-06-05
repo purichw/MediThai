@@ -1,0 +1,184 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="ค้นหาแพทย์ | MediThai Hospital Network" description="ทีมแพทย์เชี่ยวชาญกว่า 200 ท่าน พร้อมดูแลคุณ"
+  extraHead={`
+    <style>
+    .doctors-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+    @media(max-width:1100px){ .doctors-grid{grid-template-columns:repeat(3,1fr);} }
+    @media(max-width:768px) { .doctors-grid{grid-template-columns:repeat(2,1fr);} }
+    @media(max-width:480px) { .doctors-grid{grid-template-columns:1fr;} }
+    .no-results{ text-align:center; padding:80px 20px; color:var(--gray-400); }
+    </style>
+  `}
+  extraScripts={`<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>`}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span data-i18n="nav_doctors">แพทย์</span></div>
+    <h1 data-i18n="pg_doctors_title">ค้นหาแพทย์</h1>
+    <p data-i18n="pg_doctors_sub">ทีมแพทย์เชี่ยวชาญกว่า 200 ท่าน พร้อมดูแลคุณ</p>
+  </div>
+</section>
+
+<section class="section-pad-sm" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="filter-bar">
+      <div class="search-input-wrap">
+        <Icon name="fa6-solid:magnifying-glass" />
+        <input type="text" id="doctor-search" class="search-input" data-i18n-ph="search_ph" placeholder="ค้นหาแพทย์ ความเชี่ยวชาญ..." />
+      </div>
+      <select id="doc-spec-filter" class="filter-select">
+        <option value="">ทุกสาขา</option>
+        <option value="heart">ศูนย์หัวใจ</option>
+        <option value="cancer">ศูนย์มะเร็ง</option>
+        <option value="neuro">ศูนย์สมองและระบบประสาท</option>
+        <option value="ortho">ศูนย์กระดูกและข้อ</option>
+        <option value="peds">ศูนย์เด็ก</option>
+        <option value="obgyn">ศูนย์สตรี</option>
+        <option value="eye">ศูนย์ตา</option>
+        <option value="internal">อายุรกรรม</option>
+      </select>
+      <select id="doc-hosp-filter" class="filter-select">
+        <option value="">ทุกสาขา</option>
+        <option value="bkk">MediThai กรุงเทพ</option>
+        <option value="heart">MediThai หัวใจ</option>
+        <option value="cancer">MediThai มะเร็ง</option>
+        <option value="spine">MediThai สมองและกระดูก</option>
+        <option value="kids">MediThai เด็ก</option>
+        <option value="chiang">MediThai เชียงใหม่</option>
+      </select>
+      <select class="filter-select">
+        <option value="">ภาษาที่พูด</option>
+        <option value="th">ภาษาไทย</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+      </select>
+    </div>
+
+    <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:24px">
+      แสดง <strong style="color:var(--primary)">12</strong> แพทย์จากทั้งหมด 200+ ท่าน
+    </p>
+
+    <div class="doctors-grid" id="doctors-grid">
+      <div class="doctor-card reveal" data-specialty="heart" data-hospital="heart">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#FFF1F2,#FFE4E6)"><Icon name="fa6-solid:user-doctor" style="color:#EF4444" /></div><div class="doctor-specialty-badge" style="background:#EF4444">ศูนย์หัวใจ</div></div>
+        <div class="doctor-name">นพ. ชาติทนง ยอดวุฒิ</div>
+        <div class="doctor-title">อายุรแพทย์โรคหัวใจและหลอดเลือด</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai หัวใจ</div>
+        <div class="doctor-tags"><span class="doctor-tag">MitraClip</span><span class="doctor-tag">Electrophysiology</span><span class="doctor-tag">HF</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-1" data-specialty="cancer" data-hospital="cancer">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#F3E8FF,#EDE9FE)"><Icon name="fa6-solid:user-doctor" style="color:#8B5CF6" /></div><div class="doctor-specialty-badge" style="background:#8B5CF6">ศูนย์มะเร็ง</div></div>
+        <div class="doctor-name">พญ. ศรัณยา งามรัศมีวงศ์</div>
+        <div class="doctor-title">รังสีแพทย์วินิจฉัย (Breast Imaging)</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai มะเร็ง</div>
+        <div class="doctor-tags"><span class="doctor-tag">AI Mammography</span><span class="doctor-tag">Breast MRI</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-2" data-specialty="neuro" data-hospital="spine">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5)"><Icon name="fa6-solid:user-doctor" style="color:#10B981" /></div><div class="doctor-specialty-badge" style="background:#10B981">ระบบประสาท</div></div>
+        <div class="doctor-name">พญ. ศรินพร มานิตย์ศิริกุล</div>
+        <div class="doctor-title">อายุรแพทย์ระบบประสาท</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai สมองและกระดูก</div>
+        <div class="doctor-tags"><span class="doctor-tag">Neurology</span><span class="doctor-tag">Meningitis</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-3" data-specialty="cancer" data-hospital="cancer">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5)"><Icon name="fa6-solid:user-doctor" style="color:#F59E0B" /></div><div class="doctor-specialty-badge" style="background:#F59E0B">ศูนย์มะเร็ง</div></div>
+        <div class="doctor-name">นพ. ผดุงเกียรติ ตั้งพิรุฬห์ธรรม</div>
+        <div class="doctor-title">ศัลยแพทย์ทรวงอก (มะเร็งปอด)</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai มะเร็ง</div>
+        <div class="doctor-tags"><span class="doctor-tag">da Vinci Robot</span><span class="doctor-tag">Lung Cancer</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal" data-specialty="ortho" data-hospital="spine">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE)"><Icon name="fa6-solid:user-doctor" style="color:#2554A0" /></div><div class="doctor-specialty-badge" style="background:#2554A0">กระดูกและข้อ</div></div>
+        <div class="doctor-name">นพ. ศริษฏ์ หงษ์วิไล</div>
+        <div class="doctor-title">ศัลยแพทย์กระดูกและข้อ</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai สมองและกระดูก</div>
+        <div class="doctor-tags"><span class="doctor-tag">Robotic UKA</span><span class="doctor-tag">Joint Replacement</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-1" data-specialty="heart" data-hospital="heart">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#FFF1F2,#FFE4E6)"><Icon name="fa6-solid:user-doctor" style="color:#EF4444" /></div><div class="doctor-specialty-badge" style="background:#EF4444">ศูนย์หัวใจ</div></div>
+        <div class="doctor-name">นพ. ณัฐพล อารยวุฒิกุล</div>
+        <div class="doctor-title">ศัลยแพทย์หัวใจและทรวงอก</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai หัวใจ</div>
+        <div class="doctor-tags"><span class="doctor-tag">MICS</span><span class="doctor-tag">Open Heart Surgery</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-2" data-specialty="internal" data-hospital="bkk">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7)"><Icon name="fa6-solid:user-doctor" style="color:#16A34A" /></div><div class="doctor-specialty-badge" style="background:#16A34A">อายุรกรรม</div></div>
+        <div class="doctor-name">นพ. ชยพล ชีถนอม</div>
+        <div class="doctor-title">อายุรแพทย์ทั่วไป โรคเบาหวาน</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai กรุงเทพ</div>
+        <div class="doctor-tags"><span class="doctor-tag">Internal Medicine</span><span class="doctor-tag">CKM Syndrome</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-3" data-specialty="peds" data-hospital="kids">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#FFF0F9,#FCE7F3)"><Icon name="fa6-solid:user-doctor" style="color:#DB2777" /></div><div class="doctor-specialty-badge" style="background:#DB2777">ศูนย์เด็ก</div></div>
+        <div class="doctor-name">พญ. อรุณรัตน์ พิพัฒน์กุล</div>
+        <div class="doctor-title">กุมารแพทย์ด้านพัฒนาการเด็ก</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai เด็ก</div>
+        <div class="doctor-tags"><span class="doctor-tag">Pediatrics</span><span class="doctor-tag">Child Development</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal" data-specialty="obgyn" data-hospital="bkk">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#FDF4FF,#F5D0FE)"><Icon name="fa6-solid:user-doctor" style="color:#9333EA" /></div><div class="doctor-specialty-badge" style="background:#9333EA">สูติ-นรีเวช</div></div>
+        <div class="doctor-name">พญ. ขวัญสกุล บุญศรารักษพงศ์</div>
+        <div class="doctor-title">สูติ-นรีแพทย์ มะเร็งนรีเวช</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai กรุงเทพ</div>
+        <div class="doctor-tags"><span class="doctor-tag">OB/GYN</span><span class="doctor-tag">Breast MRI</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-1" data-specialty="eye" data-hospital="bkk">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7)"><Icon name="fa6-solid:user-doctor" style="color:#D97706" /></div><div class="doctor-specialty-badge" style="background:#D97706">ศูนย์ตา</div></div>
+        <div class="doctor-name">นพ. จิรวัฒน์ เชี่ยวเฉลิมศรี</div>
+        <div class="doctor-title">จักษุแพทย์ LASIK &amp; ต้อกระจก</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai กรุงเทพ</div>
+        <div class="doctor-tags"><span class="doctor-tag">LASIK</span><span class="doctor-tag">Cataract</span><span class="doctor-tag">Retina</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-2" data-specialty="neuro" data-hospital="spine">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#F0F9FF,#E0F2FE)"><Icon name="fa6-solid:user-doctor" style="color:#0284C7" /></div><div class="doctor-specialty-badge" style="background:#0284C7">ศัลยกรรมประสาท</div></div>
+        <div class="doctor-name">นพ. วีระ สันติกุลกาญจน์</div>
+        <div class="doctor-title">ศัลยแพทย์ระบบประสาทและสมอง</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai สมองและกระดูก</div>
+        <div class="doctor-tags"><span class="doctor-tag">Brain Surgery</span><span class="doctor-tag">Spine</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+      <div class="doctor-card reveal reveal-delay-3" data-specialty="internal" data-hospital="chiang">
+        <div class="doctor-photo"><div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5)"><Icon name="fa6-solid:user-doctor" style="color:#059669" /></div><div class="doctor-specialty-badge" style="background:#059669">อายุรกรรม</div></div>
+        <div class="doctor-name">พญ. มัลลิกา ธรรมสถิตย์</div>
+        <div class="doctor-title">อายุรแพทย์โรคระบบทางเดินหายใจ</div>
+        <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai เชียงใหม่</div>
+        <div class="doctor-tags"><span class="doctor-tag">Pulmonology</span><span class="doctor-tag">Allergy</span></div>
+        <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center;margin-bottom:8px" data-i18n="doc_appt">นัดหมาย</a>
+      </div>
+    </div>
+
+    <div class="text-center" style="margin-top:48px">
+      <button class="btn btn-outline btn-lg">
+        <Icon name="fa6-solid:rotate" /> โหลดเพิ่มเติม (188 ท่าน)
+      </button>
+    </div>
+  </div>
+</section>
+
+<section style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:72px 0;text-align:center">
+  <div class="container">
+    <h2 style="color:#fff;font-size:clamp(1.5rem,3vw,2rem);margin-bottom:12px">ไม่แน่ใจว่าควรพบแพทย์สาขาไหน?</h2>
+    <p style="color:rgba(255,255,255,.75);margin-bottom:32px">ปรึกษาทีมงานของเราได้เลย เราพร้อมช่วยแนะนำ</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="tel:1722" class="btn btn-white btn-lg"><Icon name="fa6-solid:phone" /> โทร 1722</a>
+      <a href="/appointments" class="btn btn-primary btn-lg"><Icon name="fa6-solid:calendar-check" /> นัดหมายออนไลน์</a>
+    </div>
+  </div>
+</section>
+
+</Layout>

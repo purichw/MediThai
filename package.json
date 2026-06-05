@@ -1,0 +1,16 @@
+{
+  "name": "medithai-network",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^4.16.0",
+    "astro-icon": "^1.1.5",
+    "@iconify-json/fa6-solid": "^1.2.4",
+    "@iconify-json/fa6-brands": "^1.2.4",
+    "@iconify-json/fa6-regular": "^1.2.4"
+  }
+}

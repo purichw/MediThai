@@ -1,0 +1,63 @@
+---
+import Layout from '../../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout
+  title="MediThai มะเร็ง | เครือโรงพยาบาล MediThai"
+  description="ศูนย์รักษาโรคมะเร็งครบวงจร ด้วยหุ่นยนต์ da Vinci, PET/CT Scan, AI Mammography"
+  extraScripts={`
+    <script src="/js/hospital-page.js"></script>
+    <script>initHospitalPage({id:'cancer'});</script>
+  `}
+>
+
+<section class="hosp-hero" style="background:linear-gradient(135deg,#8B5CF6 0%,#7C3AED 100%)">
+  <div class="container">
+    <div class="breadcrumb" style="margin-bottom:20px"><a href="/" style="color:rgba(255,255,255,.6)">หน้าแรก</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><a href="/locations" style="color:rgba(255,255,255,.6)">โรงพยาบาล</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><span style="color:#fff">MediThai มะเร็ง</span></div>
+    <div class="hosp-hero-inner">
+      <div>
+        <div class="hosp-badge"><Icon name="fa6-solid:ribbon" /> โรงพยาบาลเฉพาะทางโรคมะเร็ง</div>
+        <h1 class="hosp-title">MediThai มะเร็ง</h1>
+        <p class="hosp-desc">ศูนย์รักษาโรคมะเร็งครบวงจร ด้วยหุ่นยนต์ da Vinci, PET/CT Scan, AI Mammography และทีมแพทย์เฉพาะทาง 40+ ท่าน</p>
+        <div class="hosp-accred-row"><span class="hosp-accred-chip"><Icon name="fa6-solid:certificate" /> JCI</span><span class="hosp-accred-chip"><Icon name="fa6-solid:award" /> HA Thailand</span></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px">
+          <a href="/appointments" class="btn btn-primary btn-lg"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+          <a href="tel:023103200" class="btn btn-secondary btn-lg"><Icon name="fa6-solid:phone" /> 02-310-3200</a>
+        </div>
+      </div>
+      <div class="hosp-quick-stats">
+        <div class="hosp-qstat"><div class="num">45+</div><div class="lbl">แพทย์</div></div>
+        <div class="hosp-qstat"><div class="num" style="color:#FDE68A">4.8 ⭐</div><div class="lbl">Rating</div></div>
+      </div>
+    </div>
+    <div style="margin-top:24px"><div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-bottom:8px"><Icon name="fa6-solid:train-subway" style="margin-right:4px" />การเดินทาง</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span style="background:rgba(255,255,255,.15);color:#fff;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:8px"><Icon name="fa6-solid:route" style="margin-right:4px" />BTS สุทธิสาร 400ม.</span>
+      <span style="background:rgba(255,255,255,.15);color:#fff;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:8px"><Icon name="fa6-solid:route" style="margin-right:4px" />MRT พระราม 9 800ม.</span>
+    </div></div>
+  </div>
+</section>
+
+<section style="background:var(--gray-50);padding:56px 0">
+  <div class="container">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px">
+      <div><div class="tag"><Icon name="fa6-solid:tag" /> แพ็กเกจ</div><h2 class="section-heading" style="margin-bottom:0">แพ็กเกจจาก MediThai มะเร็ง</h2></div>
+      <a href="/packages" class="view-all-link">ดูทั้งหมด <Icon name="fa6-solid:arrow-right" /></a>
+    </div>
+    <div class="pkg-grid">
+      <div class="pkg-card" data-cat="cancer"><div class="pkg-thumb" style="background:linear-gradient(135deg,#8B5CF6,#7C3AED)"><Icon name="fa6-solid:ribbon" /><div class="pkg-discount-badge">-60%</div><div class="pkg-trust-chips"><span class="trust-chip bestseller">ขายดี</span></div></div><div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#8B5CF6"></div>MediThai มะเร็ง</div><div class="pkg-card-body"><div class="pkg-card-title">PET/CT Scan ตรวจคัดกรองมะเร็ง</div><ul class="pkg-includes"><li><Icon name="fa6-solid:check" />PET/CT Scan ทั้งร่างกาย</li><li><Icon name="fa6-solid:check" />Tumor Marker Panel 20 รายการ</li><li><Icon name="fa6-solid:check" />ตรวจมะเร็ง 15 ชนิด</li></ul><div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿72,400</span><span class="pkg-price-was">฿181,695</span></div><div class="pkg-cta-row"><a href="/packages" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--gray-50);padding:32px 0">
+  <div class="container">
+    <div class="contact-info-item"><div class="contact-icon" style="background:rgba(8,145,178,.1);color:#8B5CF6"><Icon name="fa6-solid:phone" /></div><div><h4>ติดต่อ MediThai มะเร็ง</h4><p>02-310-3200</p></div></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <a href="/appointments" class="btn btn-primary"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+      <a href="/hospitals/medithai-bangkok" class="btn btn-outline"><Icon name="fa6-solid:building-columns" /> MediThai กรุงเทพ (HQ)</a>
+    </div>
+  </div>
+</section>
+
+</Layout>

@@ -1,0 +1,200 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout
+  title="MediCare Concierge — บริการดูแลผ่าตัดครบวงจร | MediThai"
+  description="บริการ Concierge สำหรับเคสผ่าตัดและการรักษาซับซ้อน"
+  extraHead={`
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
+  `}
+  extraScripts={`<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>`}
+>
+
+<!-- HERO -->
+<section class="concierge-hero">
+  <div class="container" style="position:relative;z-index:1">
+    <div class="breadcrumb" style="margin-bottom:20px"><a href="/" style="color:rgba(255,255,255,.6)">หน้าแรก</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><span style="color:#fff">MediCare Concierge</span></div>
+    <div style="max-width:680px">
+      <div class="tag" style="background:rgba(255,255,255,.15);color:#fff;margin-bottom:16px"><Icon name="fa6-solid:user-nurse" /> บริการดูแลผ่าตัดครบวงจร — เหมือน HDcare แต่เป็น MediThai</div>
+      <h1 style="font-size:clamp(1.8rem,4vw,3rem);font-weight:700;color:#fff;margin-bottom:16px;line-height:1.2">MediCare Concierge<br><span style="color:var(--secondary-light)">ดูแลคุณทุกขั้นตอน ตั้งแต่ปรึกษาจนฟื้นตัว</span></h1>
+      <p style="font-size:1rem;color:rgba(255,255,255,.82);line-height:1.8;margin-bottom:32px">บริการ Concierge สำหรับเคสผ่าตัดและการรักษาซับซ้อน มีทีม Nurse Coordinator ส่วนตัวดูแลคุณตลอด 24 ชม. ได้คิวเร็ว ราคาโปร ผ่อน 0% นาน 10 เดือน และเบิกประกันได้</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <a href="tel:17221" class="btn btn-primary btn-lg"><Icon name="fa6-solid:phone" /> โทร 1722 กด 1 (Concierge)</a>
+        <a href="https://line.me" class="btn btn-secondary btn-lg"><Icon name="fa6-brands:line" /> LINE @MediThai</a>
+      </div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:36px;padding-top:28px;border-top:1px solid rgba(255,255,255,.15)">
+        <div style="color:rgba(255,255,255,.9);font-size:.85rem;display:flex;align-items:center;gap:6px"><Icon name="fa6-solid:circle-check" style="color:var(--accent)" />ฟรี ไม่มีค่าปรึกษา</div>
+        <div style="color:rgba(255,255,255,.9);font-size:.85rem;display:flex;align-items:center;gap:6px"><Icon name="fa6-solid:circle-check" style="color:var(--accent)" />ผ่อน 0% นาน 10 เดือน</div>
+        <div style="color:rgba(255,255,255,.9);font-size:.85rem;display:flex;align-items:center;gap:6px"><Icon name="fa6-solid:circle-check" style="color:var(--accent)" />เบิกประกันได้ 30+ บริษัท</div>
+        <div style="color:rgba(255,255,255,.9);font-size:.85rem;display:flex;align-items:center;gap:6px"><Icon name="fa6-solid:circle-check" style="color:var(--accent)" />ได้คิวภายใน 48 ชม.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section-pad" style="background:#fff">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:16px">
+      <div class="tag"><Icon name="fa6-solid:list-ol" /> ขั้นตอน</div>
+      <h2 class="section-heading">ทำงานอย่างไร?</h2>
+      <p class="section-sub" style="margin:0 auto">5 ขั้นตอนง่าย ๆ ที่เราดูแลคุณทุกอย่าง</p>
+    </div>
+    <div class="concierge-steps reveal">
+      <div class="concierge-step">
+        <div class="step-circle"><Icon name="fa6-solid:comments" /></div>
+        <h4>1. ปรึกษาฟรี</h4>
+        <p>แชทหรือโทรหาทีม Concierge ของเรา เล่าอาการ อธิบายความต้องการ ไม่มีค่าใช้จ่าย</p>
+      </div>
+      <div class="concierge-step">
+        <div class="step-circle alt"><Icon name="fa6-solid:user-doctor" /></div>
+        <h4>2. จับคู่แพทย์</h4>
+        <p>ทีม Concierge ค้นหาแพทย์เฉพาะทางที่เหมาะสมที่สุดกับเคสของคุณ</p>
+      </div>
+      <div class="concierge-step">
+        <div class="step-circle"><Icon name="fa6-solid:calendar-check" /></div>
+        <h4>3. จองคิว</h4>
+        <p>ช่วยประสานงานจองคิวให้ทันที ได้คิวภายใน 48 ชม. ไม่ต้องรอนาน</p>
+      </div>
+      <div class="concierge-step">
+        <div class="step-circle alt"><Icon name="fa6-solid:user-nurse" /></div>
+        <h4>4. Nurse Coordinator</h4>
+        <p>มีพยาบาลประจำตัวคอยดูแลก่อน-ระหว่าง-หลังผ่าตัด ติดต่อได้ตลอด 24 ชม.</p>
+      </div>
+      <div class="concierge-step">
+        <div class="step-circle"><Icon name="fa6-solid:heart-circle-check" /></div>
+        <h4>5. ติดตามจนฟื้นตัว</h4>
+        <p>ทีม Concierge ติดตามอาการหลังกลับบ้าน จนกว่าคุณจะฟื้นตัวสมบูรณ์</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:40px">
+      <div class="tag"><Icon name="fa6-solid:gem" /> สิทธิพิเศษ</div>
+      <h2 class="section-heading">ทำไมต้องเลือก MediCare Concierge</h2>
+    </div>
+    <div class="benefit-cards">
+      <div class="benefit-card reveal">
+        <div class="benefit-icon" style="background:rgba(27,58,107,.1);color:var(--primary)"><Icon name="fa6-solid:phone-volume" /></div>
+        <h4>ปรึกษาฟรี ตลอด 24 ชม.</h4>
+        <p>ทีม Concierge พร้อมรับสายและตอบคำถามทุกวัน ไม่มีวันหยุด ไม่มีค่าใช้จ่าย</p>
+      </div>
+      <div class="benefit-card reveal reveal-delay-1">
+        <div class="benefit-icon" style="background:rgba(8,145,178,.1);color:var(--secondary)"><Icon name="fa6-solid:bolt" /></div>
+        <h4>ได้คิวเร็วกว่าปกติ</h4>
+        <p>ช่องทาง Concierge มีคิวพิเศษ ได้รับการจัดสรรภายใน 48 ชม. เร็วกว่าจองเอง</p>
+      </div>
+      <div class="benefit-card reveal reveal-delay-2">
+        <div class="benefit-icon" style="background:rgba(16,185,129,.1);color:var(--success)"><Icon name="fa6-solid:tag" /></div>
+        <h4>ราคาพิเศษ ประหยัดกว่า</h4>
+        <p>แพ็กเกจผ่าตัดผ่าน Concierge ได้ราคาพิเศษและส่วนลดที่ไม่มีในช่องทางปกติ</p>
+      </div>
+      <div class="benefit-card reveal">
+        <div class="benefit-icon" style="background:rgba(139,92,246,.1);color:#8B5CF6"><Icon name="fa6-solid:credit-card" /></div>
+        <h4>ผ่อน 0% นาน 10 เดือน</h4>
+        <p>แบ่งชำระค่ารักษาได้สูงสุด 10 เดือน โดยไม่มีดอกเบี้ย รองรับทุกบัตรเครดิต</p>
+      </div>
+      <div class="benefit-card reveal reveal-delay-1">
+        <div class="benefit-icon" style="background:rgba(245,158,11,.1);color:var(--accent)"><Icon name="fa6-solid:shield-halved" /></div>
+        <h4>เบิกประกันได้ ไม่ต้องสำรองจ่าย</h4>
+        <p>ประสานงานกับบริษัทประกัน 30+ แห่ง เบิกตรง ไม่ต้องจ่ายเงินสดล่วงหน้า</p>
+      </div>
+      <div class="benefit-card reveal reveal-delay-2">
+        <div class="benefit-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><Icon name="fa6-solid:user-nurse" /></div>
+        <h4>Nurse Coordinator ส่วนตัว</h4>
+        <p>มีพยาบาลประจำตัว 1 คนต่อ 1 เคส ดูแลทุกขั้นตอน ตอบคำถามแทนคุณกับแพทย์ได้</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SURGERY CATEGORIES -->
+<section class="section-pad" style="background:#fff">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:40px">
+      <div class="tag"><Icon name="fa6-solid:scissors" /> หัตถการที่รองรับ</div>
+      <h2 class="section-heading">ผ่าตัดและหัตถการยอดนิยม</h2>
+      <p class="section-sub" style="margin:0 auto">ปรึกษาเคสผ่าตัดที่ซับซ้อน ทีม Concierge ช่วยหาแพทย์ที่เหมาะสมที่สุดให้</p>
+    </div>
+    <div class="surgery-cats reveal">
+      <a href="/appointments" class="surgery-cat-card">
+        <div class="surgery-cat-icon"><Icon name="fa6-solid:heart-pulse" /></div>
+        <h4>ผ่าตัดหัวใจ</h4>
+        <p>Bypass, Valve, MitraClip, MICS</p>
+        <div class="surgery-cat-price">เริ่ม ฿54,000</div>
+      </a>
+      <a href="/appointments" class="surgery-cat-card">
+        <div class="surgery-cat-icon"><Icon name="fa6-solid:ribbon" /></div>
+        <h4>ผ่าตัดมะเร็ง</h4>
+        <p>da Vinci Robot, ปอด, ลำไส้, เต้านม</p>
+        <div class="surgery-cat-price">เริ่ม ฿80,000</div>
+      </a>
+      <a href="/appointments" class="surgery-cat-card">
+        <div class="surgery-cat-icon"><Icon name="fa6-solid:brain" /></div>
+        <h4>ผ่าตัดสมองและกระดูก</h4>
+        <p>Spine, Robotic UKA, Brain Tumor</p>
+        <div class="surgery-cat-price">เริ่ม ฿45,000</div>
+      </a>
+      <a href="/appointments" class="surgery-cat-card">
+        <div class="surgery-cat-icon"><Icon name="fa6-solid:eye" /></div>
+        <h4>ผ่าตัดตา</h4>
+        <p>LASIK, SMILE Pro, Cataract</p>
+        <div class="surgery-cat-price">เริ่ม ฿37,000</div>
+      </a>
+      <a href="/appointments" class="surgery-cat-card">
+        <div class="surgery-cat-icon"><Icon name="fa6-solid:venus" /></div>
+        <h4>ผ่าตัดสูตินรีเวช</h4>
+        <p>Laparoscopy, Myomectomy, Hysterectomy</p>
+        <div class="surgery-cat-price">เริ่ม ฿40,000</div>
+      </a>
+      <a href="/appointments" class="surgery-cat-card">
+        <div class="surgery-cat-icon"><Icon name="fa6-solid:ellipsis" /></div>
+        <h4>หัตถการอื่น ๆ</h4>
+        <p>ปรึกษาทีมสำหรับเคสพิเศษ</p>
+        <div class="surgery-cat-price" style="color:var(--secondary)">ปรึกษาได้เลย</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:40px">
+      <div class="tag"><Icon name="fa6-solid:comments" /> รีวิวจากผู้ใช้บริการ Concierge</div>
+      <h2 class="section-heading">เสียงจากผู้ที่ไว้วางใจเรา</h2>
+    </div>
+    <div class="swiper testimonials-swiper" style="padding-bottom:48px">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide"><div class="testimonial-card"><div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div><p class="testimonial-text">"ผ่าตัดหัวใจเป็นเรื่องใหญ่มาก กังวลมาก แต่พอติดต่อ Concierge ทีมช่วยทุกอย่างตั้งแต่หาหมอ จองคิว ประสานประกัน จนผ่าตัดเสร็จ ไม่ต้องยุ่งยากเลย ประทับใจมาก"</p><div class="testimonial-author"><div class="testimonial-avatar">ส</div><div><div class="testimonial-name">สมชาย ประเสริฐสุข</div><div class="testimonial-detail">ผ่าตัดหัวใจ MICS · MediThai หัวใจ</div></div></div></div></div>
+        <div class="swiper-slide"><div class="testimonial-card"><div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div><p class="testimonial-text">"พยาบาล Coordinator ตอบทุกคำถาม แม้แต่ดึกดื่นก็ยังตอบ ผ่าตัดมะเร็งด้วย da Vinci ผ่านไปด้วยดี ผ่อน 10 เดือนไม่มีดอกเบี้ย คุ้มมากจริงๆ"</p><div class="testimonial-author"><div class="testimonial-avatar">ว</div><div><div class="testimonial-name">วนิดา แสนงาม</div><div class="testimonial-detail">ผ่าตัดมะเร็งปอด · MediThai มะเร็ง</div></div></div></div></div>
+        <div class="swiper-slide"><div class="testimonial-card"><div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star-half-stroke" /></div><p class="testimonial-text">"โทรครั้งเดียว ได้คิวผ่าตัดภายใน 2 วัน เบิกประกันได้ ไม่ต้องจ่ายเงินสดเลย บริการดีมาก จะแนะนำให้ทุกคนที่ต้องผ่าตัดเลยครับ"</p><div class="testimonial-author"><div class="testimonial-avatar">ป</div><div><div class="testimonial-name">ประทีป ชัยสมบัติ</div><div class="testimonial-detail">ผ่าตัดกระดูก Robotic · MediThai สมองฯ</div></div></div></div></div>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:80px 0;text-align:center">
+  <div class="container">
+    <div style="max-width:580px;margin:0 auto">
+      <div class="tag" style="background:rgba(255,255,255,.15);color:#fff;margin-bottom:16px"><Icon name="fa6-solid:phone-volume" /> พร้อมให้บริการ 24 ชม.</div>
+      <h2 style="color:#fff;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin-bottom:14px">เริ่มต้นง่ายๆ ปรึกษาฟรีวันนี้</h2>
+      <p style="color:rgba(255,255,255,.75);margin-bottom:36px">ทีม Concierge พร้อมรับสาย ตอบแชท และช่วยวางแผนการรักษาให้คุณ ไม่มีค่าใช้จ่าย</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="tel:17221" class="btn btn-primary btn-lg"><Icon name="fa6-solid:phone" /> โทร 1722 กด 1</a>
+        <a href="https://line.me" class="btn btn-secondary btn-lg"><Icon name="fa6-brands:line" /> แชท LINE</a>
+        <a href="/appointments" class="btn btn-white btn-lg"><Icon name="fa6-solid:calendar-check" /> นัดปรึกษาออนไลน์</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</Layout>

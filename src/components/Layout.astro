@@ -1,0 +1,68 @@
+---
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  extraHead?: string;
+  extraScripts?: string;
+}
+
+const {
+  title = 'MediThai Hospital Network | เครือโรงพยาบาลเมดิไทย',
+  description = 'เครือโรงพยาบาล MediThai — ดูแลทุกชีวิต ด้วยมาตรฐานระดับโลก | MediThai Hospital Network — World-Class Care',
+  extraHead = '',
+  extraScripts = '',
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content={description}>
+  <title>{title}</title>
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/hdmall-features.css">
+
+  <Fragment set:html={extraHead} />
+</head>
+<body>
+  <!-- Page Loader -->
+  <div class="page-loader" id="page-loader">
+    <div class="loader-logo">
+      <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1B3A6B,#0891B2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <svg style="color:#fff;width:1.4rem;height:1.4rem;fill:currentColor" viewBox="0 0 640 512"><path d="M192 48c0-26.5 21.5-48 48-48h160c26.5 0 48 21.5 48 48v48h88c30.9 0 56 25.1 56 56v296c0 30.9-25.1 56-56 56H104c-30.9 0-56-25.1-56-56V152c0-30.9 25.1-56 56-56h88V48zm208 48H240v352h160V96zM112 192v24c0 13.3 10.7 24 24 24s24-10.7 24-24V192c0-13.3-10.7-24-24-24s-24 10.7-24 24zm304 0v24c0 13.3 10.7 24 24 24s24-10.7 24-24V192c0-13.3-10.7-24-24-24s-24 10.7-24 24zM112 320v24c0 13.3 10.7 24 24 24s24-10.7 24-24V320c0-13.3-10.7-24-24-24s-24 10.7-24 24zm304 0v24c0 13.3 10.7 24 24 24s24-10.7 24-24V320c0-13.3-10.7-24-24-24s-24 10.7-24 24zM272 240c0-26.5 21.5-48 48-48s48 21.5 48 48v112H272V240z"/></svg>
+      </div>
+      <div style="font-family:'Noto Sans Thai','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:1.4rem;font-weight:700;color:#fff">MediThai</div>
+      <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:4px">Hospital Network</div>
+      <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <Header />
+  <slot />
+  <Footer />
+
+  <!-- Scroll to top button -->
+  <button class="scroll-top" aria-label="Scroll to top">
+    <svg data-icon width="1em" height="1em" viewBox="0 0 512 512" fill="currentColor"><path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"/></svg>
+  </button>
+
+  <!-- Common scripts -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/lenis@1.1.9/dist/lenis.min.js"></script>
+  <script is:inline src="/js/translations.js"></script>
+  <script is:inline src="/js/main.js"></script>
+
+  <Fragment set:html={extraScripts} />
+</body>
+</html>

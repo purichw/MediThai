@@ -1,0 +1,245 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="สาขาของเรา | MediThai Hospital Network" description="6 โรงพยาบาลในเครือ ทั่วประเทศไทย"
+  extraHead={`
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+    .loc-detail-card{background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);overflow:hidden;border:1px solid var(--gray-200);margin-bottom:36px;scroll-margin-top:calc(var(--header-height) + 20px);}
+    .loc-detail-header{background:linear-gradient(135deg,var(--primary-dark),var(--primary));padding:28px 32px;display:flex;align-items:center;gap:20px;}
+    .loc-num{width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.15);color:#fff;font-family:var(--font-heading);font-size:1.4rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .loc-detail-header h2{color:#fff;font-size:1.2rem;margin-bottom:4px;}
+    .loc-detail-header p{color:rgba(255,255,255,.7);font-size:.82rem;}
+    .loc-detail-body{padding:28px 32px;}
+    .loc-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+    @media(max-width:600px){.loc-info-grid{grid-template-columns:1fr;}}
+    .loc-info-item{display:flex;gap:12px;align-items:flex-start;}
+    .loc-info-item [data-icon]{color:var(--secondary);margin-top:2px;width:16px;flex-shrink:0;}
+    .loc-info-item h4{font-size:.82rem;color:var(--gray-500);margin-bottom:2px;}
+    .loc-info-item p{font-size:.88rem;color:var(--gray-800);font-weight:500;}
+    .services-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;}
+    .services-chip{background:rgba(8,145,178,.08);color:var(--secondary);font-size:.75rem;font-weight:600;padding:4px 12px;border-radius:99px;}
+    #main-map{height:500px;border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);overflow:hidden;}
+    </style>
+  `}
+  extraScripts={`
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if(typeof L === 'undefined') return;
+      const map = L.map('main-map', { center:[13.8,100.52], zoom:10, scrollWheelZoom:false });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CartoDB',maxZoom:19}).addTo(map);
+      L.control.zoom({position:'topright'}).addTo(map);
+      const hospitals = [
+        {lat:13.7328,lng:100.5308,name:'MediThai กรุงเทพ (HQ)',color:'#1B3A6B',id:'loc-1'},
+        {lat:13.7563,lng:100.5018,name:'MediThai หัวใจ',color:'#EF4444',id:'loc-2'},
+        {lat:13.7969,lng:100.5600,name:'MediThai มะเร็ง',color:'#8B5CF6',id:'loc-3'},
+        {lat:13.7144,lng:100.4612,name:'MediThai สมองและกระดูก',color:'#0891B2',id:'loc-4'},
+        {lat:13.8200,lng:100.5200,name:'MediThai เด็ก',color:'#10B981',id:'loc-5'},
+        {lat:18.7883,lng:98.9853,name:'MediThai เชียงใหม่ ✨ใหม่',color:'#F59E0B',id:'loc-6'},
+      ];
+      hospitals.forEach(h => {
+        const icon = L.divIcon({className:'',html:'<div style="width:36px;height:36px;background:'+h.color+';border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center"></div>',iconSize:[36,48],iconAnchor:[18,46],popupAnchor:[0,-48]});
+        L.marker([h.lat,h.lng],{icon}).addTo(map)
+          .bindPopup('<div class="map-popup"><h4>'+h.name+'</h4><a href="#'+h.id+'">ดูรายละเอียด →</a></div>');
+      });
+    });
+    </script>
+  `}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span data-i18n="nav_hospitals">โรงพยาบาล</span></div>
+    <h1 data-i18n="pg_loc_title">สาขาของเรา</h1>
+    <p data-i18n="pg_loc_sub">6 โรงพยาบาลในเครือ ทั่วประเทศไทย</p>
+  </div>
+</section>
+
+<section class="section-pad-sm" style="background:var(--gray-50)">
+  <div class="container">
+    <div id="main-map" class="reveal"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;justify-content:center">
+      <a href="#loc-1" class="btn btn-outline btn-sm"><Icon name="fa6-solid:building-columns" /> กรุงเทพ (HQ)</a>
+      <a href="#loc-2" class="btn btn-outline btn-sm"><Icon name="fa6-solid:heart-pulse" style="color:#EF4444" /> หัวใจ</a>
+      <a href="#loc-3" class="btn btn-outline btn-sm"><Icon name="fa6-solid:ribbon" style="color:#8B5CF6" /> มะเร็ง</a>
+      <a href="#loc-4" class="btn btn-outline btn-sm"><Icon name="fa6-solid:brain" style="color:#0891B2" /> สมองฯ</a>
+      <a href="#loc-5" class="btn btn-outline btn-sm"><Icon name="fa6-solid:child" style="color:#10B981" /> เด็ก</a>
+      <a href="#loc-6" class="btn btn-outline btn-sm"><Icon name="fa6-solid:mountain-city" style="color:#F59E0B" /> เชียงใหม่ ใหม่!</a>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" style="background:#fff">
+  <div class="container">
+
+    <div class="loc-detail-card reveal" id="loc-1">
+      <div class="loc-detail-header">
+        <div class="loc-num">1</div>
+        <div><h2>MediThai กรุงเทพ (สำนักงานใหญ่)</h2><p>MediThai Bangkok — Headquarters</p></div>
+        <span class="open-badge" style="margin-left:auto;background:rgba(16,185,129,.2);padding:6px 14px;border-radius:99px" data-i18n="map_open">เปิดให้บริการ</span>
+      </div>
+      <div class="loc-detail-body">
+        <div class="loc-info-grid">
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:location-dot" /><div><h4>ที่อยู่</h4><p>2 ถนนเพชรบุรีตัดใหม่ แขวงบางกอกน้อย กรุงเทพมหานคร 10700</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:phone" /><div><h4>โทรศัพท์</h4><p>02-310-3000</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:clock" /><div><h4>เวลาทำการ</h4><p>ทุกวัน 06:00 – 22:00 น. (OPD)<br>ฉุกเฉิน 24 ชั่วโมง</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:car" /><div><h4>การเดินทาง</h4><p>BTS อโศก → รถไฟฟ้า MRT ลงพระราม 9<br>มีที่จอดรถ 500 คัน</p></div></div>
+          </div>
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:stethoscope" /><div><h4>บริการหลัก</h4></div></div>
+            <div class="services-chips">
+              <span class="services-chip">อายุรกรรม</span><span class="services-chip">ศัลยกรรม</span><span class="services-chip">สูติ-นรีเวช</span><span class="services-chip">จักษุ</span><span class="services-chip">หู คอ จมูก</span><span class="services-chip">ตรวจสุขภาพ</span><span class="services-chip">ฉุกเฉิน 24 ชม.</span><span class="services-chip">ICU</span><span class="services-chip">ห้องผ่าตัด 20 ห้อง</span><span class="services-chip">MRI 3T</span><span class="services-chip">PET/CT</span>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+              <a href="/appointments" class="btn btn-primary btn-sm"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+              <a href="https://maps.google.com" target="_blank" class="btn btn-outline btn-sm"><Icon name="fa6-solid:map-location-dot" /> ดูแผนที่</a>
+              <a href="tel:023103000" class="btn btn-outline btn-sm"><Icon name="fa6-solid:phone" /> โทรหา</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loc-detail-card reveal" id="loc-2">
+      <div class="loc-detail-header" style="background:linear-gradient(135deg,#991B1B,#EF4444)">
+        <div class="loc-num">2</div>
+        <div><h2>MediThai หัวใจ</h2><p>MediThai Heart Hospital</p></div>
+        <span class="open-badge" style="margin-left:auto;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:99px" data-i18n="map_open">เปิดให้บริการ</span>
+      </div>
+      <div class="loc-detail-body">
+        <div class="loc-info-grid">
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:location-dot" /><div><h4>ที่อยู่</h4><p>1 ซอยสาทร 15 ถนนสาทรใต้ แขวงยานนาวา สาทร กรุงเทพ 10120</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:phone" /><div><h4>โทรศัพท์</h4><p>02-310-3100</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:clock" /><div><h4>เวลาทำการ</h4><p>ทุกวัน 07:00 – 20:00 น.<br>ห้องฉุกเฉินหัวใจ 24 ชั่วโมง</p></div></div>
+          </div>
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:stethoscope" /><div><h4>ความเชี่ยวชาญ</h4></div></div>
+            <div class="services-chips">
+              <span class="services-chip">อายุรแพทย์หัวใจ</span><span class="services-chip">ผ่าตัดหัวใจ</span><span class="services-chip">Electrophysiology</span><span class="services-chip">MitraClip</span><span class="services-chip">MICS</span><span class="services-chip">Cardiac Rehab</span><span class="services-chip">Cardiac Cath Lab</span>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+              <a href="/appointments" class="btn btn-primary btn-sm"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+              <a href="https://maps.google.com" target="_blank" class="btn btn-outline btn-sm"><Icon name="fa6-solid:map-location-dot" /> ดูแผนที่</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loc-detail-card reveal" id="loc-3">
+      <div class="loc-detail-header" style="background:linear-gradient(135deg,#4C1D95,#8B5CF6)">
+        <div class="loc-num">3</div>
+        <div><h2>MediThai มะเร็ง (วัฒโนสถ)</h2><p>MediThai Cancer Center</p></div>
+        <span class="open-badge" style="margin-left:auto;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:99px" data-i18n="map_open">เปิดให้บริการ</span>
+      </div>
+      <div class="loc-detail-body">
+        <div class="loc-info-grid">
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:location-dot" /><div><h4>ที่อยู่</h4><p>99 ถนนพระราม 9 แขวงห้วยขวาง กรุงเทพ 10310</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:phone" /><div><h4>โทรศัพท์</h4><p>02-310-3200</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:clock" /><div><h4>เวลาทำการ</h4><p>จ-ศ 07:00 – 20:00 น.<br>ส-อา 07:00 – 17:00 น.</p></div></div>
+          </div>
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:stethoscope" /><div><h4>ความเชี่ยวชาญ</h4></div></div>
+            <div class="services-chips">
+              <span class="services-chip">PET/CT Scan</span><span class="services-chip">da Vinci Robot</span><span class="services-chip">Chemotherapy</span><span class="services-chip">Radiation Therapy</span><span class="services-chip">AI Mammography</span><span class="services-chip">Immunotherapy</span><span class="services-chip">Palliative Care</span>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+              <a href="/appointments" class="btn btn-primary btn-sm"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+              <a href="https://maps.google.com" target="_blank" class="btn btn-outline btn-sm"><Icon name="fa6-solid:map-location-dot" /> ดูแผนที่</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loc-detail-card reveal" id="loc-4">
+      <div class="loc-detail-header" style="background:linear-gradient(135deg,#0C4A6E,#0891B2)">
+        <div class="loc-num">4</div>
+        <div><h2>MediThai สมองและกระดูก</h2><p>MediThai Brain &amp; Spine Hospital</p></div>
+        <span class="open-badge" style="margin-left:auto;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:99px" data-i18n="map_open">เปิดให้บริการ</span>
+      </div>
+      <div class="loc-detail-body">
+        <div class="loc-info-grid">
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:location-dot" /><div><h4>ที่อยู่</h4><p>33 ถนนบางขุนนนท์ แขวงบางขุนนนท์ บางกอกน้อย กรุงเทพ 10700</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:phone" /><div><h4>โทรศัพท์</h4><p>02-310-3300</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:clock" /><div><h4>เวลาทำการ</h4><p>ทุกวัน 07:00 – 20:00 น.</p></div></div>
+          </div>
+          <div>
+            <div class="services-chips" style="margin-top:20px">
+              <span class="services-chip">ศัลยกรรมสมอง</span><span class="services-chip">Robotic UKA</span><span class="services-chip">Spine Surgery</span><span class="services-chip">MRI 3T</span><span class="services-chip">Neuro ICU</span><span class="services-chip">กายภาพบำบัด</span>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+              <a href="/appointments" class="btn btn-primary btn-sm"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+              <a href="https://maps.google.com" target="_blank" class="btn btn-outline btn-sm"><Icon name="fa6-solid:map-location-dot" /> ดูแผนที่</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loc-detail-card reveal" id="loc-5">
+      <div class="loc-detail-header" style="background:linear-gradient(135deg,#064E3B,#10B981)">
+        <div class="loc-num">5</div>
+        <div><h2>MediThai เด็ก</h2><p>MediThai Children's Hospital</p></div>
+        <span class="open-badge" style="margin-left:auto;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:99px" data-i18n="map_open">เปิดให้บริการ</span>
+      </div>
+      <div class="loc-detail-body">
+        <div class="loc-info-grid">
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:location-dot" /><div><h4>ที่อยู่</h4><p>55 ถนนลาดพร้าว แขวงจตุจักร กรุงเทพ 10900</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:phone" /><div><h4>โทรศัพท์</h4><p>02-310-3400</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:clock" /><div><h4>เวลาทำการ</h4><p>ทุกวัน 07:00 – 21:00 น.</p></div></div>
+          </div>
+          <div>
+            <div class="services-chips" style="margin-top:20px">
+              <span class="services-chip">กุมารแพทย์ทั่วไป</span><span class="services-chip">พัฒนาการเด็ก</span><span class="services-chip">ทันตกรรมเด็ก</span><span class="services-chip">วัคซีน</span><span class="services-chip">NICU</span><span class="services-chip">PICU</span>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+              <a href="/appointments" class="btn btn-primary btn-sm"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+              <a href="https://maps.google.com" target="_blank" class="btn btn-outline btn-sm"><Icon name="fa6-solid:map-location-dot" /> ดูแผนที่</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loc-detail-card reveal" id="loc-6" style="border:2px solid var(--accent)">
+      <div class="loc-detail-header" style="background:linear-gradient(135deg,#92400E,#F59E0B)">
+        <div class="loc-num">6</div>
+        <div>
+          <h2>MediThai เชียงใหม่ <span style="background:var(--accent);color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:99px;vertical-align:middle;margin-left:8px">ใหม่!</span></h2>
+          <p>MediThai Chiang Mai — Newly Opened</p>
+        </div>
+        <span class="open-badge" style="margin-left:auto;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:99px" data-i18n="map_open">เปิดให้บริการ</span>
+      </div>
+      <div class="loc-detail-body">
+        <div class="loc-info-grid">
+          <div>
+            <div class="loc-info-item"><Icon name="fa6-solid:location-dot" /><div><h4>ที่อยู่</h4><p>100 ถนนห้วยแก้ว ตำบลสุเทพ อำเภอเมือง เชียงใหม่ 50200</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:phone" /><div><h4>โทรศัพท์</h4><p>053-310-3000</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:clock" /><div><h4>เวลาทำการ</h4><p>ทุกวัน 07:00 – 21:00 น.</p></div></div>
+            <div class="loc-info-item" style="margin-top:12px"><Icon name="fa6-solid:globe" /><div><h4>ภาษาที่ให้บริการ</h4><p>ไทย · English · 中文 · 日本語</p></div></div>
+          </div>
+          <div>
+            <div class="services-chips" style="margin-top:20px">
+              <span class="services-chip">อายุรกรรมทั่วไป</span><span class="services-chip">ศัลยกรรม</span><span class="services-chip">ตรวจสุขภาพ</span><span class="services-chip">ฉุกเฉิน</span><span class="services-chip">International Patients</span><span class="services-chip">Medical Tourism</span>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+              <a href="/appointments" class="btn btn-primary btn-sm"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+              <a href="https://maps.google.com" target="_blank" class="btn btn-outline btn-sm"><Icon name="fa6-solid:map-location-dot" /> ดูแผนที่</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</Layout>

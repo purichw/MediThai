@@ -1,0 +1,744 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout
+  title="MediThai Hospital Network | เครือโรงพยาบาลเมดิไทย"
+  description="เครือโรงพยาบาล MediThai — ดูแลทุกชีวิต ด้วยมาตรฐานระดับโลก | MediThai Hospital Network — World-Class Care"
+  extraHead={`
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  `}
+  extraScripts={`
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  `}
+>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-image"></div>
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="container hero-inner">
+      <!-- Left -->
+      <div>
+        <div class="hero-tag">
+          <span></span>
+          <span data-i18n="hero_tag">อันดับ 1 โรงพยาบาลไทย โดย Newsweek 2026</span>
+        </div>
+        <h1 class="hero-title">
+          <span data-i18n="hero_title_1">ดูแลทุกชีวิต</span><br>
+          <span class="accent" data-i18n="hero_title_2">ด้วยความเชี่ยวชาญ</span><br>
+          <span data-i18n="hero_title_3">ระดับโลก</span>
+        </h1>
+        <p class="hero-desc" data-i18n="hero_desc">เครือโรงพยาบาล MediThai พร้อมทีมแพทย์ผู้เชี่ยวชาญกว่า 200 ท่าน ใน 6 สาขาทั่วประเทศ ดูแลคุณด้วยเทคโนโลยีทางการแพทย์ที่ทันสมัยที่สุด</p>
+        <div class="hero-cta">
+          <a href="/appointments" class="btn btn-primary btn-lg" data-i18n="hero_btn1">นัดหมายออนไลน์</a>
+          <a href="/doctors" class="btn btn-secondary btn-lg" data-i18n="hero_btn2">ค้นหาแพทย์</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="num" data-i18n="hero_stat1_num">200+</div>
+            <div class="label" data-i18n="hero_stat1_lbl">แพทย์เชี่ยวชาญ</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num" data-i18n="hero_stat2_num">6</div>
+            <div class="label" data-i18n="hero_stat2_lbl">สาขาทั่วประเทศ</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num" data-i18n="hero_stat3_num">50K+</div>
+            <div class="label" data-i18n="hero_stat3_lbl">ผู้ป่วยต่อปี</div>
+          </div>
+        </div>
+      </div>
+      <!-- Right — Quick Cards -->
+      <div class="hero-cards">
+        <a href="/appointments" class="hero-card">
+          <div class="hero-card-icon teal"><Icon name="fa6-solid:calendar-check" /></div>
+          <h4 data-i18n="qc1_title">นัดหมายออนไลน์</h4>
+          <p data-i18n="qc1_desc">จองคิวได้ทันที</p>
+        </a>
+        <a href="/doctors" class="hero-card">
+          <div class="hero-card-icon amber"><Icon name="fa6-solid:user-doctor" /></div>
+          <h4 data-i18n="qc2_title">ค้นหาแพทย์</h4>
+          <p data-i18n="qc2_desc">แพทย์เฉพาะทางกว่า 200 ท่าน</p>
+        </a>
+        <a href="/locations" class="hero-card">
+          <div class="hero-card-icon green"><Icon name="fa6-solid:location-dot" /></div>
+          <h4 data-i18n="qc3_title">สาขาใกล้คุณ</h4>
+          <p data-i18n="qc3_desc">6 สาขาทั่วประเทศ</p>
+        </a>
+        <a href="/packages" class="hero-card">
+          <div class="hero-card-icon purple"><Icon name="fa6-solid:tag" /></div>
+          <h4 data-i18n="qc4_title">แพ็กเกจสุขภาพ</h4>
+          <p data-i18n="qc4_desc">ราคาพิเศษ มีโปรโมชั่น</p>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <div class="wheel"></div>
+  </div>
+</section>
+
+<!-- QUICK ACTIONS BAR -->
+<section class="quick-actions">
+  <div class="container">
+    <div class="quick-actions-inner reveal">
+      <a href="/appointments" class="qa-item">
+        <div class="qa-icon blue"><Icon name="fa6-solid:calendar-check" /></div>
+        <div class="qa-text">
+          <h4 data-i18n="qa1_title">นัดหมายแพทย์</h4>
+          <p data-i18n="qa1_desc">นัดออนไลน์ 24 ชม.</p>
+        </div>
+      </a>
+      <a href="/doctors" class="qa-item">
+        <div class="qa-icon teal"><Icon name="fa6-solid:user-doctor" /></div>
+        <div class="qa-text">
+          <h4 data-i18n="qa2_title">ค้นหาแพทย์</h4>
+          <p data-i18n="qa2_desc">เฉพาะทาง 30+ สาขา</p>
+        </div>
+      </a>
+      <a href="/locations" class="qa-item">
+        <div class="qa-icon amber"><Icon name="fa6-solid:location-dot" /></div>
+        <div class="qa-text">
+          <h4 data-i18n="qa3_title">สาขาใกล้ฉัน</h4>
+          <p data-i18n="qa3_desc">6 โรงพยาบาลในเครือ</p>
+        </div>
+      </a>
+      <a href="/packages" class="qa-item">
+        <div class="qa-icon green"><Icon name="fa6-solid:tag" /></div>
+        <div class="qa-text">
+          <h4 data-i18n="qa4_title">แพ็กเกจ &amp; โปรโมชั่น</h4>
+          <p data-i18n="qa4_desc">ราคาพิเศษ สิ้นสุด 31 ธ.ค.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-num"><span data-target="200" data-suffix="+">200+</span></div>
+        <div class="stat-label" data-i18n="stat1_lbl">แพทย์เชี่ยวชาญ</div>
+        <Icon name="fa6-solid:user-doctor" class="stat-icon" />
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-num"><span data-target="6">6</span></div>
+        <div class="stat-label" data-i18n="stat2_lbl">สาขาทั่วประเทศ</div>
+        <Icon name="fa6-solid:hospital" class="stat-icon" />
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-num"><span data-target="50000">50,000</span><span class="plus">+</span></div>
+        <div class="stat-label" data-i18n="stat3_lbl">ผู้ป่วยต่อปี</div>
+        <Icon name="fa6-solid:heart-pulse" class="stat-icon" />
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-num"><span data-target="25">25</span></div>
+        <div class="stat-label" data-i18n="stat4_lbl">ปีแห่งความเชี่ยวชาญ</div>
+        <Icon name="fa6-solid:award" class="stat-icon" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECIALTIES -->
+<section class="specialties-section section-pad">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:48px">
+      <div class="tag"><Icon name="fa6-solid:stethoscope" /> <span data-i18n="sec_spec_tag">ศูนย์การแพทย์เฉพาะทาง</span></div>
+      <h2 class="section-heading" data-i18n="sec_spec_title">บริการครบครัน ดูแลทุกความต้องการ</h2>
+      <p class="section-sub" style="margin:0 auto" data-i18n="sec_spec_sub">ศูนย์การแพทย์เฉพาะทางระดับโลก พร้อมเทคโนโลยีและทีมแพทย์ผู้เชี่ยวชาญ</p>
+    </div>
+    <div class="specialties-grid">
+      <a href="/doctors?spec=heart" class="specialty-card reveal">
+        <div class="spec-icon"><Icon name="fa6-solid:heart-pulse" /></div>
+        <h4 data-i18n="spec1">ศูนย์หัวใจ</h4>
+        <p data-i18n="spec1d">โรคหัวใจ หลอดเลือด ผ่าตัดหัวใจ</p>
+      </a>
+      <a href="/doctors?spec=cancer" class="specialty-card reveal reveal-delay-1">
+        <div class="spec-icon"><Icon name="fa6-solid:ribbon" /></div>
+        <h4 data-i18n="spec2">ศูนย์มะเร็ง</h4>
+        <p data-i18n="spec2d">วินิจฉัยและรักษาโรคมะเร็งครบวงจร</p>
+      </a>
+      <a href="/doctors?spec=neuro" class="specialty-card reveal reveal-delay-2">
+        <div class="spec-icon"><Icon name="fa6-solid:brain" /></div>
+        <h4 data-i18n="spec3">ศูนย์สมองฯ</h4>
+        <p data-i18n="spec3d">ระบบประสาท สมอง กระดูกสันหลัง</p>
+      </a>
+      <a href="/doctors?spec=ortho" class="specialty-card reveal reveal-delay-3">
+        <div class="spec-icon"><Icon name="fa6-solid:bone" /></div>
+        <h4 data-i18n="spec4">ศูนย์กระดูก</h4>
+        <p data-i18n="spec4d">ข้อเสื่อม กระดูกหัก กายภาพบำบัด</p>
+      </a>
+      <a href="/doctors?spec=peds" class="specialty-card reveal">
+        <div class="spec-icon"><Icon name="fa6-solid:child-reaching" /></div>
+        <h4 data-i18n="spec5">ศูนย์เด็ก</h4>
+        <p data-i18n="spec5d">กุมารแพทย์ พัฒนาการเด็ก</p>
+      </a>
+      <a href="/doctors?spec=obgyn" class="specialty-card reveal reveal-delay-1">
+        <div class="spec-icon"><Icon name="fa6-solid:venus" /></div>
+        <h4 data-i18n="spec6">ศูนย์สตรี</h4>
+        <p data-i18n="spec6d">สูติ-นรีเวช ฝากครรภ์ คลอด</p>
+      </a>
+      <a href="/doctors?spec=eye" class="specialty-card reveal reveal-delay-2">
+        <div class="spec-icon"><Icon name="fa6-solid:eye" /></div>
+        <h4 data-i18n="spec7">ศูนย์ตา</h4>
+        <p data-i18n="spec7d">จักษุ LASIK ต้อกระจก</p>
+      </a>
+      <a href="/packages?cat=checkup" class="specialty-card reveal reveal-delay-3">
+        <div class="spec-icon"><Icon name="fa6-solid:clipboard-list" /></div>
+        <h4 data-i18n="spec8">ตรวจสุขภาพ</h4>
+        <p data-i18n="spec8d">โปรแกรมตรวจสุขภาพประจำปี</p>
+      </a>
+    </div>
+    <div class="text-center" style="margin-top:36px">
+      <a href="/doctors" class="view-all-link" data-i18n="view_all">ดูทั้งหมด <Icon name="fa6-solid:arrow-right" /></a>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="packages-section section-pad">
+  <div class="container">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:40px">
+      <div class="reveal">
+        <div class="tag"><Icon name="fa6-solid:tag" /> <span data-i18n="sec_pkg_tag">แพ็กเกจ &amp; โปรโมชั่น</span></div>
+        <h2 class="section-heading" data-i18n="sec_pkg_title">แพ็กเกจสุขภาพราคาพิเศษ</h2>
+        <p class="section-sub" data-i18n="sec_pkg_sub">ดูแลสุขภาพเชิงป้องกัน ด้วยแพ็กเกจที่ออกแบบมาเพื่อคุณโดยเฉพาะ</p>
+      </div>
+      <a href="/packages" class="view-all-link reveal" data-i18n="view_all">ดูทั้งหมด <Icon name="fa6-solid:arrow-right" /></a>
+    </div>
+
+    <div class="swiper packages-swiper" style="padding-bottom:48px">
+      <div class="swiper-wrapper">
+
+        <!-- Package 1 -->
+        <div class="swiper-slide">
+          <div class="package-card" data-cat="checkup">
+            <div class="package-img" style="background:linear-gradient(135deg,#1B3A6B,#2554A0)">
+              <Icon name="fa6-solid:user-tie" />
+              <div class="package-badge hot">ยอดนิยม</div>
+            </div>
+            <div class="package-body">
+              <div class="package-hospital"><Icon name="fa6-solid:hospital" /> MediThai กรุงเทพ</div>
+              <div class="package-title">CEO Check-up Program ตรวจสุขภาพเชิงลึกสำหรับผู้บริหาร</div>
+              <div class="package-price">
+                <span class="price-current">฿129,000</span>
+                <span class="price-original">฿145,000</span>
+              </div>
+              <div class="package-expires"><Icon name="fa6-regular:clock" /> <span data-i18n="pkg_expires">สิ้นสุด</span> 31 ธ.ค. 2569</div>
+              <div class="package-footer">
+                <a href="/packages" class="btn btn-outline btn-sm" data-i18n="pkg_detail">รายละเอียด</a>
+                <a href="/appointments" class="btn btn-primary btn-sm" data-i18n="pkg_buy">ซื้อเลย</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package 2 -->
+        <div class="swiper-slide">
+          <div class="package-card" data-cat="cancer">
+            <div class="package-img" style="background:linear-gradient(135deg,#8B5CF6,#7C3AED)">
+              <Icon name="fa6-solid:microscope" />
+              <div class="package-badge new">ใหม่</div>
+            </div>
+            <div class="package-body">
+              <div class="package-hospital"><Icon name="fa6-solid:hospital" /> MediThai มะเร็ง</div>
+              <div class="package-title">PET/CT Scan ตรวจคัดกรองมะเร็ง Absolute Early Detection</div>
+              <div class="package-price">
+                <span class="price-current">฿72,400</span>
+                <span class="price-original">฿181,695</span>
+              </div>
+              <div class="package-expires"><Icon name="fa6-regular:clock" /> <span data-i18n="pkg_expires">สิ้นสุด</span> 31 ธ.ค. 2569</div>
+              <div class="package-footer">
+                <a href="/packages" class="btn btn-outline btn-sm" data-i18n="pkg_detail">รายละเอียด</a>
+                <a href="/appointments" class="btn btn-primary btn-sm" data-i18n="pkg_buy">ซื้อเลย</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package 3 -->
+        <div class="swiper-slide">
+          <div class="package-card" data-cat="heart">
+            <div class="package-img" style="background:linear-gradient(135deg,#EF4444,#DC2626)">
+              <Icon name="fa6-solid:heart-pulse" />
+            </div>
+            <div class="package-body">
+              <div class="package-hospital"><Icon name="fa6-solid:hospital" /> MediThai หัวใจ</div>
+              <div class="package-title">3 โปรแกรมตรวจหัวใจ ออกแบบเพื่อคุณโดยเฉพาะ</div>
+              <div class="package-price">
+                <span class="price-current">฿7,500</span>
+                <span class="price-unit">เริ่มต้น</span>
+              </div>
+              <div class="package-expires"><Icon name="fa6-regular:clock" /> <span data-i18n="pkg_expires">สิ้นสุด</span> 31 ธ.ค. 2569</div>
+              <div class="package-footer">
+                <a href="/packages" class="btn btn-outline btn-sm" data-i18n="pkg_detail">รายละเอียด</a>
+                <a href="/appointments" class="btn btn-primary btn-sm" data-i18n="pkg_buy">ซื้อเลย</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package 4 -->
+        <div class="swiper-slide">
+          <div class="package-card" data-cat="checkup">
+            <div class="package-img" style="background:linear-gradient(135deg,#0891B2,#0E7490)">
+              <Icon name="fa6-solid:dna" />
+              <div class="package-badge hot">พิเศษ</div>
+            </div>
+            <div class="package-body">
+              <div class="package-hospital"><Icon name="fa6-solid:hospital" /> MediThai สมองฯ</div>
+              <div class="package-title">Integrated GenomeXplorer ตรวจสุขภาพระดับ DNA</div>
+              <div class="package-price">
+                <span class="price-current">฿28,000</span>
+                <span class="price-original">฿30,800</span>
+              </div>
+              <div class="package-expires"><Icon name="fa6-regular:clock" /> <span data-i18n="pkg_expires">สิ้นสุด</span> 31 ธ.ค. 2569</div>
+              <div class="package-footer">
+                <a href="/packages" class="btn btn-outline btn-sm" data-i18n="pkg_detail">รายละเอียด</a>
+                <a href="/appointments" class="btn btn-primary btn-sm" data-i18n="pkg_buy">ซื้อเลย</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package 5 -->
+        <div class="swiper-slide">
+          <div class="package-card" data-cat="checkup">
+            <div class="package-img" style="background:linear-gradient(135deg,#10B981,#059669)">
+              <Icon name="fa6-solid:lungs" />
+            </div>
+            <div class="package-body">
+              <div class="package-hospital"><Icon name="fa6-solid:hospital" /> MediThai กรุงเทพ</div>
+              <div class="package-title">Low-dose CT Scan ตรวจคัดกรองมะเร็งปอด</div>
+              <div class="package-price">
+                <span class="price-current">฿6,900</span>
+                <span class="price-original">฿9,440</span>
+              </div>
+              <div class="package-expires"><Icon name="fa6-regular:clock" /> <span data-i18n="pkg_expires">สิ้นสุด</span> 31 ธ.ค. 2569</div>
+              <div class="package-footer">
+                <a href="/packages" class="btn btn-outline btn-sm" data-i18n="pkg_detail">รายละเอียด</a>
+                <a href="/appointments" class="btn btn-primary btn-sm" data-i18n="pkg_buy">ซื้อเลย</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCTORS -->
+<section class="doctors-section section-pad">
+  <div class="container">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:40px">
+      <div class="reveal">
+        <div class="tag"><Icon name="fa6-solid:user-doctor" /> <span data-i18n="sec_doc_tag">ทีมแพทย์ผู้เชี่ยวชาญ</span></div>
+        <h2 class="section-heading" data-i18n="sec_doc_title">พบกับแพทย์ผู้เชี่ยวชาญของเรา</h2>
+        <p class="section-sub" data-i18n="sec_doc_sub">ทีมแพทย์ระดับโลก พร้อมดูแลคุณด้วยความเชี่ยวชาญและความเอาใจใส่</p>
+      </div>
+      <a href="/doctors" class="view-all-link reveal" data-i18n="view_all">ดูทั้งหมด <Icon name="fa6-solid:arrow-right" /></a>
+    </div>
+
+    <div class="swiper doctors-swiper" style="padding-bottom:48px">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="doctor-card" data-specialty="heart" data-hospital="heart">
+            <div class="doctor-photo">
+              <div class="doctor-photo-placeholder"><Icon name="fa6-solid:user-doctor" /></div>
+              <div class="doctor-specialty-badge">ศูนย์หัวใจ</div>
+            </div>
+            <div class="doctor-name">นพ. ชาติทนง ยอดวุฒิ</div>
+            <div class="doctor-title">อายุรแพทย์โรคหัวใจ และหลอดเลือด</div>
+            <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai หัวใจ</div>
+            <div class="doctor-tags"><span class="doctor-tag">MitraClip</span><span class="doctor-tag">Electrophysiology</span></div>
+            <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center" data-i18n="doc_appt">นัดหมาย</a>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="doctor-card" data-specialty="cancer" data-hospital="cancer">
+            <div class="doctor-photo">
+              <div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#F3E8FF,#EDE9FE)"><Icon name="fa6-solid:user-doctor" style="color:#8B5CF6" /></div>
+              <div class="doctor-specialty-badge" style="background:#8B5CF6">ศูนย์มะเร็ง</div>
+            </div>
+            <div class="doctor-name">พญ. ศรัณยา งามรัศมีวงศ์</div>
+            <div class="doctor-title">รังสีแพทย์วินิจฉัย (Breast Imaging)</div>
+            <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai มะเร็ง</div>
+            <div class="doctor-tags"><span class="doctor-tag">AI Mammography</span><span class="doctor-tag">Breast MRI</span></div>
+            <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center" data-i18n="doc_appt">นัดหมาย</a>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="doctor-card" data-specialty="neuro" data-hospital="spine">
+            <div class="doctor-photo">
+              <div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5)"><Icon name="fa6-solid:user-doctor" style="color:#10B981" /></div>
+              <div class="doctor-specialty-badge" style="background:#10B981">ศูนย์สมองฯ</div>
+            </div>
+            <div class="doctor-name">พญ. ศรินพร มานิตย์ศิริกุล</div>
+            <div class="doctor-title">อายุรแพทย์ระบบประสาท</div>
+            <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai สมองและกระดูก</div>
+            <div class="doctor-tags"><span class="doctor-tag">Neurology</span><span class="doctor-tag">Meningitis</span></div>
+            <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center" data-i18n="doc_appt">นัดหมาย</a>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="doctor-card" data-specialty="ortho" data-hospital="spine">
+            <div class="doctor-photo">
+              <div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE)"><Icon name="fa6-solid:user-doctor" style="color:#2554A0" /></div>
+              <div class="doctor-specialty-badge" style="background:#2554A0">ศูนย์กระดูก</div>
+            </div>
+            <div class="doctor-name">นพ. ศริษฏ์ หงษ์วิไล</div>
+            <div class="doctor-title">ศัลยแพทย์กระดูกและข้อ (Robotic Surgery)</div>
+            <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai สมองและกระดูก</div>
+            <div class="doctor-tags"><span class="doctor-tag">Robotic UKA</span><span class="doctor-tag">Joint Replacement</span></div>
+            <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center" data-i18n="doc_appt">นัดหมาย</a>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="doctor-card" data-specialty="heart" data-hospital="heart">
+            <div class="doctor-photo">
+              <div class="doctor-photo-placeholder" style="background:linear-gradient(135deg,#FFF1F2,#FFE4E6)"><Icon name="fa6-solid:user-doctor" style="color:#EF4444" /></div>
+              <div class="doctor-specialty-badge" style="background:#EF4444">ศูนย์หัวใจ</div>
+            </div>
+            <div class="doctor-name">นพ. ณัฐพล อารยวุฒิกุล</div>
+            <div class="doctor-title">ศัลยแพทย์หัวใจและทรวงอก</div>
+            <div class="doctor-hospital"><Icon name="fa6-solid:hospital" /> MediThai หัวใจ</div>
+            <div class="doctor-tags"><span class="doctor-tag">MICS</span><span class="doctor-tag">Open Heart</span></div>
+            <a href="/appointments" class="btn btn-primary btn-sm" style="width:calc(100% - 40px);justify-content:center" data-i18n="doc_appt">นัดหมาย</a>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-section section-pad">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:40px">
+      <div class="tag"><Icon name="fa6-solid:location-dot" /> <span data-i18n="sec_map_tag">สาขาของเรา</span></div>
+      <h2 class="section-heading" data-i18n="sec_map_title">โรงพยาบาลในเครือ MediThai</h2>
+      <p class="section-sub" style="margin:0 auto" data-i18n="sec_map_sub">6 สาขาทั่วประเทศ พร้อมให้บริการทุกวัน</p>
+    </div>
+    <div class="map-layout reveal">
+      <div id="map"></div>
+      <div class="location-list">
+        <div class="location-card" data-id="1">
+          <div class="location-pin pin-1"><Icon name="fa6-solid:hospital" /></div>
+          <div class="location-info">
+            <h4>MediThai กรุงเทพ (สำนักงานใหญ่)</h4>
+            <p>2 ถนนเพชรบุรีตัดใหม่ กรุงเทพ</p>
+            <p>02-310-3000</p>
+            <span class="open-badge" data-i18n="map_open">เปิดให้บริการ</span>
+          </div>
+        </div>
+        <div class="location-card" data-id="2">
+          <div class="location-pin pin-5"><Icon name="fa6-solid:heart-pulse" /></div>
+          <div class="location-info">
+            <h4>MediThai หัวใจ</h4>
+            <p>1 ซอยสาทร 15 สาทร กรุงเทพ</p>
+            <p>02-310-3100</p>
+            <span class="open-badge" data-i18n="map_open">เปิดให้บริการ</span>
+          </div>
+        </div>
+        <div class="location-card" data-id="3">
+          <div class="location-pin pin-2"><Icon name="fa6-solid:ribbon" /></div>
+          <div class="location-info">
+            <h4>MediThai มะเร็ง</h4>
+            <p>99 ถนนพระราม 9 ห้วยขวาง กรุงเทพ</p>
+            <p>02-310-3200</p>
+            <span class="open-badge" data-i18n="map_open">เปิดให้บริการ</span>
+          </div>
+        </div>
+        <div class="location-card" data-id="4">
+          <div class="location-pin pin-3"><Icon name="fa6-solid:brain" /></div>
+          <div class="location-info">
+            <h4>MediThai สมองและกระดูก</h4>
+            <p>33 ถนนบางขุนนนท์ บางกอกน้อย</p>
+            <p>02-310-3300</p>
+            <span class="open-badge" data-i18n="map_open">เปิดให้บริการ</span>
+          </div>
+        </div>
+        <div class="location-card" data-id="5">
+          <div class="location-pin pin-4"><Icon name="fa6-solid:child" /></div>
+          <div class="location-info">
+            <h4>MediThai เด็ก</h4>
+            <p>55 ถนนลาดพร้าว จตุจักร กรุงเทพ</p>
+            <p>02-310-3400</p>
+            <span class="open-badge" data-i18n="map_open">เปิดให้บริการ</span>
+          </div>
+        </div>
+        <div class="location-card" data-id="6">
+          <div class="location-pin pin-6"><Icon name="fa6-solid:mountain-city" /></div>
+          <div class="location-info">
+            <h4>MediThai เชียงใหม่</h4>
+            <p>100 ถนนห้วยแก้ว เมือง เชียงใหม่</p>
+            <p>053-310-3000</p>
+            <span class="open-badge" data-i18n="map_open">เปิดให้บริการ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTICLES -->
+<section class="articles-section section-pad">
+  <div class="container">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:40px">
+      <div class="reveal">
+        <div class="tag"><Icon name="fa6-solid:book-open-reader" /> <span data-i18n="sec_art_tag">คลังความรู้</span></div>
+        <h2 class="section-heading" data-i18n="sec_art_title">บทความสุขภาพโดยแพทย์ผู้เชี่ยวชาญ</h2>
+        <p class="section-sub" data-i18n="sec_art_sub">ความรู้สุขภาพที่เป็นประโยชน์ จากทีมแพทย์ MediThai</p>
+      </div>
+      <a href="/health-library" class="view-all-link reveal" data-i18n="view_all">ดูทั้งหมด <Icon name="fa6-solid:arrow-right" /></a>
+    </div>
+    <div class="articles-grid">
+      <a href="/health-library" class="article-card reveal" data-letter="ห">
+        <div class="article-img" style="background:linear-gradient(135deg,#EF4444,#DC2626)"></div>
+        <div class="article-body">
+          <div class="article-cat">โรคหัวใจ</div>
+          <div class="article-title">MitraClip ซ่อมลิ้นหัวใจไมตรัลรั่วแบบไม่ผ่าตัด ลดเสี่ยง ฟื้นตัวเร็ว</div>
+          <div class="article-meta">
+            <span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span> นพ. ชาติทนง</span>
+            <span>07 ม.ค. 2569</span>
+          </div>
+        </div>
+      </a>
+      <a href="/health-library" class="article-card reveal reveal-delay-1" data-letter="ม">
+        <div class="article-img" style="background:linear-gradient(135deg,#8B5CF6,#7C3AED)"></div>
+        <div class="article-body">
+          <div class="article-cat">มะเร็ง</div>
+          <div class="article-title">หุ่นยนต์ช่วยผ่าตัด da Vinci Xi กับการรักษามะเร็งปอดในยุคใหม่</div>
+          <div class="article-meta">
+            <span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span> นพ. ผดุงเกียรติ</span>
+            <span>10 ธ.ค. 2568</span>
+          </div>
+        </div>
+      </a>
+      <a href="/health-library" class="article-card reveal reveal-delay-2" data-letter="ส">
+        <div class="article-img" style="background:linear-gradient(135deg,#0891B2,#0E7490)"></div>
+        <div class="article-body">
+          <div class="article-cat">ระบบประสาท</div>
+          <div class="article-title">เยื่อหุ้มสมองอักเสบ (Meningitis) อาการเตือน สาเหตุ และแนวทางการรักษา</div>
+          <div class="article-meta">
+            <span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span> พญ. ศรินพร</span>
+            <span>20 มี.ค. 2569</span>
+          </div>
+        </div>
+      </a>
+      <a href="/health-library" class="article-card reveal" data-letter="ก">
+        <div class="article-img" style="background:linear-gradient(135deg,#2554A0,#1B3A6B)"></div>
+        <div class="article-body">
+          <div class="article-cat">กระดูกและข้อ</div>
+          <div class="article-title">ผ่าตัดเปลี่ยนข้อเข่าเทียมบางส่วนด้วยหุ่นยนต์ช่วยผ่าตัด Robotic UKA</div>
+          <div class="article-meta">
+            <span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span> นพ. ศริษฏ์</span>
+            <span>05 มี.ค. 2569</span>
+          </div>
+        </div>
+      </a>
+      <a href="/health-library" class="article-card reveal reveal-delay-1" data-letter="ก">
+        <div class="article-img" style="background:linear-gradient(135deg,#10B981,#059669)"></div>
+        <div class="article-body">
+          <div class="article-cat">หัวใจ</div>
+          <div class="article-title">การผ่าตัดหัวใจแผลเล็ก Minimally Invasive Cardiac Surgery (MICS)</div>
+          <div class="article-meta">
+            <span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span> นพ. ณัฐพล</span>
+            <span>02 เม.ย. 2569</span>
+          </div>
+        </div>
+      </a>
+      <a href="/health-library" class="article-card reveal reveal-delay-2" data-letter="ม">
+        <div class="article-img" style="background:linear-gradient(135deg,#F59E0B,#D97706)"></div>
+        <div class="article-body">
+          <div class="article-cat">มะเร็งเต้านม</div>
+          <div class="article-title">AI Mammography เพิ่มประสิทธิภาพการตรวจมะเร็งเต้านม</div>
+          <div class="article-meta">
+            <span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span> พญ. ศรัณยา</span>
+            <span>10 ธ.ค. 2568</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="trust-section section-pad">
+  <div class="container">
+    <div class="trust-grid">
+      <div class="reveal-left">
+        <div class="tag" style="background:rgba(255,255,255,.15);color:#fff"><Icon name="fa6-solid:star" /> <span data-i18n="sec_trust_tag">ทำไมต้องเลือก MediThai</span></div>
+        <h2 class="section-heading text-white" data-i18n="sec_trust_title">มาตรฐานสูงสุด ความไว้วางใจที่แท้จริง</h2>
+        <p style="color:rgba(255,255,255,.7);margin-bottom:0;max-width:440px;font-size:.95rem" data-i18n="sec_trust_sub">โรงพยาบาลชั้นนำที่ได้รับการยอมรับระดับนานาชาติ</p>
+        <div class="trust-points">
+          <div class="trust-point">
+            <div class="trust-point-icon"><Icon name="fa6-solid:bullseye" /></div>
+            <div>
+              <h4 data-i18n="trust1_h">วินิจฉัยแม่นยำ รักษาถูกต้อง</h4>
+              <p data-i18n="trust1_p">ทีมแพทย์เชี่ยวชาญเฉพาะทาง วินิจฉัยด้วยเทคโนโลยีล้ำสมัย ให้คุณได้รับการรักษาที่ถูกต้องตั้งแต่ครั้งแรก</p>
+            </div>
+          </div>
+          <div class="trust-point">
+            <div class="trust-point-icon"><Icon name="fa6-solid:robot" /></div>
+            <div>
+              <h4 data-i18n="trust2_h">เทคโนโลยีทางการแพทย์ระดับโลก</h4>
+              <p data-i18n="trust2_p">หุ่นยนต์ผ่าตัด da Vinci, AI Mammography, PET/CT Scan และอีกมากมาย</p>
+            </div>
+          </div>
+          <div class="trust-point">
+            <div class="trust-point-icon"><Icon name="fa6-solid:clock" /></div>
+            <div>
+              <h4 data-i18n="trust3_h">บริการต่อเนื่อง 24 ชั่วโมง</h4>
+              <p data-i18n="trust3_p">ทีมแพทย์และพยาบาลพร้อมดูแลคุณตลอด 24 ชั่วโมง ทุกวัน ไม่มีวันหยุด</p>
+            </div>
+          </div>
+          <div class="trust-point">
+            <div class="trust-point-icon"><Icon name="fa6-solid:certificate" /></div>
+            <div>
+              <h4 data-i18n="trust4_h">รับรองมาตรฐาน JCI &amp; HA</h4>
+              <p data-i18n="trust4_p">ผ่านการรับรองมาตรฐานโรงพยาบาลระดับนานาชาติ JCI และมาตรฐานสถานพยาบาล HA</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="trust-awards reveal-right">
+        <div class="award-card"><div class="award-icon">🏆</div><div class="award-name">Newsweek World's Best Hospital</div><div class="award-year">2024 · 2025 · 2026</div></div>
+        <div class="award-card"><div class="award-icon">🌐</div><div class="award-name">JCI Accreditation</div><div class="award-year">International Standard</div></div>
+        <div class="award-card"><div class="award-icon">🇹🇭</div><div class="award-name">HA Thailand Accreditation</div><div class="award-year">All 6 Hospitals</div></div>
+        <div class="award-card"><div class="award-icon">⭐</div><div class="award-name">ISO 9001:2015</div><div class="award-year">Quality Management</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section section-pad">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:40px">
+      <div class="tag"><Icon name="fa6-solid:comments" /> <span data-i18n="sec_test_tag">เสียงจากผู้ป่วย</span></div>
+      <h2 class="section-heading" data-i18n="sec_test_title">ความไว้ใจจากผู้ป่วยกว่า 50,000 คน</h2>
+    </div>
+    <div class="swiper testimonials-swiper" style="padding-bottom:48px">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div>
+            <p class="testimonial-text">"แพทย์วินิจฉัยได้รวดเร็ว ใจดีมาก อธิบายอาการให้เข้าใจง่าย ขั้นตอนการรักษาชัดเจนตั้งแต่ต้น รู้สึกอุ่นใจมากที่ได้รับการดูแลที่นี่"</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">ส</div>
+              <div><div class="testimonial-name">สมชาย วงศ์ประสิทธิ์</div><div class="testimonial-detail">ผู้ป่วยศูนย์หัวใจ · MediThai กรุงเทพ</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div>
+            <p class="testimonial-text">"ผ่าตัดมะเร็งด้วยหุ่นยนต์ da Vinci ฟื้นตัวเร็วมาก แผลเล็ก ไม่เจ็บมาก กลับบ้านได้เร็ว ประทับใจทีมแพทย์มากครับ"</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">ป</div>
+              <div><div class="testimonial-name">ประเสริฐ ทองคำ</div><div class="testimonial-detail">ผู้ป่วยมะเร็งปอด · MediThai มะเร็ง</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div>
+            <p class="testimonial-text">"นัดหมายผ่านแอปสะดวกมาก ไม่ต้องรอคิวนาน ผลตรวจส่งผ่านแอปได้เลย หมอติดตามอาการสม่ำเสมอ ดีใจที่เลือกมาที่นี่ค่ะ"</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">ว</div>
+              <div><div class="testimonial-name">วนิดา เจริญสุข</div><div class="testimonial-detail">ผู้ป่วยตรวจสุขภาพ · MediThai เชียงใหม่</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="testimonial-card">
+            <div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star-half-stroke" /></div>
+            <p class="testimonial-text">"ลูกสาวผ่าตัดเปลี่ยนข้อเข่าที่นี่ ทีมกายภาพบำบัดดีมาก ฟื้นตัวเร็วกว่าที่คาดไว้ กลับมาเดินได้ตามปกติภายใน 3 สัปดาห์"</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">ม</div>
+              <div><div class="testimonial-name">มาลี สุขสมบูรณ์</div><div class="testimonial-detail">ผู้ป่วยกระดูกและข้อ · MediThai สมองและกระดูก</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<!-- APP DOWNLOAD -->
+<section class="app-section section-pad">
+  <div class="container">
+    <div class="app-inner">
+      <div class="reveal-left">
+        <div class="tag" style="background:rgba(255,255,255,.15);color:#fff"><Icon name="fa6-solid:mobile-screen-button" /> <span data-i18n="sec_app_tag">MediThai Application</span></div>
+        <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700;color:#fff;margin-bottom:8px" data-i18n="sec_app_title">ดาวน์โหลดแอปเพื่อประสบการณ์</h2>
+        <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:700;color:var(--secondary-light)" data-i18n="sec_app_title2">ที่ดียิ่งขึ้น</h2>
+        <div class="app-features">
+          <div class="app-feature"><Icon name="fa6-solid:check" /> <span data-i18n="app_f1">นัดหมายแพทย์ออนไลน์ได้ทันที</span></div>
+          <div class="app-feature"><Icon name="fa6-solid:check" /> <span data-i18n="app_f2">ดูผลตรวจและประวัติการรักษา</span></div>
+          <div class="app-feature"><Icon name="fa6-solid:check" /> <span data-i18n="app_f3">ปรึกษาแพทย์ผ่าน Video Call</span></div>
+          <div class="app-feature"><Icon name="fa6-solid:check" /> <span data-i18n="app_f4">รับการแจ้งเตือนนัดหมาย</span></div>
+          <div class="app-feature"><Icon name="fa6-solid:check" /> <span data-i18n="app_f5">ชำระค่าบริการออนไลน์</span></div>
+        </div>
+        <div class="app-buttons">
+          <a href="#" class="app-btn">
+            <Icon name="fa6-brands:apple" />
+            <div><div class="sub">Download on the</div><div class="main" data-i18n="app_ios">App Store</div></div>
+          </a>
+          <a href="#" class="app-btn">
+            <Icon name="fa6-brands:google-play" />
+            <div><div class="sub">Get it on</div><div class="main" data-i18n="app_and">Google Play</div></div>
+          </a>
+        </div>
+      </div>
+      <div class="app-mockup reveal-right">
+        <div class="phone-mockup float">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-row medium"></div>
+            <div class="phone-row tall"></div>
+            <div class="phone-row"></div>
+            <div class="phone-row"></div>
+            <div class="phone-row medium"></div>
+            <div class="phone-row"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter-section">
+  <div class="container">
+    <div class="newsletter-box reveal">
+      <div class="newsletter-text">
+        <h2 data-i18n="news_title">รับข่าวสารสุขภาพ</h2>
+        <p data-i18n="news_sub">รับส่วนลด แพ็กเกจพิเศษ และบทความสุขภาพโดยตรงถึงอีเมลของคุณ</p>
+      </div>
+      <form class="newsletter-form" onsubmit="return false">
+        <input type="email" data-i18n-ph="news_ph" placeholder="กรอกอีเมลของคุณ" />
+        <button type="submit" class="btn btn-white" data-i18n="news_btn">สมัครรับข่าวสาร</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+</Layout>

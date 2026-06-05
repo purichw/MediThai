@@ -1,0 +1,51 @@
+---
+import Layout from '../../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout
+  title="MediThai สมองและกระดูก | เครือโรงพยาบาล MediThai"
+  description="ศูนย์ระบบประสาทและกระดูกสันหลัง พร้อมหุ่นยนต์ผ่าตัด Robotic UKA"
+  extraScripts={`
+    <script src="/js/hospital-page.js"></script>
+    <script>initHospitalPage({id:'spine'});</script>
+  `}
+>
+
+<section class="hosp-hero" style="background:linear-gradient(135deg,#0891B2 0%,#0E7490 100%)">
+  <div class="container">
+    <div class="breadcrumb" style="margin-bottom:20px"><a href="/" style="color:rgba(255,255,255,.6)">หน้าแรก</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><a href="/locations" style="color:rgba(255,255,255,.6)">โรงพยาบาล</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><span style="color:#fff">MediThai สมองและกระดูก</span></div>
+    <div class="hosp-hero-inner">
+      <div>
+        <div class="hosp-badge"><Icon name="fa6-solid:brain" /> โรงพยาบาลเฉพาะทางสมองและระบบกระดูก</div>
+        <h1 class="hosp-title">MediThai สมองและกระดูก</h1>
+        <p class="hosp-desc">ศูนย์ระบบประสาทและกระดูกสันหลัง พร้อมหุ่นยนต์ผ่าตัด Robotic UKA และทีมศัลยแพทย์ระดับโลก</p>
+        <div class="hosp-accred-row"><span class="hosp-accred-chip"><Icon name="fa6-solid:certificate" /> JCI</span><span class="hosp-accred-chip"><Icon name="fa6-solid:award" /> HA Thailand</span></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px">
+          <a href="/appointments" class="btn btn-primary btn-lg"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+          <a href="tel:023103300" class="btn btn-secondary btn-lg"><Icon name="fa6-solid:phone" /> 02-310-3300</a>
+        </div>
+      </div>
+      <div class="hosp-quick-stats">
+        <div class="hosp-qstat"><div class="num">30+</div><div class="lbl">แพทย์</div></div>
+        <div class="hosp-qstat"><div class="num" style="color:#FDE68A">4.8 ⭐</div><div class="lbl">Rating</div></div>
+      </div>
+    </div>
+    <div style="margin-top:24px"><div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-bottom:8px"><Icon name="fa6-solid:train-subway" style="margin-right:4px" />การเดินทาง</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span style="background:rgba(255,255,255,.15);color:#fff;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:8px"><Icon name="fa6-solid:route" style="margin-right:4px" />MRT บางขุนนนท์ 300ม.</span>
+      <span style="background:rgba(255,255,255,.15);color:#fff;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:8px"><Icon name="fa6-solid:route" style="margin-right:4px" />BTS บางหว้า 600ม.</span>
+    </div></div>
+  </div>
+</section>
+
+<section style="background:var(--gray-50);padding:32px 0">
+  <div class="container">
+    <div class="contact-info-item"><div class="contact-icon" style="background:rgba(8,145,178,.1);color:#0891B2"><Icon name="fa6-solid:phone" /></div><div><h4>ติดต่อ MediThai สมองและกระดูก</h4><p>02-310-3300</p></div></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+      <a href="/appointments" class="btn btn-primary"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
+      <a href="/hospitals/medithai-bangkok" class="btn btn-outline"><Icon name="fa6-solid:building-columns" /> MediThai กรุงเทพ (HQ)</a>
+    </div>
+  </div>
+</section>
+
+</Layout>

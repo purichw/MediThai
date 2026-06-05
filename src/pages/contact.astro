@@ -1,0 +1,164 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="ติดต่อเรา | MediThai Hospital Network" description="เราพร้อมตอบทุกคำถามของคุณตลอด 24 ชั่วโมง"
+  extraScripts={`
+    <script>
+    function submitContact(btn) {
+      btn.innerHTML = '✓ ส่งข้อความสำเร็จแล้ว!';
+      btn.style.background = '#10B981';
+      btn.disabled = true;
+    }
+    </script>
+  `}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ติดต่อเรา</span></div>
+    <h1 data-i18n="pg_contact_title">ติดต่อเรา</h1>
+    <p data-i18n="pg_contact_sub">เราพร้อมตอบทุกคำถามของคุณตลอด 24 ชั่วโมง</p>
+  </div>
+</section>
+
+<section style="background:var(--white);padding:48px 0">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+      <a href="tel:1722" class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
+        <div class="qa-icon blue"><Icon name="fa6-solid:phone" /></div>
+        <div class="qa-text"><h4>โทรศัพท์</h4><p>1722 (24 ชม.)</p></div>
+      </a>
+      <a href="https://line.me" target="_blank" class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
+        <div class="qa-icon green"><Icon name="fa6-brands:line" /></div>
+        <div class="qa-text"><h4>LINE Official</h4><p>@medithai</p></div>
+      </a>
+      <a href="mailto:contact@medithai.com" class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
+        <div class="qa-icon teal"><Icon name="fa6-solid:envelope" /></div>
+        <div class="qa-text"><h4>อีเมล</h4><p>contact@medithai.com</p></div>
+      </a>
+      <a href="/appointments" class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
+        <div class="qa-icon amber"><Icon name="fa6-solid:calendar-check" /></div>
+        <div class="qa-text"><h4>นัดหมายออนไลน์</h4><p>24/7 พร้อมให้บริการ</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="contact-layout">
+      <div class="form-card reveal-left">
+        <h2 style="font-size:1.3rem;font-weight:700;color:var(--primary);margin-bottom:24px"><Icon name="fa6-solid:paper-plane" style="margin-right:8px;color:var(--secondary)" />ส่งข้อความหาเรา</h2>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">ชื่อ-นามสกุล <span class="required">*</span></label><input type="text" class="form-control" placeholder="ชื่อของคุณ" /></div>
+          <div class="form-group"><label class="form-label">เบอร์โทรศัพท์</label><input type="tel" class="form-control" placeholder="08X-XXX-XXXX" /></div>
+        </div>
+        <div class="form-group"><label class="form-label">อีเมล <span class="required">*</span></label><input type="email" class="form-control" placeholder="email@example.com" /></div>
+        <div class="form-group">
+          <label class="form-label">หัวข้อ</label>
+          <select class="form-control">
+            <option value="">-- เลือกหัวข้อ --</option>
+            <option>สอบถามข้อมูลทั่วไป</option>
+            <option>นัดหมายแพทย์</option>
+            <option>สอบถามแพ็กเกจ</option>
+            <option>แพ็กเกจองค์กร</option>
+            <option>ร้องเรียน / ข้อเสนอแนะ</option>
+            <option>สมัครงาน</option>
+            <option>ผู้ป่วยต่างชาติ (International Patients)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">โรงพยาบาลที่ต้องการติดต่อ</label>
+          <select class="form-control">
+            <option value="">-- ทุกสาขา / ไม่ระบุ --</option>
+            <option>MediThai กรุงเทพ (สำนักงานใหญ่)</option>
+            <option>MediThai หัวใจ</option>
+            <option>MediThai มะเร็ง</option>
+            <option>MediThai สมองและกระดูก</option>
+            <option>MediThai เด็ก</option>
+            <option>MediThai เชียงใหม่</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">ข้อความ <span class="required">*</span></label><textarea class="form-control" rows="5" placeholder="พิมพ์ข้อความของคุณที่นี่..."></textarea></div>
+        <div class="form-group" style="display:flex;align-items:flex-start;gap:10px">
+          <input type="checkbox" id="consent" style="margin-top:4px;accent-color:var(--secondary)" />
+          <label for="consent" style="font-size:.82rem;color:var(--gray-600);line-height:1.6">ฉันยอมรับ <a href="#" style="color:var(--secondary)">นโยบายความเป็นส่วนตัว</a> และยินยอมให้ MediThai เก็บรวบรวมข้อมูลของฉันเพื่อติดต่อกลับ</label>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="submitContact(this)">
+          <Icon name="fa6-solid:paper-plane" /> ส่งข้อความ
+        </button>
+      </div>
+
+      <div class="reveal-right">
+        <h3 style="font-size:1.1rem;font-weight:600;color:var(--primary);margin-bottom:28px">ข้อมูลติดต่อ</h3>
+        <div class="contact-info-item">
+          <div class="contact-icon"><Icon name="fa6-solid:building-columns" /></div>
+          <div><h4>สำนักงานใหญ่</h4><p>2 ถนนเพชรบุรีตัดใหม่ แขวงบางกอกน้อย<br>กรุงเทพมหานคร 10700</p></div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon"><Icon name="fa6-solid:phone" /></div>
+          <div><h4>สายด่วน (24 ชั่วโมง)</h4><p><strong style="font-size:1.1rem;color:var(--primary)">1722</strong></p></div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon"><Icon name="fa6-solid:envelope" /></div>
+          <div><h4>อีเมล</h4><p>contact@medithai.com<br>international@medithai.com</p></div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon"><Icon name="fa6-solid:clock" /></div>
+          <div><h4>เวลาทำการ (OPD)</h4><p>ทุกวัน 07:00 – 21:00 น.<br>ห้องฉุกเฉิน: 24 ชั่วโมง</p></div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-icon"><Icon name="fa6-solid:globe" /></div>
+          <div><h4>บริการผู้ป่วยต่างชาติ</h4><p>ไทย · English · 中文 · 日本語<br>한국어 · Deutsch · العربية</p></div>
+        </div>
+        <div style="margin-top:28px;padding-top:28px;border-top:1px solid var(--gray-200)">
+          <h4 style="font-size:.85rem;font-weight:600;color:var(--gray-700);margin-bottom:14px">ติดตามเราบนโซเชียล</h4>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a href="#" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:.82rem;color:var(--gray-700)"><Icon name="fa6-brands:facebook-f" style="color:#1877F2" /> Facebook</a>
+            <a href="#" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:.82rem;color:var(--gray-700)"><Icon name="fa6-brands:line" style="color:#06C755" /> LINE OA</a>
+            <a href="#" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:.82rem;color:var(--gray-700)"><Icon name="fa6-brands:instagram" style="color:#E1306C" /> Instagram</a>
+            <a href="#" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:.82rem;color:var(--gray-700)"><Icon name="fa6-brands:youtube" style="color:#FF0000" /> YouTube</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" style="background:var(--white)">
+  <div class="container">
+    <div class="text-center reveal" style="margin-bottom:40px">
+      <div class="tag"><Icon name="fa6-solid:circle-question" /> คำถามที่พบบ่อย</div>
+      <h2 class="section-heading">FAQ</h2>
+    </div>
+    <div style="max-width:720px;margin:0 auto">
+      <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
+        <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
+          นัดหมายออนไลน์ต้องทำอย่างไร? <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
+        </summary>
+        <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8">กดปุ่ม "นัดหมาย" บนเว็บไซต์ เลือกโรงพยาบาล สาขาการแพทย์ แพทย์ และวันเวลา กรอกข้อมูลผู้ป่วย และยืนยันการนัดหมาย ระบบจะส่ง SMS และอีเมลยืนยันให้อัตโนมัติ</div>
+      </details>
+      <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
+        <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
+          รองรับประกันสุขภาพจากต่างประเทศหรือไม่? <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
+        </summary>
+        <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8">ใช่ เรารองรับประกันสุขภาพนานาชาติกว่า 30 บริษัท รวมถึง AIA, BUPA, Cigna, AXA, Allianz และอื่น ๆ สอบถามรายละเอียดได้ที่ 1722</div>
+      </details>
+      <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
+        <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
+          Virtual Visit หรือ Telemedicine คืออะไร? <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
+        </summary>
+        <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8">บริการปรึกษาแพทย์ผ่านวิดีโอคอลจากที่บ้าน เหมาะสำหรับการติดตามอาการ ขอใบรับรองแพทย์ หรือปรึกษาเบื้องต้น ไม่ต้องเดินทาง นัดหมายผ่านแอป MediThai ได้เลย</div>
+      </details>
+      <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
+        <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
+          ผู้ป่วยต่างชาติสามารถใช้บริการได้อย่างไร? <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
+        </summary>
+        <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8">เรามีทีม International Patient Services ที่พูดได้หลายภาษา รองรับผู้ป่วยจากทั่วโลก มีบริการล่ามแปลภาษา ช่วยประสานงานที่พัก และจัดทำเอกสารทางการแพทย์เป็นภาษาอังกฤษ ติดต่อ international@medithai.com</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+</Layout>

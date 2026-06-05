@@ -1,0 +1,325 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="นัดหมายออนไลน์ | MediThai Hospital Network" description="จองคิวได้ง่าย สะดวก รวดเร็ว ตลอด 24 ชั่วโมง"
+  extraHead={`
+    <style>
+    .service-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
+    @media(max-width:600px){.service-type-grid{grid-template-columns:1fr;}}
+    .service-type-card{border:2px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:var(--t) var(--ease);text-align:center;}
+    .service-type-card:hover,.service-type-card.selected{border-color:var(--secondary);background:rgba(8,145,178,.04);}
+    .service-type-card [data-icon]{font-size:2rem;color:var(--secondary);margin-bottom:10px;display:block;}
+    .service-type-card h4{font-size:.95rem;font-weight:600;color:var(--gray-800);margin-bottom:4px;}
+    .service-type-card p{font-size:.78rem;color:var(--gray-500);}
+    .appt-step{display:none;}
+    .appt-step.active{display:block;}
+    .time-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;}
+    @media(max-width:580px){.time-slots{grid-template-columns:repeat(3,1fr);}}
+    .time-slot{border:1.5px solid var(--gray-200);border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;font-size:.82rem;font-weight:500;color:var(--gray-700);transition:var(--t);}
+    .time-slot:hover,.time-slot.selected{border-color:var(--secondary);background:rgba(8,145,178,.08);color:var(--secondary);}
+    .time-slot.full{background:var(--gray-50);color:var(--gray-300);cursor:not-allowed;border-color:var(--gray-200);}
+    .success-screen{text-align:center;padding:48px 20px;}
+    .success-icon{width:80px;height:80px;border-radius:50%;background:rgba(16,185,129,.1);color:var(--success);font-size:2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+    </style>
+  `}
+  extraScripts={`
+    <script>
+    function selectServiceType(el, type) {
+      document.querySelectorAll('.service-type-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    function goToApptStep(step) {
+      document.querySelectorAll('.appt-step').forEach((el,i) => el.classList.toggle('active', i+1 === step));
+      ['step-ind-1','step-ind-2','step-ind-3'].forEach((id,i) => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.classList.toggle('active', i+1 === step);
+        el.classList.toggle('done', i+1 < step);
+      });
+      document.querySelector('.form-card').scrollIntoView({behavior:'smooth'});
+    }
+    function selectTime(el) {
+      if(el.classList.contains('full')) return;
+      document.querySelectorAll('.time-slot').forEach(t => t.classList.remove('selected'));
+      el.classList.add('selected');
+      const timeEl = document.getElementById('sum-time');
+      if(timeEl) timeEl.textContent = el.textContent + ' น.';
+    }
+    function submitAppt() {
+      document.querySelectorAll('.appt-step').forEach(el => el.classList.remove('active'));
+      document.getElementById('appt-step-success').classList.add('active');
+      ['step-ind-1','step-ind-2','step-ind-3'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.classList.add('done');
+      });
+    }
+    </script>
+  `}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>นัดหมาย</span></div>
+    <h1 data-i18n="pg_appt_title">นัดหมายออนไลน์</h1>
+    <p data-i18n="pg_appt_sub">จองคิวได้ง่าย สะดวก รวดเร็ว ตลอด 24 ชั่วโมง</p>
+  </div>
+</section>
+
+<section style="background:var(--gray-50);padding:48px 0 0">
+  <div class="container">
+    <p style="text-align:center;font-size:.88rem;color:var(--gray-500);margin-bottom:20px">เลือกประเภทบริการที่ต้องการ</p>
+    <div class="service-type-grid" style="max-width:700px;margin:0 auto">
+      <div class="service-type-card selected" onclick="selectServiceType(this,'onsite')">
+        <Icon name="fa6-solid:hospital" />
+        <h4>พบแพทย์ที่โรงพยาบาล</h4>
+        <p>Walk-in หรือนัดหมายล่วงหน้า</p>
+      </div>
+      <div class="service-type-card" id="virtual" onclick="selectServiceType(this,'virtual')">
+        <Icon name="fa6-solid:video" />
+        <h4>Virtual Visit</h4>
+        <p>ปรึกษาแพทย์ผ่านวิดีโอคอล</p>
+      </div>
+      <div class="service-type-card" id="second" onclick="selectServiceType(this,'second')">
+        <Icon name="fa6-solid:magnifying-glass-plus" />
+        <h4>Second Opinion</h4>
+        <p>ขอความเห็นที่สองจากผู้เชี่ยวชาญ</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="appt-layout">
+      <div>
+        <div class="form-card">
+          <div class="step-indicator">
+            <div class="step active" id="step-ind-1">
+              <div class="step-num">1</div>
+              <div class="step-label">ข้อมูลผู้ป่วย</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step-ind-2">
+              <div class="step-num">2</div>
+              <div class="step-label">เลือกแพทย์และวัน</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="step-ind-3">
+              <div class="step-num">3</div>
+              <div class="step-label">ยืนยัน</div>
+            </div>
+          </div>
+
+          <div class="appt-step active" id="appt-step-1">
+            <h3 style="font-size:1.1rem;font-weight:600;color:var(--primary);margin-bottom:24px">
+              <Icon name="fa6-solid:user" style="margin-right:8px" />ข้อมูลผู้ป่วย
+            </h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">ชื่อ <span class="required">*</span></label>
+                <input id="appt-fname" type="text" class="form-control appt-form-input" placeholder="ชื่อจริง" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">นามสกุล <span class="required">*</span></label>
+                <input id="appt-lname" type="text" class="form-control appt-form-input" placeholder="นามสกุล" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">เบอร์โทรศัพท์ <span class="required">*</span></label>
+                <input id="appt-phone" type="tel" class="form-control appt-form-input" placeholder="08X-XXX-XXXX" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">อีเมล</label>
+                <input type="email" class="form-control" placeholder="email@example.com" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">เลขบัตรประชาชน / Passport</label>
+                <input type="text" class="form-control" placeholder="หมายเลขบัตร" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">วันเดือนปีเกิด</label>
+                <input type="date" class="form-control" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ประเภทผู้ป่วย</label>
+              <div class="radio-group">
+                <label class="radio-card selected"><input type="radio" name="patient-type" value="new" checked /><Icon name="fa6-solid:user-plus" /><span>ผู้ป่วยใหม่</span></label>
+                <label class="radio-card"><input type="radio" name="patient-type" value="old" /><Icon name="fa6-solid:user-check" /><span>ผู้ป่วยเก่า</span></label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">สิทธิการรักษา</label>
+              <select class="form-control">
+                <option value="">เลือกสิทธิ</option>
+                <option>ชำระเอง (Self-pay)</option>
+                <option>ประกันชีวิต / Health Insurance</option>
+                <option>ประกันสังคม</option>
+                <option>บัตรทอง (30 บาท)</option>
+                <option>ข้าราชการ</option>
+              </select>
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center" onclick="goToApptStep(2)">
+              ถัดไป <Icon name="fa6-solid:arrow-right" />
+            </button>
+          </div>
+
+          <div class="appt-step" id="appt-step-2">
+            <h3 style="font-size:1.1rem;font-weight:600;color:var(--primary);margin-bottom:24px">
+              <Icon name="fa6-solid:calendar-check" style="margin-right:8px" />เลือกแพทย์และวันนัดหมาย
+            </h3>
+            <div class="form-group">
+              <label class="form-label">โรงพยาบาล <span class="required">*</span></label>
+              <select id="appt-hospital" class="form-control appt-form-input">
+                <option value="">-- เลือกโรงพยาบาล --</option>
+                <option>MediThai กรุงเทพ (สำนักงานใหญ่)</option>
+                <option>MediThai หัวใจ</option>
+                <option>MediThai มะเร็ง</option>
+                <option>MediThai สมองและกระดูก</option>
+                <option>MediThai เด็ก</option>
+                <option>MediThai เชียงใหม่</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">สาขาการแพทย์ <span class="required">*</span></label>
+              <select id="appt-specialty" class="form-control appt-form-input">
+                <option value="">-- เลือกสาขา --</option>
+                <option>อายุรกรรมทั่วไป</option>
+                <option>ศูนย์หัวใจ</option>
+                <option>ศูนย์มะเร็ง</option>
+                <option>ศูนย์สมองและระบบประสาท</option>
+                <option>ศูนย์กระดูกและข้อ</option>
+                <option>ศูนย์เด็ก</option>
+                <option>สูติ-นรีเวชกรรม</option>
+                <option>จักษุวิทยา</option>
+                <option>ตรวจสุขภาพ</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">วันที่นัดหมาย <span class="required">*</span></label>
+                <input id="appt-date" type="date" class="form-control appt-form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">เวลาที่ต้องการ</label>
+                <select id="appt-time" class="form-control appt-form-input">
+                  <option>-- เลือกช่วงเวลา --</option>
+                  <option>เช้า (08:00 - 12:00)</option>
+                  <option>บ่าย (13:00 - 17:00)</option>
+                  <option>เย็น (17:00 - 20:00)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">เลือกเวลา</label>
+              <div class="time-slots">
+                <div class="time-slot" onclick="selectTime(this)">08:00</div>
+                <div class="time-slot" onclick="selectTime(this)">08:30</div>
+                <div class="time-slot" onclick="selectTime(this)">09:00</div>
+                <div class="time-slot full">09:30</div>
+                <div class="time-slot" onclick="selectTime(this)">10:00</div>
+                <div class="time-slot full">10:30</div>
+                <div class="time-slot" onclick="selectTime(this)">11:00</div>
+                <div class="time-slot" onclick="selectTime(this)">11:30</div>
+                <div class="time-slot" onclick="selectTime(this)">13:00</div>
+                <div class="time-slot full">13:30</div>
+                <div class="time-slot" onclick="selectTime(this)">14:00</div>
+                <div class="time-slot" onclick="selectTime(this)">14:30</div>
+                <div class="time-slot" onclick="selectTime(this)">15:00</div>
+                <div class="time-slot" onclick="selectTime(this)">15:30</div>
+                <div class="time-slot full">16:00</div>
+                <div class="time-slot" onclick="selectTime(this)">16:30</div>
+              </div>
+              <p style="font-size:.73rem;color:var(--gray-400);margin-top:8px"><Icon name="fa6-solid:circle" style="color:var(--gray-300)" /> เต็มแล้ว</p>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px">
+              <button class="btn btn-outline btn-lg" style="flex:1;justify-content:center" onclick="goToApptStep(1)"><Icon name="fa6-solid:arrow-left" /> ย้อนกลับ</button>
+              <button class="btn btn-primary btn-lg" style="flex:2;justify-content:center" onclick="goToApptStep(3)">ถัดไป <Icon name="fa6-solid:arrow-right" /></button>
+            </div>
+          </div>
+
+          <div class="appt-step" id="appt-step-3">
+            <h3 style="font-size:1.1rem;font-weight:600;color:var(--primary);margin-bottom:24px">
+              <Icon name="fa6-solid:circle-check" style="margin-right:8px" />ยืนยันการนัดหมาย
+            </h3>
+            <div class="form-group">
+              <label class="form-label">อาการและเหตุผลในการมาพบแพทย์</label>
+              <textarea class="form-control" rows="3" placeholder="อธิบายอาการหรือสิ่งที่ต้องการปรึกษา..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ยาที่ใช้ประจำ (ถ้ามี)</label>
+              <textarea class="form-control" rows="2" placeholder="ระบุชื่อยาและขนาดยา..."></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">โรคประจำตัว / ประวัติการแพ้ยา</label>
+              <input type="text" class="form-control" placeholder="เช่น เบาหวาน ความดัน / แพ้ยา..." />
+            </div>
+            <div style="background:var(--gray-50);border-radius:var(--radius);padding:16px;margin:16px 0;font-size:.85rem;color:var(--gray-600)">
+              <p style="font-weight:600;color:var(--gray-800);margin-bottom:8px"><Icon name="fa6-solid:circle-info" style="color:var(--secondary);margin-right:6px" />ข้อควรทราบก่อนมาพบแพทย์</p>
+              <ul style="padding-left:20px;line-height:2">
+                <li>กรุณามาก่อนเวลานัด 15-30 นาที</li>
+                <li>นำบัตรประชาชนหรือหนังสือเดินทางมาด้วย</li>
+                <li>นำผลตรวจหรือยาเดิมมาแสดงแพทย์ด้วย</li>
+                <li>หากต้องยกเลิกนัด กรุณาแจ้งล่วงหน้าอย่างน้อย 24 ชม.</li>
+              </ul>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button class="btn btn-outline btn-lg" style="flex:1;justify-content:center" onclick="goToApptStep(2)"><Icon name="fa6-solid:arrow-left" /> ย้อนกลับ</button>
+              <button class="btn btn-primary btn-lg" style="flex:2;justify-content:center" onclick="submitAppt()"><Icon name="fa6-solid:calendar-check" /> ยืนยันนัดหมาย</button>
+            </div>
+          </div>
+
+          <div class="appt-step" id="appt-step-success">
+            <div class="success-screen">
+              <div class="success-icon"><Icon name="fa6-solid:check" /></div>
+              <h3 style="font-size:1.4rem;font-weight:700;color:var(--primary);margin-bottom:12px">นัดหมายสำเร็จแล้ว!</h3>
+              <p style="color:var(--gray-500);margin-bottom:24px">เราได้ส่งรายละเอียดการนัดหมายไปยังอีเมลและเบอร์โทรศัพท์ของคุณแล้ว</p>
+              <div style="background:var(--gray-50);border-radius:var(--radius-lg);padding:24px;text-align:left;margin-bottom:28px">
+                <div class="summary-row"><span class="key">หมายเลขนัดหมาย</span><span class="value" style="color:var(--secondary)">#MTH-2026-00847</span></div>
+                <div class="summary-row"><span class="key">โรงพยาบาล</span><span class="value">MediThai กรุงเทพ</span></div>
+                <div class="summary-row"><span class="key">สาขา</span><span class="value">ศูนย์หัวใจ</span></div>
+                <div class="summary-row"><span class="key">วันที่</span><span class="value">15 มิถุนายน 2569</span></div>
+                <div class="summary-row"><span class="key">เวลา</span><span class="value">10:00 น.</span></div>
+              </div>
+              <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                <a href="/" class="btn btn-outline">กลับหน้าแรก</a>
+                <button class="btn btn-primary" onclick="window.print()"><Icon name="fa6-solid:print" /> พิมพ์ใบนัด</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div>
+        <div class="appt-summary-card">
+          <h3><Icon name="fa6-solid:clipboard-list" style="margin-right:8px;color:var(--secondary)" />สรุปการนัดหมาย</h3>
+          <div class="summary-row"><span class="key">ชื่อ-นามสกุล</span><span class="value" id="sum-name">—</span></div>
+          <div class="summary-row"><span class="key">เบอร์โทร</span><span class="value" id="sum-phone">—</span></div>
+          <div class="summary-row"><span class="key">สาขา</span><span class="value" id="sum-specialty">—</span></div>
+          <div class="summary-row"><span class="key">โรงพยาบาล</span><span class="value" id="sum-hospital">—</span></div>
+          <div class="summary-row"><span class="key">วันที่</span><span class="value" id="sum-date">—</span></div>
+          <div class="summary-row"><span class="key">เวลา</span><span class="value" id="sum-time">—</span></div>
+          <div style="border-top:1px solid var(--gray-200);margin-top:16px;padding-top:16px">
+            <div style="font-size:.8rem;color:var(--gray-500);line-height:1.8">
+              <Icon name="fa6-solid:phone" style="color:var(--secondary);margin-right:6px" />สายด่วน: <strong>1722</strong><br />
+              <Icon name="fa6-solid:clock" style="color:var(--secondary);margin-right:6px" />บริการ 24 ชั่วโมง
+            </div>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:var(--radius-lg);padding:20px;margin-top:16px;color:#fff">
+          <h4 style="font-size:.9rem;font-weight:600;margin-bottom:8px"><Icon name="fa6-solid:video" style="margin-right:6px" />Virtual Visit พร้อมให้บริการ</h4>
+          <p style="font-size:.78rem;opacity:.85;margin-bottom:12px">ปรึกษาแพทย์ผ่านวิดีโอคอลจากที่บ้าน ไม่ต้องเดินทาง</p>
+          <a href="#" onclick="selectServiceType(document.querySelectorAll('.service-type-card')[1],'virtual');return false;" class="btn btn-white btn-sm" style="width:100%;justify-content:center">เลือก Virtual Visit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</Layout>
