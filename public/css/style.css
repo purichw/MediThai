@@ -1887,7 +1887,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   opacity: 1;
   visibility: visible;
 }
-.page-loader.hidden { opacity: 0; visibility: hidden; }
+.page-loader.hidden { opacity: 0 !important; visibility: hidden !important; }
 .loader-logo { text-align: center; }
 .loader-bar {
   width: 200px;
