@@ -2,11 +2,11 @@
   "name": "medithai-network",
   "type": "module",
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node -e \"const fs=require('fs'),p='.vercel/output/functions/_render.func/.vc-config.json';const c=JSON.parse(fs.readFileSync(p));c.runtime='nodejs20.x';fs.writeFileSync(p,JSON.stringify(c,null,2));console.log('runtime patched to nodejs20.x');\"",
+    "build": "astro build && node -e \"const fs=require('fs'),p='.vercel/output/functions/_render.func/.vc-config.json';const c=JSON.parse(fs.readFileSync(p));c.runtime='nodejs22.x';fs.writeFileSync(p,JSON.stringify(c,null,2));console.log('runtime patched to nodejs22.x');\"",
     "preview": "astro preview"
   },
   "dependencies": {
