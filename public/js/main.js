@@ -5,19 +5,33 @@
 /* ----------------------------------------------------------------
    Page Loader
    ---------------------------------------------------------------- */
-// Show loader only if page takes longer than 500ms (slow network / heavy page)
+// Always show loader on every page load; hide after page is ready + min 800ms
 const _loader = document.querySelector('.page-loader');
-if (_loader) _loader.style.transition = 'none'; // prevent flash on fast loads
-const _loaderTimer = setTimeout(() => {
-  if (_loader) {
-    _loader.style.transition = '';
-    _loader.style.opacity = '1';
-    _loader.style.visibility = 'visible';
+const _loaderMinMs = 800;
+const _loaderStart = performance.now();
+let _pageLoaded = false;
+let _minTimeDone = false;
+
+function _tryHideLoader() {
+  if (_pageLoaded && _minTimeDone && _loader) {
+    _loader.style.transition = 'opacity 0.4s ease, visibility 0.4s ease';
+    _loader.classList.add('hidden');
   }
-}, 500);
+}
+
+if (_loader) {
+  _loader.style.opacity = '1';
+  _loader.style.visibility = 'visible';
+}
+
+setTimeout(() => {
+  _minTimeDone = true;
+  _tryHideLoader();
+}, _loaderMinMs);
+
 window.addEventListener('load', () => {
-  clearTimeout(_loaderTimer);
-  if (_loader) _loader.classList.add('hidden');
+  _pageLoaded = true;
+  _tryHideLoader();
 });
 
 /* ----------------------------------------------------------------
