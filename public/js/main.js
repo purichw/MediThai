@@ -25,8 +25,8 @@ function _tryHideLoader() {
 // Minimum 800ms so animation plays
 setTimeout(() => { _minTimeDone = true; _tryHideLoader(); }, 800);
 
-// Force-hide after 2s no matter what
-setTimeout(_hideLoader, 2000);
+// Force-hide after 3.5s no matter what
+setTimeout(_hideLoader, 3500);
 
 window.addEventListener('load', () => { _pageLoaded = true; _tryHideLoader(); });
 
