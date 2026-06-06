@@ -5,34 +5,30 @@
 /* ----------------------------------------------------------------
    Page Loader
    ---------------------------------------------------------------- */
-// Always show loader on every page load; hide after page is ready + min 800ms
+// Always show loader; hide after page ready + min 800ms, force-hide after 2s max
 const _loader = document.querySelector('.page-loader');
-const _loaderMinMs = 800;
-const _loaderStart = performance.now();
+let _loaderHidden = false;
+
+function _hideLoader() {
+  if (_loaderHidden || !_loader) return;
+  _loaderHidden = true;
+  _loader.classList.add('hidden');
+}
+
 let _pageLoaded = false;
 let _minTimeDone = false;
 
 function _tryHideLoader() {
-  if (_pageLoaded && _minTimeDone && _loader) {
-    _loader.style.transition = 'opacity 0.4s ease, visibility 0.4s ease';
-    _loader.classList.add('hidden');
-  }
+  if (_pageLoaded && _minTimeDone) _hideLoader();
 }
 
-if (_loader) {
-  _loader.style.opacity = '1';
-  _loader.style.visibility = 'visible';
-}
+// Minimum 800ms so animation plays
+setTimeout(() => { _minTimeDone = true; _tryHideLoader(); }, 800);
 
-setTimeout(() => {
-  _minTimeDone = true;
-  _tryHideLoader();
-}, _loaderMinMs);
+// Force-hide after 2s no matter what
+setTimeout(_hideLoader, 2000);
 
-window.addEventListener('load', () => {
-  _pageLoaded = true;
-  _tryHideLoader();
-});
+window.addEventListener('load', () => { _pageLoaded = true; _tryHideLoader(); });
 
 /* ----------------------------------------------------------------
    DOM refs shared by scroll handler (declared before Lenis init)
