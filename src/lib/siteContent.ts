@@ -43,8 +43,10 @@ export async function getFlatContent(
   const en: Record<string, string> = {};
 
   for (const section of Object.values(sections)) {
-    Object.assign(th, section.content.th ?? {});
-    Object.assign(en, section.content.en ?? {});
+    // Meta fields are language-neutral; copy them into both th and en
+    const meta = section.content.meta ?? {};
+    Object.assign(th, meta, section.content.th ?? {});
+    Object.assign(en, meta, section.content.en ?? {});
   }
   return { th, en };
 }

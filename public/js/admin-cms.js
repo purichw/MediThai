@@ -93,23 +93,25 @@
     const en   = {};
     const meta = {};
 
-    // Textarea / input fields
+    // Textarea / input fields — skip empty values (empty = use default)
     body.querySelectorAll('.cms-textarea, .cms-input').forEach(el => {
       const lang  = el.dataset.lang;
       const field = el.dataset.field;
       if (!field) return;
-      const val   = el.value;
+      const val   = el.value.trim();
+      if (!val) return;
       if (lang === 'th') th[field] = val;
       else if (lang === 'en') en[field] = val;
       else if (lang === 'meta') meta[field] = val;
     });
 
-    // Quill editors
+    // Quill editors — skip empty content
     Object.entries(quillers).forEach(([qKey, q]) => {
       const [lang, secKey, field] = qKey.split('::');
       if (secKey !== sectionKey) return;
       const html = q.root.innerHTML;
       const val  = html === '<p><br></p>' ? '' : html;
+      if (!val) return;
       if (lang === 'th') th[field] = val;
       else if (lang === 'en') en[field] = val;
       else if (lang === 'meta') meta[field] = val;
