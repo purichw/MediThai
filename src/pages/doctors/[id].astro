@@ -2,13 +2,29 @@
 export const prerender = false;
 import Layout from '../../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { getDoctorById } from '../../lib/doctorsData';
+import { getDoctorByIdFromDB } from '../../lib/doctorsData';
 
 const { id } = Astro.params;
-const doctor = getDoctorById(id!);
+const doctor = await getDoctorByIdFromDB(id!);
 if (!doctor) return Astro.redirect('/doctors');
+
+const physicianSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Physician',
+  name: doctor.nameEn,
+  alternateName: doctor.nameTh,
+  description: doctor.bioEn,
+  medicalSpecialty: doctor.specialtyEn,
+  worksFor: {
+    '@type': 'Hospital',
+    name: doctor.hospitalEn,
+    url: 'https://medithai-network.vercel.app',
+  },
+  url: `https://medithai-network.vercel.app/doctors/${doctor.id}`,
+};
 ---
 <Layout title={`${doctor.nameTh} | MediThai`} description={doctor.bioTh}
+  ogType="profile" schema={physicianSchema}
   extraHead={`<style>
   .profile-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--secondary) 100%); padding: 80px 0 0; }
   .profile-card { background: #fff; border-radius: 24px 24px 0 0; margin-top: 40px; padding: 48px 56px; display: grid; grid-template-columns: 280px 1fr; gap: 48px; }

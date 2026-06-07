@@ -241,3 +241,67 @@ export const doctors: Doctor[] = [
 export function getDoctorById(id: string): Doctor | undefined {
   return doctors.find(d => d.id === id);
 }
+
+// Map a Supabase row to the Doctor interface
+function rowToDoctor(row: Record<string, unknown>): Doctor {
+  return {
+    id:          row.id as string,
+    nameTh:      row.name_th as string,
+    nameEn:      row.name_en as string,
+    titleTh:     row.title_th as string,
+    titleEn:     row.title_en as string,
+    specialty:   row.specialty as string,
+    specialtyEn: row.specialty_en as string,
+    hospital:    row.hospital as string,
+    hospitalEn:  row.hospital_en as string,
+    hospitalKey: row.hospital_key as string,
+    color:       row.color as string,
+    tags:        (row.tags as string[]) ?? [],
+    bioTh:       row.bio_th as string,
+    bioEn:       row.bio_en as string,
+    education:   (row.education as { th: string; en: string }[]) ?? [],
+    awards:      (row.awards as { th: string; en: string }[]) ?? [],
+    schedule:    (row.schedule as { day: string; dayEn: string; time: string }[]) ?? [],
+    languages:   (row.languages as string[]) ?? [],
+    experience:  row.experience as number,
+  };
+}
+
+export async function getDoctorsFromDB(): Promise<Doctor[]> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+    );
+    const { data, error } = await supabase
+      .from('doctors')
+      .select('*')
+      .eq('is_active', true)
+      .order('experience', { ascending: false });
+    if (error || !data?.length) return doctors;
+    return data.map(rowToDoctor);
+  } catch {
+    return doctors;
+  }
+}
+
+export async function getDoctorByIdFromDB(id: string): Promise<Doctor | undefined> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+    );
+    const { data, error } = await supabase
+      .from('doctors')
+      .select('*')
+      .eq('id', id)
+      .eq('is_active', true)
+      .single();
+    if (error || !data) return getDoctorById(id);
+    return rowToDoctor(data);
+  } catch {
+    return getDoctorById(id);
+  }
+}

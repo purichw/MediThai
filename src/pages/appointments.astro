@@ -46,13 +46,63 @@ import { Icon } from 'astro-icon/components';
       const timeEl = document.getElementById('sum-time');
       if(timeEl) timeEl.textContent = el.textContent + ' น.';
     }
-    function submitAppt() {
-      document.querySelectorAll('.appt-step').forEach(el => el.classList.remove('active'));
-      document.getElementById('appt-step-success').classList.add('active');
-      ['step-ind-1','step-ind-2','step-ind-3'].forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.classList.add('done');
-      });
+    async function submitAppt() {
+      const btn = document.querySelector('#appt-step-3 .btn-primary');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span style="opacity:.7">กำลังบันทึก...</span>'; }
+
+      const payload = {
+        firstName:       document.getElementById('appt-fname')?.value?.trim() || '',
+        lastName:        document.getElementById('appt-lname')?.value?.trim() || '',
+        phone:           document.getElementById('appt-phone')?.value?.trim() || '',
+        email:           document.getElementById('appt-email')?.value?.trim() || '',
+        idNumber:        document.getElementById('appt-idnum')?.value?.trim() || '',
+        dob:             document.getElementById('appt-dob')?.value || '',
+        patientType:     document.querySelector('input[name="patient-type"]:checked')?.value || 'new',
+        insurance:       document.getElementById('appt-insurance')?.value || '',
+        serviceType:     document.querySelector('.service-type-card.selected')?.dataset?.type || 'onsite',
+        hospital:        document.getElementById('appt-hospital')?.value || '',
+        specialty:       document.getElementById('appt-specialty')?.value || '',
+        appointmentDate: document.getElementById('appt-date')?.value || '',
+        appointmentTime: document.querySelector('.time-slot.selected')?.textContent?.trim() ||
+                         document.getElementById('appt-time')?.value || '',
+        symptoms:        document.getElementById('appt-symptoms')?.value?.trim() || '',
+        medications:     document.getElementById('appt-medications')?.value?.trim() || '',
+        medicalHistory:  document.getElementById('appt-history')?.value?.trim() || '',
+      };
+
+      if (!payload.firstName || !payload.lastName || !payload.phone || !payload.hospital || !payload.specialty || !payload.appointmentDate) {
+        alert('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<span>ยืนยันนัดหมาย</span>'; }
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/appointments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
+
+        // Populate success screen
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+        set('success-appt-number', data.appointmentNumber);
+        set('sum-hospital-s', payload.hospital);
+        set('sum-specialty-s', payload.specialty);
+        set('sum-date-s', payload.appointmentDate);
+        set('sum-time-s', payload.appointmentTime || 'จะแจ้งยืนยันภายหลัง');
+
+        document.querySelectorAll('.appt-step').forEach(el => el.classList.remove('active'));
+        document.getElementById('appt-step-success').classList.add('active');
+        ['step-ind-1','step-ind-2','step-ind-3'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.add('done');
+        });
+      } catch (err) {
+        alert('เกิดข้อผิดพลาด: ' + err.message);
+        if (btn) { btn.disabled = false; btn.innerHTML = '<span>ยืนยันนัดหมาย</span>'; }
+      }
     }
     </script>
   `}
@@ -132,17 +182,17 @@ import { Icon } from 'astro-icon/components';
               </div>
               <div class="form-group">
                 <label class="form-label">อีเมล</label>
-                <input type="email" class="form-control" placeholder="email@example.com" />
+                <input id="appt-email" type="email" class="form-control" placeholder="email@example.com" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">เลขบัตรประชาชน / Passport</label>
-                <input type="text" class="form-control" placeholder="หมายเลขบัตร" />
+                <input id="appt-idnum" type="text" class="form-control" placeholder="หมายเลขบัตร" />
               </div>
               <div class="form-group">
                 <label class="form-label">วันเดือนปีเกิด</label>
-                <input type="date" class="form-control" />
+                <input id="appt-dob" type="date" class="form-control" />
               </div>
             </div>
             <div class="form-group">
@@ -154,7 +204,7 @@ import { Icon } from 'astro-icon/components';
             </div>
             <div class="form-group">
               <label class="form-label">สิทธิการรักษา</label>
-              <select class="form-control">
+              <select id="appt-insurance" class="form-control">
                 <option value="">เลือกสิทธิ</option>
                 <option>ชำระเอง (Self-pay)</option>
                 <option>ประกันชีวิต / Health Insurance</option>
@@ -248,15 +298,15 @@ import { Icon } from 'astro-icon/components';
             </h3>
             <div class="form-group">
               <label class="form-label">อาการและเหตุผลในการมาพบแพทย์</label>
-              <textarea class="form-control" rows="3" placeholder="อธิบายอาการหรือสิ่งที่ต้องการปรึกษา..."></textarea>
+              <textarea id="appt-symptoms" class="form-control" rows="3" placeholder="อธิบายอาการหรือสิ่งที่ต้องการปรึกษา..."></textarea>
             </div>
             <div class="form-group">
               <label class="form-label">ยาที่ใช้ประจำ (ถ้ามี)</label>
-              <textarea class="form-control" rows="2" placeholder="ระบุชื่อยาและขนาดยา..."></textarea>
+              <textarea id="appt-medications" class="form-control" rows="2" placeholder="ระบุชื่อยาและขนาดยา..."></textarea>
             </div>
             <div class="form-group">
               <label class="form-label">โรคประจำตัว / ประวัติการแพ้ยา</label>
-              <input type="text" class="form-control" placeholder="เช่น เบาหวาน ความดัน / แพ้ยา..." />
+              <input id="appt-history" type="text" class="form-control" placeholder="เช่น เบาหวาน ความดัน / แพ้ยา..." />
             </div>
             <div style="background:var(--gray-50);border-radius:var(--radius);padding:16px;margin:16px 0;font-size:.85rem;color:var(--gray-600)">
               <p style="font-weight:600;color:var(--gray-800);margin-bottom:8px"><Icon name="fa6-solid:circle-info" style="color:var(--secondary);margin-right:6px" />ข้อควรทราบก่อนมาพบแพทย์</p>
@@ -279,11 +329,11 @@ import { Icon } from 'astro-icon/components';
               <h3 style="font-size:1.4rem;font-weight:700;color:var(--primary);margin-bottom:12px">นัดหมายสำเร็จแล้ว!</h3>
               <p style="color:var(--gray-500);margin-bottom:24px">เราได้ส่งรายละเอียดการนัดหมายไปยังอีเมลและเบอร์โทรศัพท์ของคุณแล้ว</p>
               <div style="background:var(--gray-50);border-radius:var(--radius-lg);padding:24px;text-align:left;margin-bottom:28px">
-                <div class="summary-row"><span class="key">หมายเลขนัดหมาย</span><span class="value" style="color:var(--secondary)">#MTH-2026-00847</span></div>
-                <div class="summary-row"><span class="key">โรงพยาบาล</span><span class="value">MediThai กรุงเทพ</span></div>
-                <div class="summary-row"><span class="key">สาขา</span><span class="value">ศูนย์หัวใจ</span></div>
-                <div class="summary-row"><span class="key">วันที่</span><span class="value">15 มิถุนายน 2569</span></div>
-                <div class="summary-row"><span class="key">เวลา</span><span class="value">10:00 น.</span></div>
+                <div class="summary-row"><span class="key">หมายเลขนัดหมาย</span><span id="success-appt-number" class="value" style="color:var(--secondary)">—</span></div>
+                <div class="summary-row"><span class="key">โรงพยาบาล</span><span class="value" id="sum-hospital-s">—</span></div>
+                <div class="summary-row"><span class="key">สาขา</span><span class="value" id="sum-specialty-s">—</span></div>
+                <div class="summary-row"><span class="key">วันที่</span><span class="value" id="sum-date-s">—</span></div>
+                <div class="summary-row"><span class="key">เวลา</span><span class="value" id="sum-time-s">—</span></div>
               </div>
               <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
                 <a href="/" class="btn btn-outline">กลับหน้าแรก</a>

@@ -10,6 +10,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "@astrojs/vercel": "^10.0.8",
     "@iconify-json/fa6-brands": "^1.2.4",
     "@iconify-json/fa6-regular": "^1.2.4",
