@@ -1,0 +1,705 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="โปรแกรมคำนวณสุขภาพ | MediThai" description="คำนวณ BMI, BMR, TDEE, ไขมันในร่างกาย, น้ำที่ควรดื่ม, วันไข่ตก, อายุ, เปอร์เซ็นต์ และอื่นๆ ฟรี"
+  extraHead={`<style>
+  .calc-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:32px; }
+  .calc-tab { padding:10px 18px; border-radius:12px; border:2px solid var(--gray-200); background:#fff; font-family:inherit; font-size:.875rem; font-weight:600; color:var(--gray-600); cursor:pointer; transition:all .2s; }
+  .calc-tab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .calc-panel { display:none; }
+  .calc-panel.active { display:grid; grid-template-columns:1fr 1fr; gap:32px; }
+  @media(max-width:768px){ .calc-panel.active { grid-template-columns:1fr; } }
+  .calc-input-section { background:#fff; border-radius:20px; padding:32px; box-shadow:var(--shadow-md); }
+  .calc-result-section { background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:20px; padding:32px; color:#fff; }
+  .result-box { background:rgba(255,255,255,.15); border-radius:16px; padding:20px; margin-bottom:12px; text-align:center; }
+  .result-row { background:rgba(255,255,255,.1); border-radius:12px; padding:12px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; font-size:.875rem; }
+  .result-row-label { opacity:.8; }
+  .result-row-value { font-weight:700; }
+  .result-big { font-size:3rem; font-weight:800; line-height:1; }
+  .result-label { font-size:.875rem; opacity:.8; margin-top:4px; }
+  .result-cat { display:inline-block; padding:6px 16px; border-radius:20px; font-size:.85rem; font-weight:700; margin-top:8px; }
+  .cat-thin { background:#BFDBFE; color:#1E40AF; }
+  .cat-normal { background:#BBF7D0; color:#14532D; }
+  .cat-over { background:#FED7AA; color:#7C2D12; }
+  .cat-obese { background:#FECACA; color:#7F1D1D; }
+  .gauge-track { height:12px; border-radius:6px; background:rgba(255,255,255,.25); overflow:hidden; margin:12px 0; }
+  .gauge-fill { height:100%; border-radius:6px; transition:width .6s ease; }
+  .food-table { width:100%; border-collapse:collapse; font-size:.875rem; }
+  .food-table th { background:var(--primary); color:#fff; padding:10px 12px; text-align:left; }
+  .food-table td { padding:9px 12px; border-bottom:1px solid var(--gray-100); }
+  .food-table tr:hover td { background:var(--gray-50); }
+  .food-table tr:nth-child(even) td { background:var(--gray-50); }
+  .food-table tr:nth-child(even):hover td { background:var(--gray-100); }
+  .search-food { width:100%; padding:10px 16px; border:2px solid var(--gray-200); border-radius:12px; font-family:inherit; font-size:.875rem; margin-bottom:16px; }
+  .search-food:focus { outline:none; border-color:var(--secondary); }
+  .ovulation-row { display:flex; gap:8px; align-items:flex-start; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.15); font-size:.875rem; }
+  .ov-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+  .tip-box { background:rgba(255,255,255,.1); border-radius:12px; padding:16px; font-size:.85rem; line-height:1.7; margin-top:12px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media(max-width:480px){ .form-row{grid-template-columns:1fr;} }
+  .pct-mode-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px; }
+  .pct-mode-btn { padding:6px 14px; border-radius:8px; border:2px solid var(--gray-200); background:#fff; font-family:inherit; font-size:.8rem; font-weight:600; color:var(--gray-600); cursor:pointer; }
+  .pct-mode-btn.active { background:var(--secondary); color:#fff; border-color:var(--secondary); }
+  .pct-section { display:none; }
+  .pct-section.active { display:block; }
+  .age-stat { background:rgba(255,255,255,.15); border-radius:12px; padding:14px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+  .age-stat-num { font-size:1.5rem; font-weight:800; }
+  .age-stat-lbl { font-size:.8rem; opacity:.75; }
+  </style>`}
+  extraScripts={`<script>
+  // ===== Tab switching =====
+  function showCalc(id) {
+    document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-calc="'+id+'"]').classList.add('active');
+    document.getElementById('panel-'+id).classList.add('active');
+  }
+
+  // ===== BMI =====
+  function calcBMI() {
+    const w = parseFloat(document.getElementById('bmi-weight').value);
+    const h = parseFloat(document.getElementById('bmi-height').value) / 100;
+    const a = parseFloat(document.getElementById('bmi-age').value);
+    const g = document.getElementById('bmi-gender').value;
+    if (!w || !h) return;
+    const bmi = w / (h * h);
+    // Ideal weight range for this height (BMI 18.5–22.9)
+    const idealLow = (18.5 * h * h).toFixed(1);
+    const idealHigh = (22.9 * h * h).toFixed(1);
+    let cat, catClass, color, tip;
+    if (bmi < 18.5) { cat='น้ำหนักน้อยกว่าเกณฑ์'; catClass='cat-thin'; color='#60A5FA'; tip='ควรเพิ่มปริมาณอาหารและออกกำลังกายสร้างกล้ามเนื้อ ปรึกษาโภชนากรเพื่อแผนที่เหมาะสม'; }
+    else if (bmi < 23) { cat='น้ำหนักอยู่ในเกณฑ์ปกติ'; catClass='cat-normal'; color='#34D399'; tip='ดีมาก! รักษาน้ำหนักด้วยการกินอาหารสมดุลและออกกำลังกายสม่ำเสมอ'; }
+    else if (bmi < 25) { cat='น้ำหนักเกินเล็กน้อย'; catClass='cat-over'; color='#FBBF24'; tip='ลดการบริโภคแป้งและน้ำตาล เพิ่มการออกกำลังกาย ควรพบแพทย์เพื่อประเมิน'; }
+    else if (bmi < 30) { cat='อ้วน (โรคอ้วนระดับ 1)'; catClass='cat-obese'; color='#F87171'; tip='มีความเสี่ยงโรคหัวใจ เบาหวาน ควรพบแพทย์เพื่อวางแผนลดน้ำหนักอย่างปลอดภัย'; }
+    else { cat='อ้วนมาก (โรคอ้วนระดับ 2+)'; catClass='cat-obese'; color='#EF4444'; tip='ความเสี่ยงสูงมาก ควรพบแพทย์ด่วนเพื่อรับการดูแลและวางแผนอย่างเหมาะสม'; }
+    const pct = Math.min(Math.max((bmi - 10) / 30, 0), 1) * 100;
+    document.getElementById('bmi-result').innerHTML =
+      '<div class="result-box"><div class="result-big">' + bmi.toFixed(1) + '</div><div class="result-label">ค่า BMI (kg/m²)</div>' +
+      '<div class="gauge-track"><div class="gauge-fill" style="width:'+pct+'%;background:'+color+'"></div></div>' +
+      '<span class="result-cat '+catClass+'">' + cat + '</span></div>' +
+      '<div class="result-row"><span class="result-row-label">น้ำหนักที่เหมาะสม (BMI 18.5–22.9)</span><span class="result-row-value">' + idealLow + '–' + idealHigh + ' กก.</span></div>' +
+      (a ? '<div class="result-row"><span class="result-row-label">อายุ</span><span class="result-row-value">' + a + ' ปี</span></div>' : '') +
+      '<div class="tip-box">' + tip + '</div>' +
+      '<div style="margin-top:12px;font-size:.8rem;opacity:.7">เกณฑ์ WHO สำหรับชาวเอเชีย: ปกติ 18.5–22.9 · เกิน 23–24.9 · อ้วน ≥25</div>';
+  }
+
+  // ===== BMR =====
+  function calcBMR() {
+    const w = parseFloat(document.getElementById('bmr-weight').value);
+    const h = parseFloat(document.getElementById('bmr-height').value);
+    const a = parseFloat(document.getElementById('bmr-age').value);
+    const g = document.getElementById('bmr-gender').value;
+    if (!w || !h || !a) return;
+    let bmr;
+    if (g === 'm') bmr = 10*w + 6.25*h - 5*a + 5;
+    else bmr = 10*w + 6.25*h - 5*a - 161;
+    document.getElementById('bmr-result').innerHTML =
+      '<div class="result-box"><div class="result-big">' + Math.round(bmr) + '</div><div class="result-label">แคลอรี่/วัน (BMR)</div></div>' +
+      '<div class="result-row"><span class="result-row-label">ต่ำกว่า BMR = ร่างกายดึงสำรอง</span><span class="result-row-value">ไม่ควรกินต่ำกว่า ' + Math.round(bmr) + ' kcal</span></div>' +
+      '<div class="tip-box">BMR คือพลังงานขั้นต่ำที่ร่างกายต้องการเพื่อรักษาชีวิตในสภาวะพัก ใช้คำนวณ TDEE เพิ่มเติมตามระดับกิจกรรม สูตร Mifflin-St Jeor</div>';
+  }
+
+  // ===== TDEE =====
+  function calcTDEE() {
+    const w = parseFloat(document.getElementById('tdee-weight').value);
+    const h = parseFloat(document.getElementById('tdee-height').value);
+    const a = parseFloat(document.getElementById('tdee-age').value);
+    const g = document.getElementById('tdee-gender').value;
+    const act = parseFloat(document.getElementById('tdee-activity').value);
+    if (!w || !h || !a) return;
+    let bmr;
+    if (g === 'm') bmr = 10*w + 6.25*h - 5*a + 5;
+    else bmr = 10*w + 6.25*h - 5*a - 161;
+    const tdee = bmr * act;
+    document.getElementById('tdee-result').innerHTML =
+      '<div class="result-box"><div class="result-big">' + Math.round(tdee) + '</div><div class="result-label">แคลอรี่/วัน (TDEE)</div></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">' +
+      '<div class="result-box" style="padding:12px"><div style="font-size:1.1rem;font-weight:700">' + Math.round(tdee-500) + '</div><div style="font-size:.75rem;opacity:.8">ลดน้ำหนัก (−500 kcal)</div></div>' +
+      '<div class="result-box" style="padding:12px"><div style="font-size:1.1rem;font-weight:700">' + Math.round(tdee+500) + '</div><div style="font-size:.75rem;opacity:.8">เพิ่มน้ำหนัก (+500 kcal)</div></div>' +
+      '</div>' +
+      '<div class="result-row"><span class="result-row-label">BMR (ขณะพัก)</span><span class="result-row-value">' + Math.round(bmr) + ' kcal</span></div>' +
+      '<div class="tip-box">กินน้อยกว่า TDEE = ลดน้ำหนัก · กินมากกว่า = เพิ่มน้ำหนัก<br>ลด/เพิ่ม 500 kcal/วัน ≈ เปลี่ยนน้ำหนัก ~0.5 กก./สัปดาห์</div>';
+  }
+
+  // ===== Body Fat (Deurenberg — inputs: weight, height, age, gender) =====
+  function calcBodyFat() {
+    const w = parseFloat(document.getElementById('bf-weight').value);
+    const h = parseFloat(document.getElementById('bf-height').value) / 100;
+    const age = parseFloat(document.getElementById('bf-age').value);
+    const g = document.getElementById('bf-gender').value;
+    if (!w || !h || !age) return;
+    const bmi = w / (h * h);
+    // Deurenberg formula
+    const sexFactor = g === 'm' ? 1 : 0;
+    let bf = 1.2*bmi + 0.23*age - 10.8*sexFactor - 5.4;
+    bf = Math.max(0, bf);
+    const fatMass = (w * bf / 100);
+    const leanMass = w - fatMass;
+    // Ideal body fat by age & gender
+    let idealBF, idealRange;
+    if (g === 'm') {
+      if (age < 40) { idealBF = 14; idealRange = '8–19%'; }
+      else if (age < 60) { idealBF = 17; idealRange = '11–21%'; }
+      else { idealBF = 20; idealRange = '13–24%'; }
+    } else {
+      if (age < 40) { idealBF = 26; idealRange = '21–32%'; }
+      else if (age < 60) { idealBF = 29; idealRange = '23–33%'; }
+      else { idealBF = 31; idealRange = '24–35%'; }
+    }
+    const idealFatMass = w * idealBF / 100;
+    const fatToLose = Math.max(0, fatMass - idealFatMass);
+    let cat, catClass;
+    if (g === 'm') {
+      if (bf < 8) { cat='ต่ำมาก'; catClass='cat-thin'; }
+      else if (bf < 20) { cat='ปกติ'; catClass='cat-normal'; }
+      else if (bf < 25) { cat='เกินเล็กน้อย'; catClass='cat-over'; }
+      else { cat='อ้วน'; catClass='cat-obese'; }
+    } else {
+      if (bf < 21) { cat='ต่ำ'; catClass='cat-thin'; }
+      else if (bf < 33) { cat='ปกติ'; catClass='cat-normal'; }
+      else if (bf < 39) { cat='เกินเล็กน้อย'; catClass='cat-over'; }
+      else { cat='อ้วน'; catClass='cat-obese'; }
+    }
+    document.getElementById('bf-result').innerHTML =
+      '<div class="result-box"><div class="result-big">' + bf.toFixed(1) + '%</div><div class="result-label">เปอร์เซ็นต์ไขมันในร่างกาย</div>' +
+      '<span class="result-cat '+catClass+'">' + cat + '</span></div>' +
+      '<div class="result-row"><span class="result-row-label">มวลไขมันในร่างกาย</span><span class="result-row-value">' + fatMass.toFixed(1) + ' กก.</span></div>' +
+      '<div class="result-row"><span class="result-row-label">มวลกล้ามเนื้อ (Lean Mass)</span><span class="result-row-value">' + leanMass.toFixed(1) + ' กก.</span></div>' +
+      '<div class="result-row"><span class="result-row-label">ไขมันที่เหมาะสมตามอายุ</span><span class="result-row-value">' + idealRange + '</span></div>' +
+      (fatToLose > 0.1 ? '<div class="result-row"><span class="result-row-label">ไขมันที่ควรลดเพื่อให้ถึงเป้า</span><span class="result-row-value">' + fatToLose.toFixed(1) + ' กก.</span></div>' : '<div class="result-row"><span class="result-row-label">ไขมันที่ควรลด</span><span class="result-row-value">อยู่ในเกณฑ์ดีแล้ว ✓</span></div>') +
+      '<div class="tip-box">*คำนวณโดยสูตร Deurenberg (ประมาณการจาก BMI) การวัดแม่นยำ ควรใช้ BIA หรือ DEXA Scan ที่โรงพยาบาล</div>';
+  }
+
+  // ===== Water Intake =====
+  function calcWater() {
+    const w = parseFloat(document.getElementById('water-weight').value);
+    const act = document.getElementById('water-activity').value;
+    if (!w) return;
+    const minL = (w * 0.03).toFixed(2);
+    let maxL = w * 0.035;
+    if (act === 'mod') maxL += 0.5;
+    else if (act === 'high') maxL += 1.0;
+    const glassesMin = Math.round(parseFloat(minL) / 0.25);
+    const glassesMax = Math.round(maxL / 0.25);
+    document.getElementById('water-result').innerHTML =
+      '<div class="result-box">' +
+      '<div style="font-size:2rem;font-weight:800">' + minL + ' – ' + maxL.toFixed(2) + ' L</div>' +
+      '<div class="result-label">ปริมาณน้ำที่ควรดื่ม/วัน (ต่ำสุด–สูงสุด)</div>' +
+      '<div style="font-size:.9rem;opacity:.8;margin-top:6px">≈ ' + glassesMin + '–' + glassesMax + ' แก้ว (250 มล./แก้ว)</div></div>' +
+      '<div class="result-row"><span class="result-row-label">ขั้นต่ำที่ควรดื่ม</span><span class="result-row-value">' + minL + ' L (น้ำหนัก × 0.03)</span></div>' +
+      '<div class="result-row"><span class="result-row-label">ปริมาณแนะนำ</span><span class="result-row-value">' + (w * 0.035).toFixed(2) + ' L (น้ำหนัก × 0.035)</span></div>' +
+      (act !== 'low' ? '<div class="result-row"><span class="result-row-label">บวกเพิ่มสำหรับออกกำลังกาย</span><span class="result-row-value">+' + (act==='mod'?'500':'1,000') + ' มล.</span></div>' : '') +
+      '<div style="display:flex;flex-wrap:wrap;gap:4px;margin:12px 0">' +
+      Array(Math.min(glassesMax,16)).fill(0).map((_,i)=>'<span title="แก้วที่'+(i+1)+'" style="font-size:1.4rem">🥤</span>').join('') +
+      '</div>' +
+      '<div class="tip-box">เริ่มดื่มน้ำทันทีหลังตื่นนอน · ดื่มก่อนรู้สึกกระหายน้ำ · น้ำปัสสาวะสีเหลืองอ่อน = ได้รับน้ำเพียงพอ</div>';
+  }
+
+  // ===== Ovulation =====
+  function calcOvulation() {
+    const lastDate = document.getElementById('ov-last').value;
+    const cycle = parseInt(document.getElementById('ov-cycle').value) || 28;
+    if (!lastDate) return;
+    const last = new Date(lastDate);
+    const ovDay = new Date(last); ovDay.setDate(ovDay.getDate() + cycle - 14);
+    const fertStart = new Date(ovDay); fertStart.setDate(fertStart.getDate() - 5);
+    const fertEnd = new Date(ovDay); fertEnd.setDate(fertEnd.getDate() + 1);
+    const nextPeriod = new Date(last); nextPeriod.setDate(nextPeriod.getDate() + cycle);
+    const testDate = new Date(nextPeriod); testDate.setDate(testDate.getDate() + 1);
+    const fmt = d => d.toLocaleDateString('th-TH', {day:'numeric',month:'short',year:'numeric'});
+    const days = d => {
+      const diff = Math.ceil((d - new Date()) / 86400000);
+      if (diff < 0) return 'ผ่านไปแล้ว ' + Math.abs(diff) + ' วัน';
+      if (diff === 0) return 'วันนี้';
+      return 'อีก ' + diff + ' วัน';
+    };
+    document.getElementById('ov-result').innerHTML =
+      '<div class="result-box" style="text-align:left;padding:20px">' +
+      '<div class="ovulation-row"><div class="ov-dot" style="background:#34D399"></div><div><strong>วันไข่ตก (โอกาสตั้งครรภ์สูงสุด)</strong><br>' + fmt(ovDay) + ' · ' + days(ovDay) + '</div></div>' +
+      '<div class="ovulation-row"><div class="ov-dot" style="background:#60A5FA"></div><div><strong>ช่วงเวลาเหมาะสมมีเพศสัมพันธ์เพื่อตั้งครรภ์</strong><br>' + fmt(fertStart) + ' – ' + fmt(fertEnd) + '</div></div>' +
+      '<div class="ovulation-row"><div class="ov-dot" style="background:#F87171"></div><div><strong>ประจำเดือนครั้งถัดไป (คาดการณ์)</strong><br>' + fmt(nextPeriod) + ' · ' + days(nextPeriod) + '</div></div>' +
+      '<div class="ovulation-row" style="border:none"><div class="ov-dot" style="background:#FBBF24"></div><div><strong>วันที่ควรทดสอบการตั้งครรภ์</strong><br>' + fmt(testDate) + ' · ' + days(testDate) + '</div></div>' +
+      '</div>' +
+      '<div class="tip-box">⚠️ การคำนวณนี้เป็นเพียงการประมาณการ รอบประจำเดือนอาจผันแปร ควรตรวจสอบร่วมกับแพทย์สำหรับการวางแผนครอบครัว</div>';
+  }
+
+  // ===== Age Calculator =====
+  function calcAge() {
+    const dob = document.getElementById('age-dob').value;
+    const toDate = document.getElementById('age-todate').value || new Date().toISOString().split('T')[0];
+    if (!dob) return;
+    const start = new Date(dob);
+    const end = new Date(toDate);
+    if (start > end) { document.getElementById('age-result').innerHTML = '<div style="text-align:center;padding:20px;opacity:.7">วันเกิดต้องน้อยกว่าวันปัจจุบัน</div>'; return; }
+    let years = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    let days2 = end.getDate() - start.getDate();
+    if (days2 < 0) { months--; const lastMonth = new Date(end.getFullYear(), end.getMonth(), 0); days2 += lastMonth.getDate(); }
+    if (months < 0) { years--; months += 12; }
+    const diffMs = end - start;
+    const totalDays = Math.floor(diffMs / 86400000);
+    const totalWeeks = Math.floor(totalDays / 7);
+    const totalHours = Math.floor(diffMs / 3600000);
+    const bud = new Date(end.getFullYear(), start.getMonth(), start.getDate());
+    if (bud < end) bud.setFullYear(bud.getFullYear() + 1);
+    const nextBday = bud;
+    const daysToNextBday = Math.ceil((nextBday - end) / 86400000);
+    document.getElementById('age-result').innerHTML =
+      '<div class="result-box"><div style="font-size:2.5rem;font-weight:800">' + years + ' ปี</div>' +
+      '<div class="result-label">' + months + ' เดือน ' + days2 + ' วัน</div></div>' +
+      '<div class="age-stat"><span class="age-stat-lbl">รวมวัน</span><span class="age-stat-num">' + totalDays.toLocaleString() + '</span></div>' +
+      '<div class="age-stat"><span class="age-stat-lbl">รวมสัปดาห์</span><span class="age-stat-num">' + totalWeeks.toLocaleString() + '</span></div>' +
+      '<div class="age-stat"><span class="age-stat-lbl">รวมชั่วโมง (โดยประมาณ)</span><span class="age-stat-num">' + totalHours.toLocaleString() + '</span></div>' +
+      (daysToNextBday === 0 ? '<div class="tip-box" style="text-align:center;font-size:1rem">🎂 วันนี้คือวันเกิด! สุขสันต์วันเกิด!</div>' :
+       '<div class="tip-box">วันเกิดครั้งถัดไป: ' + nextBday.toLocaleDateString("th-TH",{day:"numeric",month:"long",year:"numeric"}) + ' (อีก ' + daysToNextBday + ' วัน)</div>');
+  }
+
+  // ===== Percentage Calculator =====
+  function showPctMode(mode) {
+    document.querySelectorAll('.pct-mode-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.pct-section').forEach(s => s.classList.remove('active'));
+    document.querySelector('[data-pct="'+mode+'"]').classList.add('active');
+    document.getElementById('pct-'+mode).classList.add('active');
+    document.getElementById('pct-result').innerHTML = '';
+  }
+  function calcPct1() {
+    const x = parseFloat(document.getElementById('pct1-x').value);
+    const y = parseFloat(document.getElementById('pct1-y').value);
+    if (isNaN(x) || isNaN(y)) return;
+    const res = (x / 100) * y;
+    document.getElementById('pct-result').innerHTML =
+      '<div class="result-box"><div class="result-big">' + res.toFixed(2) + '</div><div class="result-label">' + x + '% ของ ' + y + ' = ' + res.toFixed(2) + '</div></div>';
+  }
+  function calcPct2() {
+    const a = parseFloat(document.getElementById('pct2-a').value);
+    const b = parseFloat(document.getElementById('pct2-b').value);
+    if (isNaN(a) || isNaN(b) || b === 0) return;
+    const res = (a / b) * 100;
+    document.getElementById('pct-result').innerHTML =
+      '<div class="result-box"><div class="result-big">' + res.toFixed(2) + '%</div><div class="result-label">' + a + ' คิดเป็น ' + res.toFixed(2) + '% ของ ' + b + '</div></div>';
+  }
+  function calcPct3() {
+    const val = parseFloat(document.getElementById('pct3-val').value);
+    const pct = parseFloat(document.getElementById('pct3-pct').value);
+    const dir = document.getElementById('pct3-dir').value;
+    if (isNaN(val) || isNaN(pct)) return;
+    const change = (val * pct / 100);
+    const res = dir === 'inc' ? val + change : val - change;
+    document.getElementById('pct-result').innerHTML =
+      '<div class="result-box"><div class="result-big">' + res.toFixed(2) + '</div>' +
+      '<div class="result-label">' + val + ' ' + (dir==='inc'?'เพิ่ม':'ลด') + ' ' + pct + '% = ' + res.toFixed(2) + ' (เปลี่ยน ' + (dir==='inc'?'+':'−') + change.toFixed(2) + ')</div></div>';
+  }
+  function calcPct4() {
+    const a = parseFloat(document.getElementById('pct4-a').value);
+    const b = parseFloat(document.getElementById('pct4-b').value);
+    if (isNaN(a) || isNaN(b) || (a+b)===0) return;
+    const diff = Math.abs(a - b);
+    const avg = (a + b) / 2;
+    const pctDiff = (diff / avg) * 100;
+    const pctChange = ((b - a) / Math.abs(a)) * 100;
+    document.getElementById('pct-result').innerHTML =
+      '<div class="result-box"><div class="result-big">' + pctDiff.toFixed(2) + '%</div><div class="result-label">ความแตกต่างระหว่าง ' + a + ' กับ ' + b + '</div></div>' +
+      '<div class="result-row"><span class="result-row-label">% การเปลี่ยนแปลง (จาก A ไป B)</span><span class="result-row-value">' + (pctChange > 0 ? '+' : '') + pctChange.toFixed(2) + '%</span></div>';
+  }
+
+  // ===== Food Calorie Table =====
+  const foodData = [
+    ['ข้าวสวย 1 ทัพพี (80g)', '116', 'คาร์โบไฮเดรต'],
+    ['ข้าวเหนียว 1 ทัพพี (50g)', '88', 'คาร์โบไฮเดรต'],
+    ['ขนมปังแผ่น 1 แผ่น (30g)', '79', 'คาร์โบไฮเดรต'],
+    ['บะหมี่ต้มสุก 1 ทัพพี', '95', 'คาร์โบไฮเดรต'],
+    ['วุ้นเส้นต้มสุก 100g', '84', 'คาร์โบไฮเดรต'],
+    ['กล้วยหอม 1 ลูก (120g)', '107', 'ผลไม้'],
+    ['มะม่วงสุก 100g', '60', 'ผลไม้'],
+    ['ส้ม 1 ลูก (130g)', '62', 'ผลไม้'],
+    ['แตงโม 100g', '30', 'ผลไม้'],
+    ['ทุเรียน 1 เม็ด (35g)', '52', 'ผลไม้'],
+    ['มะละกอ 100g', '43', 'ผลไม้'],
+    ['สับปะรด 100g', '50', 'ผลไม้'],
+    ['อกไก่ไม่มีหนัง 100g', '165', 'โปรตีน'],
+    ['เนื้อหมูสันใน 100g', '143', 'โปรตีน'],
+    ['ปลานิลนึ่ง 100g', '97', 'โปรตีน'],
+    ['กุ้งขาวต้ม 100g', '99', 'โปรตีน'],
+    ['ไข่ไก่ต้ม 1 ฟอง (60g)', '78', 'โปรตีน'],
+    ['นมสดไขมันเต็ม 240ml', '149', 'โปรตีน'],
+    ['เต้าหู้แข็ง 100g', '76', 'โปรตีน'],
+    ['ปลาทูนึ่ง 100g', '144', 'โปรตีน'],
+    ['ผักบุ้งผัด 100g', '67', 'ผัก'],
+    ['บล็อกโคลี่ต้ม 100g', '35', 'ผัก'],
+    ['ผักกาดหอม 100g', '15', 'ผัก'],
+    ['แครอทต้ม 100g', '35', 'ผัก'],
+    ['ฟักทอง 100g', '26', 'ผัก'],
+    ['ข้าวผัดไก่ 1 จาน', '520', 'อาหารจานหลัก'],
+    ['ผัดกะเพราหมูสับไข่ดาว', '650', 'อาหารจานหลัก'],
+    ['ข้าวมันไก่ 1 จาน', '480', 'อาหารจานหลัก'],
+    ['ก๋วยเตี๋ยวน้ำ 1 ชาม', '390', 'อาหารจานหลัก'],
+    ['ส้มตำไทย 1 ถ้วย', '170', 'อาหารจานหลัก'],
+    ['ต้มยำกุ้ง 1 ถ้วย', '180', 'อาหารจานหลัก'],
+    ['แกงเขียวหวาน 1 ถ้วย', '270', 'อาหารจานหลัก'],
+    ['ผัดไทยกุ้ง 1 จาน', '490', 'อาหารจานหลัก'],
+    ['ข้าวหน้าเป็ด 1 จาน', '560', 'อาหารจานหลัก'],
+    ['ลาบหมู 100g', '190', 'อาหารจานหลัก'],
+    ['น้ำอ้อย 1 แก้ว 300ml', '165', 'เครื่องดื่ม'],
+    ['ชาเขียวเย็น 1 แก้ว', '148', 'เครื่องดื่ม'],
+    ['กาแฟดำ 1 แก้ว', '5', 'เครื่องดื่ม'],
+    ['โค้ก 1 กระป๋อง 330ml', '139', 'เครื่องดื่ม'],
+    ['นมช็อกโกแลต 250ml', '190', 'เครื่องดื่ม'],
+    ['ชาไทยเย็น 1 แก้ว', '160', 'เครื่องดื่ม'],
+    ['ทองหยิบ 1 ดอก (20g)', '63', 'ขนม'],
+    ['โดนัทน้ำตาล 1 ชิ้น', '269', 'ขนม'],
+    ['ข้าวเหนียวมะม่วง 1 จาน', '430', 'ขนม'],
+    ['เค้กช็อกโกแลต 1 ชิ้น (100g)', '371', 'ขนม'],
+    ['มันฝรั่งทอด 1 ถุงเล็ก (27g)', '149', 'ขนม'],
+    ['บัวลอยน้ำกะทิ 1 ถ้วย', '280', 'ขนม'],
+    ['ลอดช่อง 1 ถ้วย', '180', 'ขนม'],
+  ];
+
+  function renderFoodTable(filter) {
+    const tbody = document.getElementById('food-tbody');
+    const q = filter.toLowerCase();
+    const rows = foodData.filter(f => !q || f[0].toLowerCase().includes(q) || f[2].includes(q));
+    tbody.innerHTML = rows.map(f =>
+      '<tr><td>' + f[0] + '</td><td style="font-weight:700;color:var(--primary)">' + f[1] + '</td><td>' +
+      '<span style="background:var(--secondary)15;color:var(--secondary);padding:2px 8px;border-radius:20px;font-size:.75rem">' + f[2] + '</span></td></tr>'
+    ).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--gray-400);padding:24px">ไม่พบรายการที่ค้นหา</td></tr>';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    showCalc('bmi');
+    renderFoodTable('');
+    // Set today as default for age calculator
+    const today = new Date().toISOString().split('T')[0];
+    const todayEl = document.getElementById('age-todate');
+    if (todayEl) todayEl.value = today;
+    document.getElementById('food-search').addEventListener('input', e => renderFoodTable(e.target.value));
+  });
+  </script>`}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>โปรแกรมคำนวณสุขภาพ</span></div>
+    <h1>โปรแกรมคำนวณสุขภาพ</h1>
+    <p>เครื่องมือคำนวณสุขภาพครบชุด — ฟรี ไม่ต้องสมัครสมาชิก</p>
+  </div>
+</section>
+
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+
+    <!-- Tab bar -->
+    <div class="calc-tabs">
+      {[
+        { id:'bmi',       icon:'fa6-solid:weight-scale',        label:'BMI' },
+        { id:'bmr',       icon:'fa6-solid:fire-flame-curved',   label:'BMR' },
+        { id:'tdee',      icon:'fa6-solid:bolt',                label:'TDEE' },
+        { id:'bodyfat',   icon:'fa6-solid:circle-half-stroke',  label:'ไขมันในร่างกาย' },
+        { id:'water',     icon:'fa6-solid:droplet',             label:'น้ำที่ควรดื่ม' },
+        { id:'ovulation', icon:'fa6-solid:calendar-days',       label:'วันไข่ตก' },
+        { id:'age',       icon:'fa6-solid:cake-candles',        label:'คำนวณอายุ' },
+        { id:'percent',   icon:'fa6-solid:percent',             label:'เปอร์เซ็นต์' },
+        { id:'calories',  icon:'fa6-solid:utensils',            label:'ตารางแคลอรี่' },
+      ].map(t => (
+        <button class="calc-tab" data-calc={t.id} onclick={`showCalc('${t.id}')`}>
+          <Icon name={t.icon} /> {t.label}
+        </button>
+      ))}
+    </div>
+
+    <!-- ===== BMI ===== -->
+    <div class="calc-panel" id="panel-bmi">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">คำนวณ BMI</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:24px">Body Mass Index — ดัชนีมวลกาย ใช้ประเมินภาวะน้ำหนักเบื้องต้น</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>เพศ</label>
+            <select id="bmi-gender" class="filter-select" style="width:100%;height:48px" onchange="calcBMI()">
+              <option value="m">ชาย</option><option value="f">หญิง</option>
+            </select>
+          </div>
+          <div class="form-group"><label>อายุ (ปี)</label><input type="number" id="bmi-age" placeholder="เช่น 30" min="5" max="120" oninput="calcBMI()" /></div>
+        </div>
+        <div class="form-group">
+          <label>น้ำหนัก (กิโลกรัม)</label>
+          <input type="number" id="bmi-weight" placeholder="เช่น 65" min="20" max="300" oninput="calcBMI()" />
+        </div>
+        <div class="form-group">
+          <label>ส่วนสูง (เซนติเมตร)</label>
+          <input type="number" id="bmi-height" placeholder="เช่น 170" min="100" max="250" oninput="calcBMI()" />
+        </div>
+        <div style="background:var(--gray-50);border-radius:12px;padding:16px;font-size:.8rem;color:var(--gray-600)">
+          <strong>เกณฑ์ WHO สำหรับชาวเอเชีย:</strong> &lt;18.5 ผอม · 18.5–22.9 ปกติ · 23–24.9 เกิน · ≥25 อ้วน
+        </div>
+      </div>
+      <div class="calc-result-section" id="bmi-result">
+        <div style="text-align:center;opacity:.6;padding:40px 0">
+          <Icon name="fa6-solid:weight-scale" style="font-size:3rem;margin-bottom:12px" />
+          <p>กรอกน้ำหนักและส่วนสูงเพื่อดูผล</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== BMR ===== -->
+    <div class="calc-panel" id="panel-bmr">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">คำนวณ BMR</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:24px">Basal Metabolic Rate — พลังงานขั้นต่ำที่ร่างกายต้องการขณะพัก (Mifflin-St Jeor)</p>
+        <div class="form-row">
+          <div class="form-group"><label>น้ำหนัก (กก.)</label><input type="number" id="bmr-weight" placeholder="65" oninput="calcBMR()" /></div>
+          <div class="form-group"><label>ส่วนสูง (ซม.)</label><input type="number" id="bmr-height" placeholder="170" oninput="calcBMR()" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>อายุ (ปี)</label><input type="number" id="bmr-age" placeholder="30" oninput="calcBMR()" /></div>
+          <div class="form-group">
+            <label>เพศ</label>
+            <select id="bmr-gender" class="filter-select" style="width:100%;height:48px" onchange="calcBMR()">
+              <option value="m">ชาย</option><option value="f">หญิง</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="calc-result-section" id="bmr-result">
+        <div style="text-align:center;opacity:.6;padding:40px 0">
+          <Icon name="fa6-solid:fire-flame-curved" style="font-size:3rem;margin-bottom:12px" />
+          <p>กรอกข้อมูลเพื่อดูผล</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TDEE ===== -->
+    <div class="calc-panel" id="panel-tdee">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">คำนวณ TDEE</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:24px">Total Daily Energy Expenditure — พลังงานรวมที่ต้องการต่อวัน รวมกิจกรรม</p>
+        <div class="form-row">
+          <div class="form-group"><label>น้ำหนัก (กก.)</label><input type="number" id="tdee-weight" placeholder="65" oninput="calcTDEE()" /></div>
+          <div class="form-group"><label>ส่วนสูง (ซม.)</label><input type="number" id="tdee-height" placeholder="170" oninput="calcTDEE()" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>อายุ (ปี)</label><input type="number" id="tdee-age" placeholder="30" oninput="calcTDEE()" /></div>
+          <div class="form-group">
+            <label>เพศ</label>
+            <select id="tdee-gender" class="filter-select" style="width:100%;height:48px" onchange="calcTDEE()">
+              <option value="m">ชาย</option><option value="f">หญิง</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>ระดับกิจกรรม</label>
+          <select id="tdee-activity" class="filter-select" style="width:100%;height:48px" onchange="calcTDEE()">
+            <option value="1.2">นั่งทำงาน ไม่ค่อยออกกำลังกาย</option>
+            <option value="1.375">ออกกำลังกายเบา 1–3 วัน/สัปดาห์</option>
+            <option value="1.55">ออกกำลังกายปานกลาง 3–5 วัน/สัปดาห์</option>
+            <option value="1.725">ออกกำลังกายหนัก 6–7 วัน/สัปดาห์</option>
+            <option value="1.9">นักกีฬา / งานใช้แรงงานหนัก</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-result-section" id="tdee-result">
+        <div style="text-align:center;opacity:.6;padding:40px 0">
+          <Icon name="fa6-solid:bolt" style="font-size:3rem;margin-bottom:12px" />
+          <p>กรอกข้อมูลเพื่อดูผล</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Body Fat ===== -->
+    <div class="calc-panel" id="panel-bodyfat">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">คำนวณ % ไขมันในร่างกาย</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:24px">ประมาณการไขมัน มวลไขมัน มวลกล้ามเนื้อ และเป้าหมายการลดไขมัน (Deurenberg Formula)</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>เพศ</label>
+            <select id="bf-gender" class="filter-select" style="width:100%;height:48px" onchange="calcBodyFat()">
+              <option value="m">ชาย</option><option value="f">หญิง</option>
+            </select>
+          </div>
+          <div class="form-group"><label>อายุ (ปี)</label><input type="number" id="bf-age" placeholder="30" oninput="calcBodyFat()" /></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>น้ำหนัก (กก.)</label><input type="number" id="bf-weight" placeholder="65" oninput="calcBodyFat()" /></div>
+          <div class="form-group"><label>ส่วนสูง (ซม.)</label><input type="number" id="bf-height" placeholder="170" oninput="calcBodyFat()" /></div>
+        </div>
+        <div style="background:#FEF3C7;border-radius:12px;padding:12px 16px;font-size:.8rem;color:#92400E">
+          <Icon name="fa6-solid:triangle-exclamation" /> การวัดแม่นยำควรใช้ BIA หรือ DEXA Scan ที่โรงพยาบาล — นี่เป็นการประมาณการเบื้องต้นเท่านั้น
+        </div>
+      </div>
+      <div class="calc-result-section" id="bf-result">
+        <div style="text-align:center;opacity:.6;padding:40px 0">
+          <Icon name="fa6-solid:circle-half-stroke" style="font-size:3rem;margin-bottom:12px" />
+          <p>กรอกข้อมูลเพื่อดูผล</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Water ===== -->
+    <div class="calc-panel" id="panel-water">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">คำนวณน้ำที่ควรดื่มต่อวัน</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:24px">ปริมาณน้ำขั้นต่ำและสูงสุดตามน้ำหนักตัว</p>
+        <div class="form-group"><label>น้ำหนัก (กิโลกรัม)</label><input type="number" id="water-weight" placeholder="65" oninput="calcWater()" /></div>
+        <div class="form-group">
+          <label>ระดับกิจกรรม</label>
+          <select id="water-activity" class="filter-select" style="width:100%;height:48px" onchange="calcWater()">
+            <option value="low">ไม่ค่อยออกกำลังกาย / นั่งทำงาน</option>
+            <option value="mod">ออกกำลังกายปานกลาง 3–5 วัน/สัปดาห์</option>
+            <option value="high">ออกกำลังกายหนักทุกวัน / นักกีฬา</option>
+          </select>
+        </div>
+        <div style="background:var(--gray-50);border-radius:12px;padding:16px;font-size:.8rem;color:var(--gray-600)">
+          สูตร: ขั้นต่ำ = น้ำหนัก × 0.03 L · แนะนำ = น้ำหนัก × 0.035 L
+        </div>
+      </div>
+      <div class="calc-result-section" id="water-result">
+        <div style="text-align:center;opacity:.6;padding:40px 0">
+          <Icon name="fa6-solid:droplet" style="font-size:3rem;margin-bottom:12px" />
+          <p>กรอกน้ำหนักเพื่อดูผล</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Ovulation ===== -->
+    <div class="calc-panel" id="panel-ovulation">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">นับวันไข่ตก / คำนวณประจำเดือน</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:24px">ประมาณการวันไข่ตก ช่วงมีโอกาสตั้งครรภ์ และวันทดสอบการตั้งครรภ์</p>
+        <div class="form-group">
+          <label>วันแรกที่เพิ่งมีประจำเดือน</label>
+          <input type="date" id="ov-last" onchange="calcOvulation()" />
+        </div>
+        <div class="form-group">
+          <label>ระยะเวลารอบเดือน (วัน) — ปกติ 28 วัน</label>
+          <select id="ov-cycle" class="filter-select" style="width:100%;height:48px" onchange="calcOvulation()">
+            {Array.from({length:16}, (_,i) => i+23).map(d => `<option value="${d}"${d===28?' selected':''}>${d} วัน</option>`).join('')}
+          </select>
+        </div>
+        <div style="background:var(--gray-50);border-radius:12px;padding:16px;font-size:.8rem;color:var(--gray-600)">
+          <strong>วิธีคำนวณ:</strong> วันไข่ตก = วันแรกของรอบถัดไป − 14 วัน
+        </div>
+      </div>
+      <div class="calc-result-section" id="ov-result">
+        <div style="text-align:center;opacity:.6;padding:40px 0">
+          <Icon name="fa6-solid:calendar-days" style="font-size:3rem;margin-bottom:12px" />
+          <p>เลือกวันที่ประจำเดือนมาล่าสุดเพื่อดูผล</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Age Calculator ===== -->
+    <div class="calc-panel" id="panel-age">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">คำนวณอายุ</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:24px">คำนวณอายุละเอียดระดับปี เดือน วัน ชั่วโมง พร้อมนับถอยหลังวันเกิด</p>
+        <div class="form-group">
+          <label>วันเกิด (วัน/เดือน/ปี ค.ศ.)</label>
+          <input type="date" id="age-dob" onchange="calcAge()" />
+        </div>
+        <div class="form-group">
+          <label>คำนวณถึงวันที่ (ค่าเริ่มต้น = วันนี้)</label>
+          <input type="date" id="age-todate" onchange="calcAge()" />
+        </div>
+        <div style="background:var(--gray-50);border-radius:12px;padding:16px;font-size:.8rem;color:var(--gray-600)">
+          💡 สามารถใช้คำนวณระยะห่างระหว่างวันสองวันใดก็ได้ ไม่ใช่แค่อายุ
+        </div>
+      </div>
+      <div class="calc-result-section" id="age-result">
+        <div style="text-align:center;opacity:.6;padding:40px 0">
+          <Icon name="fa6-solid:cake-candles" style="font-size:3rem;margin-bottom:12px" />
+          <p>เลือกวันเกิดเพื่อดูผล</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Percentage Calculator ===== -->
+    <div class="calc-panel" id="panel-percent">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">คำนวณเปอร์เซ็นต์</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:16px">คำนวณเปอร์เซ็นต์ 4 แบบที่ใช้บ่อยในชีวิตประจำวัน</p>
+        <!-- Mode buttons -->
+        <div class="pct-mode-tabs">
+          <button class="pct-mode-btn active" data-pct="1" onclick="showPctMode('1')">X% ของ Y</button>
+          <button class="pct-mode-btn" data-pct="2" onclick="showPctMode('2')">A คิดเป็นกี่ % ของ B</button>
+          <button class="pct-mode-btn" data-pct="3" onclick="showPctMode('3')">เพิ่ม/ลด X%</button>
+          <button class="pct-mode-btn" data-pct="4" onclick="showPctMode('4')">ความแตกต่าง %</button>
+        </div>
+        <!-- Mode 1: X% of Y -->
+        <div class="pct-section active" id="pct-1">
+          <div class="form-row">
+            <div class="form-group"><label>เปอร์เซ็นต์ (X)</label><input type="number" id="pct1-x" placeholder="เช่น 20" oninput="calcPct1()" /></div>
+            <div class="form-group"><label>จำนวน (Y)</label><input type="number" id="pct1-y" placeholder="เช่น 500" oninput="calcPct1()" /></div>
+          </div>
+          <p style="font-size:.85rem;color:var(--gray-500)">→ X% ของ Y = ?</p>
+        </div>
+        <!-- Mode 2: A is what % of B -->
+        <div class="pct-section" id="pct-2">
+          <div class="form-row">
+            <div class="form-group"><label>ค่า A</label><input type="number" id="pct2-a" placeholder="เช่น 75" oninput="calcPct2()" /></div>
+            <div class="form-group"><label>ค่า B (ฐาน)</label><input type="number" id="pct2-b" placeholder="เช่น 300" oninput="calcPct2()" /></div>
+          </div>
+          <p style="font-size:.85rem;color:var(--gray-500)">→ A คิดเป็นกี่ % ของ B?</p>
+        </div>
+        <!-- Mode 3: Percentage change -->
+        <div class="pct-section" id="pct-3">
+          <div class="form-group"><label>ค่าเริ่มต้น</label><input type="number" id="pct3-val" placeholder="เช่น 1000" oninput="calcPct3()" /></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>เพิ่ม / ลด</label>
+              <select id="pct3-dir" class="filter-select" style="width:100%;height:48px" onchange="calcPct3()">
+                <option value="inc">เพิ่ม</option><option value="dec">ลด</option>
+              </select>
+            </div>
+            <div class="form-group"><label>เปอร์เซ็นต์ (%)</label><input type="number" id="pct3-pct" placeholder="เช่น 15" oninput="calcPct3()" /></div>
+          </div>
+        </div>
+        <!-- Mode 4: Percentage difference -->
+        <div class="pct-section" id="pct-4">
+          <div class="form-row">
+            <div class="form-group"><label>ค่า A</label><input type="number" id="pct4-a" placeholder="เช่น 80" oninput="calcPct4()" /></div>
+            <div class="form-group"><label>ค่า B</label><input type="number" id="pct4-b" placeholder="เช่น 100" oninput="calcPct4()" /></div>
+          </div>
+          <p style="font-size:.85rem;color:var(--gray-500)">→ A กับ B ต่างกันกี่ %?</p>
+        </div>
+      </div>
+      <div class="calc-result-section" id="pct-result">
+        <div style="text-align:center;opacity:.6;padding:40px 0">
+          <Icon name="fa6-solid:percent" style="font-size:3rem;margin-bottom:12px" />
+          <p>กรอกตัวเลขเพื่อดูผล</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Calorie Table ===== -->
+    <div class="calc-panel" id="panel-calories" style="grid-template-columns:1fr">
+      <div class="calc-input-section">
+        <h2 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:8px">ตารางแคลอรี่อาหารไทย</h2>
+        <p style="font-size:.85rem;color:var(--gray-500);margin-bottom:20px">ค่าพลังงาน (กิโลแคลอรี่) ของอาหารไทยที่พบบ่อย — 45+ รายการ</p>
+        <input type="text" id="food-search" class="search-food" placeholder="ค้นหาอาหาร... เช่น ข้าว, ไก่, ผัก, ขนม" />
+        <div style="overflow-x:auto">
+          <table class="food-table">
+            <thead><tr><th>อาหาร / ปริมาณ</th><th>แคลอรี่ (kcal)</th><th>หมวด</th></tr></thead>
+            <tbody id="food-tbody"></tbody>
+          </table>
+        </div>
+        <p style="font-size:.75rem;color:var(--gray-400);margin-top:12px">* ค่าประมาณการ อาจแตกต่างตามวิธีปรุงและแหล่งที่มา</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section-pad-sm" style="background:var(--primary);color:#fff;text-align:center">
+  <div class="container">
+    <h2 style="margin-bottom:12px">ต้องการคำแนะนำจากผู้เชี่ยวชาญ?</h2>
+    <p style="opacity:.8;margin-bottom:24px">โปรแกรมคำนวณเป็นเพียงเครื่องมือเบื้องต้น — พบแพทย์และนักโภชนากรเพื่อแผนสุขภาพที่เหมาะกับคุณโดยเฉพาะ</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/appointments" class="btn btn-accent"><Icon name="fa6-solid:calendar-check" /> นัดหมายแพทย์</a>
+      <a href="/telehealth" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5)"><Icon name="fa6-solid:video" /> ปรึกษาออนไลน์</a>
+    </div>
+  </div>
+</section>
+
+</Layout>

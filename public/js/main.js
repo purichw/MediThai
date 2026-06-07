@@ -13,11 +13,12 @@ function _hideLoader() {
   if (_loaderHidden || !_loader) return;
   _loaderHidden = true;
   _loader.classList.add('hidden');
+  setTimeout(() => { if (_loader) _loader.style.display = 'none'; }, 450);
 }
 
 if (sessionStorage.getItem('loaderShown')) {
-  // Not first visit — hide immediately with no transition
-  if (_loader) { _loader.style.transition = 'none'; _loader.classList.add('hidden'); }
+  // Not first visit — remove immediately, bypass CSS transition entirely
+  if (_loader) _loader.style.display = 'none';
 } else {
   // First visit — show loader, mark as shown
   sessionStorage.setItem('loaderShown', '1');

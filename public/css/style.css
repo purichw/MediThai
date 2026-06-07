@@ -61,6 +61,7 @@ body {
   color: var(--gray-800);
   background: var(--white);
   line-height: 1.7;
+  overflow-x: hidden; /* fallback for Safari < 16 */
   overflow-x: clip; /* clip ไม่สร้าง scroll container — ต่างจาก hidden */
 }
 
@@ -244,7 +245,7 @@ h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); line-height: 1.3; }
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 14px;
+  padding: 10px 14px;
   font-family: var(--font-heading);
   font-weight: 400;
   font-size: .9rem;
@@ -388,6 +389,7 @@ h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); line-height: 1.3; }
 .mobile-nav {
   display: none;
   position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
   inset: 0;
   z-index: 999;
   background: var(--white);
@@ -422,6 +424,7 @@ h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); line-height: 1.3; }
 
 .hero-bg {
   position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
   inset: 0;
   background:
     linear-gradient(135deg,
@@ -434,12 +437,14 @@ h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); line-height: 1.3; }
 /* Animated mesh/particles */
 .hero-canvas {
   position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
   inset: 0;
   z-index: 0;
 }
 
 .hero-image {
   position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
   inset: 0;
   background-image: url('https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=1920&q=80');
   background-size: cover;
@@ -1877,6 +1882,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
    ---------------------------------------------------------------- */
 .page-loader {
   position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
   inset: 0;
   z-index: 9999;
   background: var(--primary-dark);
