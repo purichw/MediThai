@@ -36,9 +36,12 @@ Supabase SSR — session validated server-side in frontmatter. Protected pages r
 - Safari compat: `overflow-x: hidden` fallback before `clip`; `top/right/bottom/left: 0` fallback before `inset: 0`
 - Touch targets: minimum `padding: 10px` vertical on interactive elements (44px height)
 
-## Current state (as of 2026-06-07)
+## Current state (as of 2026-06-08)
 - All pages built and rendering — 0 JS console errors across site
-- Phase 4 (backend) not started — doctors, packages, appointments are all hardcoded mock data
+- Phase 4–6 complete: appointment booking API live, SEO layer (OG/Schema/sitemap), doctors DB-first
+- Supabase SQL migrations written (`supabase/migrations/`) — must be run manually in Supabase dashboard
+- `RESEND_API_KEY` not yet added to Vercel env (email confirmation won't send until then)
+- packages.astro still static — DB schema exists but cards have too many visual-only fields
 - No CI/CD — deploys are manual via the commands above
 
 ## What the user prefers
