@@ -134,7 +134,46 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
 
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof applyTranslations !== 'undefined') applyTranslations();
+  // Load CMS content overrides and re-apply translations
+  _loadContentOverrides();
 });
+
+/* ----------------------------------------------------------------
+   CMS Content Overrides
+   Fetches DB overrides from /api/content and patches T before
+   re-applying translations. Runs after initial render so the
+   page never shows a blank state.
+   ---------------------------------------------------------------- */
+(function _loadContentOverrides() {
+  // Determine page slug from path
+  const path = window.location.pathname;
+  let pageSlug = 'home';
+  if (path.startsWith('/doctors')) pageSlug = 'doctors';
+  else if (path.startsWith('/packages')) pageSlug = 'packages';
+  else if (path.startsWith('/appointments')) pageSlug = 'appointments';
+  else if (path.startsWith('/about')) pageSlug = 'about';
+  else if (path.startsWith('/contact')) pageSlug = 'contact';
+  else if (path === '/') pageSlug = 'home';
+
+  fetch(`/api/content?page=${pageSlug}`)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data || typeof T === 'undefined') return;
+      // Merge TH overrides
+      if (data.th) Object.assign(T.th, data.th);
+      // Merge EN overrides
+      if (data.en) Object.assign(T.en, data.en);
+      // Apply hero background image override if present
+      const bgUrl = data.meta?.hero_bg_url || data.th?.hero_bg_url;
+      if (bgUrl) {
+        const heroImg = document.querySelector('.hero-image');
+        if (heroImg) heroImg.style.backgroundImage = `url('${bgUrl}')`;
+      }
+      // Re-apply translations with updated content
+      if (typeof applyTranslations !== 'undefined') applyTranslations();
+    })
+    .catch(() => {}); // silently fail — static translations.js is the fallback
+})();
 
 /* ----------------------------------------------------------------
    Scroll Reveal (IntersectionObserver)

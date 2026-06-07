@@ -2,7 +2,7 @@ import { defineMiddleware } from 'astro:middleware';
 import { createServerClient, parseCookieHeader } from '@supabase/ssr';
 
 const PATIENT_ROUTES = ['/dashboard', '/my-appointments', '/book'];
-const ADMIN_ROUTES = ['/admin'];
+const ADMIN_ROUTES = ['/admin', '/api/admin'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { request, cookies, redirect } = context;

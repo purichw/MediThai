@@ -1,0 +1,111 @@
+---
+export const prerender = false;
+import { createAdminSupabase } from '../../../lib/supabase-server';
+import { CMS_PAGES } from '../../../lib/cmsSchema';
+
+// Fetch last-modified per page for the dashboard
+const supabase = createAdminSupabase();
+const { data: meta } = await supabase
+  .from('site_content')
+  .select('page_slug, updated_at')
+  .order('updated_at', { ascending: false });
+
+const lastModified: Record<string, string> = {};
+const sectionCount: Record<string, number> = {};
+for (const row of meta ?? []) {
+  if (!lastModified[row.page_slug]) lastModified[row.page_slug] = row.updated_at;
+  sectionCount[row.page_slug] = (sectionCount[row.page_slug] ?? 0) + 1;
+}
+---
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Management | MediThai Admin</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/admin-cms.css" />
+</head>
+<body>
+<div class="cms-shell">
+  <!-- Sidebar -->
+  <aside class="cms-sidebar">
+    <div class="cms-sidebar-header">
+      <a href="/admin" class="cms-logo">
+        <span class="cms-logo-mark">M</span>
+        <div>
+          <div class="cms-logo-name">MediThai</div>
+          <div class="cms-logo-sub">Admin Portal</div>
+        </div>
+      </a>
+    </div>
+    <nav class="cms-nav">
+      <div class="cms-nav-group-label">จัดการ</div>
+      <a href="/admin" class="cms-nav-item">
+        <span class="cms-nav-icon">📊</span> ภาพรวม
+      </a>
+      <a href="/admin/appointments" class="cms-nav-item">
+        <span class="cms-nav-icon">📅</span> นัดหมาย
+      </a>
+      <div class="cms-nav-group-label">เนื้อหา</div>
+      <a href="/admin/cms" class="cms-nav-item active">
+        <span class="cms-nav-icon">✏️</span> Content Management
+      </a>
+      <div class="cms-nav-group-label">อื่น ๆ</div>
+      <a href="/" target="_blank" class="cms-nav-item">
+        <span class="cms-nav-icon">🌐</span> ดูเว็บไซต์
+      </a>
+      <form method="POST" action="/logout" style="margin-top:auto">
+        <button type="submit" class="cms-nav-item cms-nav-logout">
+          <span class="cms-nav-icon">🚪</span> ออกจากระบบ
+        </button>
+      </form>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="cms-main">
+    <div class="cms-topbar">
+      <div>
+        <h1 class="cms-page-title">Content Management</h1>
+        <p class="cms-page-sub">แก้ไขเนื้อหาของทุกหน้าเว็บไซต์</p>
+      </div>
+    </div>
+
+    <div class="cms-cards-grid">
+      {CMS_PAGES.map(page => {
+        const modified = lastModified[page.slug];
+        const saved = sectionCount[page.slug] ?? 0;
+        const total = page.sections.length;
+        return (
+          <a href={`/admin/cms/${page.slug}`} class="cms-page-card">
+            <div class="cms-page-card-icon">{page.icon}</div>
+            <div class="cms-page-card-body">
+              <div class="cms-page-card-title">{page.label}</div>
+              <div class="cms-page-card-desc">{page.description}</div>
+              <div class="cms-page-card-meta">
+                <span class={`cms-status-badge ${saved > 0 ? 'has-overrides' : 'default'}`}>
+                  {saved > 0 ? `${saved}/${total} sections customized` : 'ใช้ค่าเริ่มต้น'}
+                </span>
+                {modified && (
+                  <span class="cms-page-card-date">
+                    แก้ไขล่าสุด {new Date(modified).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div class="cms-page-card-arrow">→</div>
+          </a>
+        );
+      })}
+    </div>
+
+    <div class="cms-info-box">
+      <strong>Phase 1 — Content Editor</strong><br>
+      แก้ไขข้อความ รูปภาพ และเนื้อหาภายใน components ที่มีอยู่แล้ว
+      การเปลี่ยนแปลงจะมีผลกับผู้เยี่ยมชมทันที (real-time override)
+    </div>
+  </main>
+</div>
+</body>
+</html>
