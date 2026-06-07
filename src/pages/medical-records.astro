@@ -1,0 +1,111 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="ขอเวชระเบียน | MediThai" description="ขอสำเนาเวชระเบียน ผลตรวจ และเอกสารทางการแพทย์ออนไลน์">
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ขอเวชระเบียน</span></div>
+    <h1>ขอสำเนาเวชระเบียน</h1>
+    <p>ยื่นคำร้องขอเวชระเบียน ผลตรวจ และเอกสารทางการแพทย์ได้ออนไลน์ — รับภายใน 3–5 วันทำการ</p>
+  </div>
+</section>
+
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container" style="max-width:720px">
+
+    <!-- What we provide -->
+    <div style="background:#fff;border-radius:20px;padding:32px;box-shadow:var(--shadow-md);margin-bottom:24px">
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:20px">เอกสารที่สามารถขอได้</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        {[
+          { icon:'fa6-solid:file-medical', label:'สรุปเวชระเบียน (Medical Summary)' },
+          { icon:'fa6-solid:vial', label:'ผลตรวจเลือด / ผลแล็บ' },
+          { icon:'fa6-solid:x-ray', label:'ภาพถ่ายรังสี / MRI / CT Scan' },
+          { icon:'fa6-solid:file-waveform', label:'ผล EKG, Echocardiogram' },
+          { icon:'fa6-solid:notes-medical', label:'ใบรับรองแพทย์ (Medical Certificate)' },
+          { icon:'fa6-solid:prescription', label:'ใบสั่งยา (Prescription)' },
+          { icon:'fa6-solid:microscope', label:'ผลพยาธิวิทยา (Pathology Report)' },
+          { icon:'fa6-solid:file-invoice-dollar', label:'ใบรับรองค่ารักษาสำหรับประกัน' },
+        ].map(d => (
+          <div style="display:flex;gap:10px;align-items:center;background:var(--gray-50);border-radius:10px;padding:12px">
+            <Icon name={d.icon} style="color:var(--secondary);flex-shrink:0" />
+            <span style="font-size:.85rem;color:var(--gray-700)">{d.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="reveal" style="background:#fff;border-radius:20px;padding:40px;box-shadow:var(--shadow-md)">
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:24px">
+        <Icon name="fa6-solid:file-pen" style="color:var(--secondary)" /> แบบฟอร์มขอเวชระเบียน
+      </h2>
+      <form>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group"><label>ชื่อ</label><input type="text" required placeholder="ชื่อ" /></div>
+          <div class="form-group"><label>นามสกุล</label><input type="text" required placeholder="นามสกุล" /></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group"><label>เลขบัตรประชาชน / Passport</label><input type="text" required placeholder="1-XXXX-XXXXX-XX-X" /></div>
+          <div class="form-group"><label>หมายเลข HN</label><input type="text" placeholder="HN-XXXX-XXXXXX" /></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group"><label>อีเมล</label><input type="email" required /></div>
+          <div class="form-group"><label>เบอร์โทรศัพท์</label><input type="tel" required /></div>
+        </div>
+        <div class="form-group">
+          <label>โรงพยาบาลที่รับบริการ</label>
+          <select class="filter-select" style="width:100%;height:48px" required>
+            <option value="">เลือกสาขา</option>
+            <option>MediThai กรุงเทพ (สำนักงานใหญ่)</option>
+            <option>MediThai หัวใจ</option>
+            <option>MediThai มะเร็ง</option>
+            <option>MediThai สมองและกระดูก</option>
+            <option>MediThai เด็ก</option>
+            <option>MediThai เชียงใหม่</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group"><label>วันที่รับบริการ (ช่วง เริ่ม)</label><input type="date" required /></div>
+          <div class="form-group"><label>วันที่รับบริการ (ถึง)</label><input type="date" /></div>
+        </div>
+        <div class="form-group">
+          <label>เอกสารที่ต้องการ</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            {['สรุปเวชระเบียน','ผลตรวจเลือด','ภาพถ่ายรังสี','ใบรับรองแพทย์','ใบสั่งยา','ผลพยาธิวิทยา','ใบรับรองสำหรับประกัน','อื่นๆ'].map(d => (
+              <label style="display:flex;gap:8px;align-items:center;font-size:.875rem;cursor:pointer">
+                <input type="checkbox" /> {d}
+              </label>
+            ))}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>วิธีรับเอกสาร</label>
+          <select class="filter-select" style="width:100%;height:48px">
+            <option>รับด้วยตนเองที่โรงพยาบาล</option>
+            <option>จัดส่งทางไปรษณีย์ (EMS)</option>
+            <option>รับทาง Email (เฉพาะ PDF)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>หมายเหตุเพิ่มเติม</label>
+          <textarea rows="2" placeholder="ระบุรายละเอียดเพิ่มเติม เช่น วัตถุประสงค์การใช้เอกสาร..."></textarea>
+        </div>
+
+        <div style="background:#FEF3C7;border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:.8rem;color:#92400E">
+          <Icon name="fa6-solid:triangle-exclamation" /> การขอเวชระเบียนอาจมีค่าธรรมเนียมตามประเภทเอกสาร (50–500 บาท) เจ้าหน้าที่จะแจ้งให้ทราบก่อนดำเนินการ
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">
+          <Icon name="fa6-solid:paper-plane" /> ยื่นคำร้องขอเวชระเบียน
+        </button>
+        <p style="font-size:.78rem;color:var(--gray-500);text-align:center;margin-top:12px">รับเอกสารภายใน 3–5 วันทำการ · โทรสอบถาม 02-310-3000 กด 3</p>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+</Layout>

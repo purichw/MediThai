@@ -1,0 +1,118 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+
+const stories = [
+  { name: 'คุณสมชาย วงศ์สุวรรณ', age: 58, condition: 'โรคหัวใจ', conditionEn: 'Heart Disease', hospital: 'MediThai หัวใจ', color: '#EF4444', icon: 'fa6-solid:heart-pulse',
+    quote: 'หมอบอกว่าหัวใจผมตีบ 3 เส้น ต้องผ่าตัดด่วน ทีมแพทย์ MediThai ช่วยชีวิตผมไว้ได้ ตอนนี้กลับไปเล่นกีฬาได้ตามปกติแล้ว',
+    quoteEn: 'My doctor said I had triple vessel disease and needed urgent surgery. The MediThai team saved my life. I\'m back to playing sports normally now.',
+    detail: 'คุณสมชายเข้ารับการผ่าตัดทำทางเบี่ยงหลอดเลือดหัวใจ (CABG) สำเร็จด้วยเทคนิค Minimally Invasive ใช้เวลาพักฟื้นเพียง 5 วัน',
+  },
+  { name: 'คุณลดาวัลย์ พงษ์ประยูร', age: 45, condition: 'มะเร็งเต้านม', conditionEn: 'Breast Cancer', hospital: 'MediThai มะเร็ง', color: '#8B5CF6', icon: 'fa6-solid:ribbon',
+    quote: 'ตรวจพบมะเร็งระยะแรก เพราะเข้าตรวจกับโปรแกรม AI Mammography ของ MediThai รักษาหายเลยโดยไม่ต้องผ่าตัดเอาเต้านมออก',
+    quoteEn: 'My cancer was found early thanks to MediThai\'s AI Mammography program. I was treated successfully without mastectomy.',
+    detail: 'พบมะเร็งระยะ 1A จากการตรวจคัดกรองด้วย AI เข้ารับการรักษาด้วยการผ่าตัดแบบอนุรักษ์ร่วมกับรังสีรักษา ปัจจุบันครบ 3 ปีโดยไม่มีการกลับเป็นซ้ำ',
+  },
+  { name: 'คุณปิยะ แสงทอง', age: 67, condition: 'โรคหลอดเลือดสมอง', conditionEn: 'Stroke', hospital: 'MediThai สมองและกระดูก', color: '#10B981', icon: 'fa6-solid:brain',
+    quote: 'เกิดอาการ stroke กลางดึก ถูกนำส่งมาที่ MediThai ภายใน 30 นาที ทีม stroke fast track ให้ยาละลายลิ่มเลือดทันเวลา ตอนนี้ฟื้นตัวสมบูรณ์แล้ว',
+    quoteEn: 'I had a stroke in the middle of the night. I was rushed to MediThai within 30 minutes. The stroke fast track team gave me clot-busting medication in time. I\'ve fully recovered.',
+    detail: 'เข้าสู่ Stroke Fast Track ภายใน 45 นาที ได้รับยา tPA ทางหลอดเลือดดำสำเร็จ ฟื้นตัวเต็ม 100% ภายใน 1 เดือน',
+  },
+  { name: 'คุณวรรณา เมืองมา', age: 52, condition: 'เปลี่ยนข้อเข่า', conditionEn: 'Knee Replacement', hospital: 'MediThai สมองและกระดูก', color: '#2554A0', icon: 'fa6-solid:person-walking',
+    quote: 'ปวดเข่ามา 10 ปี เดินลำบากมาก พอได้ผ่าตัดเปลี่ยนข้อเข่าด้วยหุ่นยนต์กับ MediThai แค่ 6 สัปดาห์ก็ออกไปเดินห้างได้แล้ว',
+    quoteEn: 'I suffered knee pain for 10 years and had difficulty walking. After robotic knee replacement at MediThai, I was walking in the mall after just 6 weeks.',
+    detail: 'ได้รับการผ่าตัดเปลี่ยนข้อเข่าเทียมด้วยหุ่นยนต์ ROSA ความแม่นยำสูง ฟื้นตัวเร็วกว่าวิธีทั่วไป 40%',
+  },
+  { name: 'คุณเจมส์ แอนเดอร์สัน', age: 41, condition: 'ตรวจสุขภาพประจำปี', conditionEn: 'Annual Health Check', hospital: 'MediThai กรุงเทพ', color: '#0891B2', icon: 'fa6-solid:microscope',
+    quote: 'As an expat in Bangkok, I was worried about finding quality healthcare. MediThai\'s staff speak excellent English, the facilities are world-class, and results came back same day. I recommend it to everyone in my office.',
+    quoteEn: 'As an expat in Bangkok, I was worried about finding quality healthcare. MediThai\'s staff speak excellent English, the facilities are world-class, and results came back same day.',
+    detail: 'ตรวจพบ pre-diabetes ในระยะแรก ได้รับคำแนะนำและแผนการดูแลสุขภาพเฉพาะบุคคล ปัจจุบันค่าน้ำตาลกลับสู่ปกติ',
+  },
+  { name: 'คุณมนัสนันท์ ดีเจริญ', age: 34, condition: 'มะเร็งปอด', conditionEn: 'Lung Cancer', hospital: 'MediThai มะเร็ง', color: '#F59E0B', icon: 'fa6-solid:lungs',
+    quote: 'ไม่เคยสูบบุหรี่เลยแต่เป็นมะเร็งปอด แพทย์ MediThai ผ่าตัดด้วยหุ่นยนต์ da Vinci บาดแผลเล็กมาก กลับบ้านได้ใน 3 วัน ชีวิตปกติทุกอย่าง',
+    quoteEn: 'I never smoked but got lung cancer. MediThai doctors operated with da Vinci robot, tiny incisions. I went home in 3 days and life is completely normal.',
+    detail: 'ตรวจพบมะเร็งปอดระยะ 1B จาก Low-dose CT scan ผ่าตัดด้วยหุ่นยนต์ da Vinci ใช้เวลาพักฟื้น 3 วัน ผลการรักษาดีเยี่ยม',
+  },
+];
+---
+<Layout title="เรื่องราวผู้ป่วย | MediThai Hospital Network" description="ฟังเรื่องราวของผู้ป่วยที่ฟื้นคืนสุขภาพกลับมาได้ด้วยทีมแพทย์ MediThai"
+  extraHead={`<style>
+  .story-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
+  @media(max-width:1000px){ .story-grid{grid-template-columns:repeat(2,1fr);} }
+  @media(max-width:640px){ .story-grid{grid-template-columns:1fr;} }
+  .story-card { background:#fff; border-radius:20px; padding:32px; box-shadow:var(--shadow-md); display:flex; flex-direction:column; transition:transform .3s,box-shadow .3s; }
+  .story-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+  .story-quote { font-size:1rem; color:var(--gray-700); line-height:1.8; font-style:italic; flex:1; margin-bottom:20px; position:relative; padding-top:24px; }
+  .story-quote::before { content:'"'; position:absolute; top:-8px; left:-4px; font-size:4rem; color:var(--gray-200); font-family:Georgia,serif; line-height:1; }
+  .story-author { display:flex; align-items:center; gap:12px; padding-top:16px; border-top:1px solid var(--gray-100); }
+  .story-avatar { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  </style>`}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>เรื่องราวผู้ป่วย</span></div>
+    <h1>เรื่องราวความสำเร็จของผู้ป่วย</h1>
+    <p>ฟังเรื่องราวจริงของผู้ป่วยที่ฟื้นคืนสุขภาพและคุณภาพชีวิตที่ดีกลับมา</p>
+  </div>
+</section>
+
+<!-- Stats -->
+<section style="background:#fff;padding:48px 0;border-bottom:1px solid var(--gray-100)">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center">
+      {[
+        { num: '98%', label: 'ความพึงพอใจผู้ป่วย', icon: 'fa6-solid:face-smile' },
+        { num: '50,000+', label: 'ผู้ป่วยที่ดูแลต่อปี', icon: 'fa6-solid:users' },
+        { num: '200+', label: 'แพทย์เชี่ยวชาญ', icon: 'fa6-solid:user-doctor' },
+        { num: '6', label: 'โรงพยาบาลในเครือ', icon: 'fa6-solid:hospital' },
+      ].map(s => (
+        <div class="reveal">
+          <div style="font-size:2rem;margin-bottom:8px;color:var(--secondary)"><Icon name={s.icon} /></div>
+          <div style="font-size:2rem;font-weight:800;color:var(--primary)">{s.num}</div>
+          <div style="font-size:.875rem;color:var(--gray-600)">{s.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Stories -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="section-header text-center reveal" style="margin-bottom:48px">
+      <span class="tag">Patient Stories</span>
+      <h2>ชีวิตที่เปลี่ยนไป</h2>
+      <p>เรื่องราวจริงจากผู้ป่วยที่ไว้วางใจทีมแพทย์ MediThai</p>
+    </div>
+    <div class="story-grid">
+      {stories.map((s, i) => (
+        <div class={`story-card reveal${i % 3 === 1 ? ' reveal-delay-1' : i % 3 === 2 ? ' reveal-delay-2' : ''}`}>
+          <div class="story-quote">{s.quote}</div>
+          <div style="font-size:.8rem;color:var(--gray-500);margin-bottom:16px;background:var(--gray-50);border-radius:8px;padding:8px 12px">{s.detail}</div>
+          <div class="story-author">
+            <div class="story-avatar" style={`background:${s.color}20`}>
+              <Icon name={s.icon} style={`color:${s.color};width:1.2rem;height:1.2rem`} />
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:.9rem;color:var(--primary)">{s.name}</div>
+              <div style="font-size:.78rem;color:var(--gray-500)">{s.condition} · {s.hospital}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Share your story CTA -->
+<section class="section-pad-sm" style="background:var(--primary);color:#fff;text-align:center">
+  <div class="container">
+    <Icon name="fa6-solid:heart" style="font-size:2rem;margin-bottom:16px;color:var(--accent)" />
+    <h2 style="margin-bottom:12px">อยากแชร์ประสบการณ์ของคุณ?</h2>
+    <p style="opacity:.8;margin-bottom:24px">เรื่องราวของคุณอาจเป็นแรงบันดาลใจให้ผู้อื่นกล้าดูแลสุขภาพ</p>
+    <a href="/contact" class="btn btn-accent">ส่งเรื่องราวของคุณ</a>
+  </div>
+</section>
+
+</Layout>

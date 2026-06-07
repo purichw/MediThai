@@ -1,0 +1,132 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="บริการสุขภาพองค์กร | MediThai" description="แพ็กเกจสุขภาพสำหรับองค์กร ดูแลพนักงานของคุณด้วยมาตรฐานระดับโรงพยาบาลชั้นนำ">
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>บริการองค์กร</span></div>
+    <h1>บริการสุขภาพสำหรับองค์กร</h1>
+    <p>พนักงานที่มีสุขภาพดีคือรากฐานขององค์กรที่แข็งแกร่ง ให้ MediThai ดูแลทีมของคุณ</p>
+    <a href="#contact-form" class="btn btn-accent" style="margin-top:24px"><Icon name="fa6-solid:building" /> ติดต่อทีมองค์กร</a>
+  </div>
+</section>
+
+<!-- Stats -->
+<section style="background:#fff;padding:56px 0;border-bottom:1px solid var(--gray-100)">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center">
+      {[
+        { n:'200+', l:'องค์กรที่ไว้วางใจ', icon:'fa6-solid:building-columns' },
+        { n:'30,000+', l:'พนักงานในโครงการ', icon:'fa6-solid:users' },
+        { n:'15%', l:'ลดการลาป่วยโดยเฉลี่ย', icon:'fa6-solid:chart-line' },
+        { n:'24/7', l:'สายด่วนองค์กร', icon:'fa6-solid:headset' },
+      ].map(s => (
+        <div class="reveal">
+          <Icon name={s.icon} style="font-size:1.5rem;color:var(--secondary);margin-bottom:8px" />
+          <div style="font-size:2rem;font-weight:800;color:var(--primary)">{s.n}</div>
+          <div style="font-size:.875rem;color:var(--gray-600)">{s.l}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="section-header text-center reveal" style="margin-bottom:48px">
+      <span class="tag">Corporate Solutions</span>
+      <h2>บริการที่ครบวงจรสำหรับองค์กร</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      {[
+        { icon:'fa6-solid:heart-pulse', color:'#EF4444', bg:'#FFF1F2', title:'ตรวจสุขภาพประจำปีพนักงาน', desc:'โปรแกรมตรวจสุขภาพที่ออกแบบตามความต้องการขององค์กร พร้อมรายงาน dashboard สรุปผลสุขภาพหมู่คณะ' },
+        { icon:'fa6-solid:video', color:'#0891B2', bg:'#EFF6FF', title:'Telehealth สำหรับพนักงาน', desc:'พนักงานสามารถปรึกษาแพทย์ออนไลน์ได้ตลอดเวลา ลดการหยุดงานเพื่อไปโรงพยาบาล' },
+        { icon:'fa6-solid:user-doctor', color:'#8B5CF6', bg:'#F5F3FF', title:'On-Site Medical Service', desc:'ทีมแพทย์และพยาบาลมาให้บริการที่สำนักงาน ทำวัคซีน ตรวจเบื้องต้น และให้คำปรึกษา' },
+        { icon:'fa6-solid:brain', color:'#10B981', bg:'#F0FDF4', title:'โปรแกรมดูแลสุขภาพจิต', desc:'บริการปรึกษาจิตแพทย์และนักจิตวิทยาสำหรับพนักงาน เพื่อลดความเครียดและ burnout' },
+        { icon:'fa6-solid:chart-pie', color:'#F59E0B', bg:'#FFFBEB', title:'Health Analytics Dashboard', desc:'รายงานสถิติสุขภาพหมู่คณะ เทรนด์ความเสี่ยง และ ROI ของโปรแกรมสุขภาพ' },
+        { icon:'fa6-solid:shield-halved', color:'#1B3A6B', bg:'#EFF6FF', title:'ประกันสุขภาพกลุ่ม', desc:'แพ็กเกจประกันสุขภาพกลุ่มร่วมกับบริษัทประกันชั้นนำ ครอบคลุมทั้งพนักงานและครอบครัว' },
+      ].map((s,i) => (
+        <div class={`reveal${i%3===1?' reveal-delay-1':i%3===2?' reveal-delay-2':''}`} style="background:#fff;border-radius:20px;padding:28px;box-shadow:var(--shadow-sm)">
+          <div style={`width:56px;height:56px;border-radius:14px;background:${s.bg};display:flex;align-items:center;justify-content:center;margin-bottom:16px`}>
+            <Icon name={s.icon} style={`color:${s.color};width:1.4rem;height:1.4rem`} />
+          </div>
+          <h3 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:8px">{s.title}</h3>
+          <p style="font-size:.875rem;color:var(--gray-600);line-height:1.7">{s.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Packages -->
+<section class="section-pad">
+  <div class="container">
+    <div class="section-header text-center reveal" style="margin-bottom:40px">
+      <span class="tag">แพ็กเกจองค์กร</span>
+      <h2>ราคาพิเศษสำหรับองค์กร</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto">
+      {[
+        { name:'SME Package', size:'5–49 คน', price:'2,900', per:'บาท/ท่าน/ปี', color:'#0891B2',
+          inc:['ตรวจสุขภาพประจำปี Basic','Telehealth ไม่จำกัดครั้ง','สายด่วน HR 24/7','รายงานสุขภาพหมู่คณะ'] },
+        { name:'Corporate Package', size:'50–499 คน', price:'4,900', per:'บาท/ท่าน/ปี', color:'#1B3A6B', featured:true,
+          inc:['ตรวจสุขภาพประจำปี Premium','Telehealth + On-Site visit 2 ครั้ง/ปี','ปรึกษาจิตแพทย์','Health Dashboard','ส่วนลดพิเศษสำหรับผู้บริหาร'] },
+        { name:'Enterprise Package', size:'500+ คน', price:'ติดต่อ', per:'ราคาพิเศษ', color:'#8B5CF6',
+          inc:['ออกแบบโปรแกรมเฉพาะองค์กร','ทีม Account Manager ประจำ','On-Site Clinic','Integration กับ HR System','SLA ระดับ Enterprise'] },
+      ].map((p,i) => (
+        <div class={`reveal${i===1?' reveal-delay-1':i===2?' reveal-delay-2':''}`} style={`background:#fff;border-radius:20px;padding:32px;box-shadow:var(--shadow-md);${p.featured?`border:2px solid ${p.color}`:''}`}>
+          {p.featured && <span style={`background:${p.color};color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px;display:inline-block`}>แนะนำ</span>}
+          <h3 style={`font-size:1.1rem;font-weight:700;color:${p.color};margin-bottom:4px`}>{p.name}</h3>
+          <p style="font-size:.8rem;color:var(--gray-500);margin-bottom:12px">{p.size}</p>
+          <div style="margin-bottom:20px">
+            <span style="font-size:2rem;font-weight:800;color:var(--primary)">฿{p.price}</span>
+            <span style="font-size:.8rem;color:var(--gray-500)"> {p.per}</span>
+          </div>
+          <ul style="list-style:none;margin-bottom:24px">
+            {p.inc.map(it => (
+              <li style="display:flex;gap:8px;align-items:center;font-size:.875rem;color:var(--gray-700);padding:6px 0;border-bottom:1px solid var(--gray-50)">
+                <Icon name="fa6-solid:check" style={`color:${p.color};flex-shrink:0`} /> {it}
+              </li>
+            ))}
+          </ul>
+          <a href="#contact-form" class="btn btn-primary" style={`width:100%;justify-content:center;background:${p.color};border-color:${p.color}`}>ติดต่อทีมองค์กร</a>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Contact form -->
+<section class="section-pad" id="contact-form" style="background:var(--gray-50)">
+  <div class="container" style="max-width:640px">
+    <div class="section-header text-center reveal" style="margin-bottom:32px">
+      <span class="tag">ติดต่อเรา</span>
+      <h2>สนใจโปรแกรมองค์กร?</h2>
+      <p>ทีมผู้เชี่ยวชาญของเราพร้อมออกแบบโปรแกรมที่เหมาะกับองค์กรของคุณ</p>
+    </div>
+    <form class="auth-form reveal" style="background:#fff;border-radius:20px;padding:40px;box-shadow:var(--shadow-md)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group"><label>ชื่อ-นามสกุล</label><input type="text" required placeholder="สมชาย วงศ์ดี" /></div>
+        <div class="form-group"><label>ตำแหน่ง</label><input type="text" required placeholder="HR Manager" /></div>
+      </div>
+      <div class="form-group"><label>ชื่อบริษัท</label><input type="text" required placeholder="บริษัท ABC จำกัด" /></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group"><label>อีเมล</label><input type="email" required /></div>
+        <div class="form-group"><label>เบอร์โทรศัพท์</label><input type="tel" required /></div>
+      </div>
+      <div class="form-group">
+        <label>จำนวนพนักงานโดยประมาณ</label>
+        <select class="filter-select" style="width:100%;height:48px">
+          <option>5–49 คน</option><option>50–199 คน</option><option>200–499 คน</option><option>500+ คน</option>
+        </select>
+      </div>
+      <div class="form-group"><label>ความต้องการเพิ่มเติม</label><textarea rows="3" placeholder="อธิบายความต้องการหรือบริการที่สนใจ..."></textarea></div>
+      <button type="submit" class="btn btn-primary btn-full"><Icon name="fa6-solid:paper-plane" /> ส่งข้อมูล</button>
+    </form>
+  </div>
+</section>
+
+</Layout>

@@ -1,0 +1,174 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="Telehealth / พบแพทย์ออนไลน์ | MediThai" description="พบแพทย์เชี่ยวชาญออนไลน์จากที่ใดก็ได้ ผ่านวิดีโอคอล — สะดวก รวดเร็ว ปลอดภัย"
+  extraHead={`<style>
+  .tele-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  @media(max-width:900px){ .tele-grid{grid-template-columns:repeat(2,1fr);} }
+  @media(max-width:600px){ .tele-grid{grid-template-columns:1fr;} }
+  .tele-card { background:#fff; border-radius:20px; padding:32px 24px; text-align:center; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); }
+  .tele-icon { width:64px; height:64px; border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+  .step-num { width:40px; height:40px; border-radius:50%; background:var(--secondary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
+  .step-row { display:flex; gap:20px; align-items:flex-start; margin-bottom:32px; }
+  .price-card { background:#fff; border-radius:20px; padding:32px; box-shadow:var(--shadow-md); border:2px solid var(--gray-100); text-align:center; transition:border-color .3s; }
+  .price-card:hover, .price-card.featured { border-color:var(--secondary); }
+  .price-card.featured { background:linear-gradient(135deg,#EFF6FF,#DBEAFE); }
+  </style>`}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>Telehealth</span></div>
+    <h1>พบแพทย์ออนไลน์</h1>
+    <p>ปรึกษาแพทย์เชี่ยวชาญจาก MediThai ผ่านวิดีโอคอล จากที่ใดก็ได้ ตลอด 24 ชั่วโมง</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px">
+      <a href="#book-tele" class="btn btn-accent"><Icon name="fa6-solid:video" /> จองนัดพบแพทย์ออนไลน์</a>
+      <a href="#how-it-works" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5)">ขั้นตอนการใช้งาน</a>
+    </div>
+  </div>
+</section>
+
+<!-- Benefits -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="section-header text-center reveal" style="margin-bottom:48px">
+      <span class="tag">Telehealth Benefits</span>
+      <h2>ทำไมต้องพบแพทย์ออนไลน์?</h2>
+    </div>
+    <div class="tele-grid">
+      {[
+        { icon:'fa6-solid:house-medical', color:'#0891B2', bg:'#EFF6FF', title:'ไม่ต้องเดินทาง', desc:'พบแพทย์จากบ้าน ที่ทำงาน หรือทุกที่ที่มีอินเทอร์เน็ต ประหยัดเวลาและค่าเดินทาง' },
+        { icon:'fa6-solid:clock', color:'#10B981', bg:'#F0FDF4', title:'นัดได้ทันที', desc:'มีสล็อตนัดหมายตั้งแต่เช้าถึงค่ำ ไม่ต้องรอคิวนาน' },
+        { icon:'fa6-solid:shield-halved', color:'#8B5CF6', bg:'#F5F3FF', title:'ปลอดภัย เป็นส่วนตัว', desc:'ระบบเข้ารหัสทุกการสนทนา ปฏิบัติตามมาตรฐาน PDPA' },
+        { icon:'fa6-solid:file-medical', color:'#F59E0B', bg:'#FFFBEB', title:'รับ e-Prescription', desc:'แพทย์สามารถออกใบสั่งยาอิเล็กทรอนิกส์ได้ทันที' },
+        { icon:'fa6-solid:user-doctor', color:'#EF4444', bg:'#FFF1F2', title:'แพทย์เชี่ยวชาญตัวจริง', desc:'พบแพทย์จาก MediThai ที่มีความเชี่ยวชาญจริง ไม่ใช่ AI' },
+        { icon:'fa6-solid:globe', color:'#1B3A6B', bg:'#EFF6FF', title:'รองรับหลายภาษา', desc:'มีล่ามหรือแพทย์ที่พูดภาษาอังกฤษ จีน และญี่ปุ่นได้' },
+      ].map((b,i) => (
+        <div class={`tele-card reveal${i%3===1?' reveal-delay-1':i%3===2?' reveal-delay-2':''}`}>
+          <div class="tele-icon" style={`background:${b.bg}`}>
+            <Icon name={b.icon} style={`color:${b.color};width:1.5rem;height:1.5rem`} />
+          </div>
+          <h3 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:8px">{b.title}</h3>
+          <p style="font-size:.875rem;color:var(--gray-600);line-height:1.7">{b.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="section-pad" id="how-it-works">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
+      <div class="reveal-left">
+        <span class="tag" style="margin-bottom:16px">ขั้นตอนง่ายๆ</span>
+        <h2 style="margin-bottom:32px">วิธีใช้งาน Telehealth</h2>
+        {[
+          { n:1, title:'เลือกแพทย์และเวลา', desc:'เลือกแพทย์ตามความเชี่ยวชาญที่ต้องการ และเลือกช่วงเวลาที่สะดวก' },
+          { n:2, title:'ชำระค่าบริการ', desc:'ชำระผ่านบัตรเครดิต / QR Code / PromptPay — ปลอดภัย 100%' },
+          { n:3, title:'รับลิงก์เข้าห้องประชุม', desc:'ระบบส่งลิงก์ไปยังอีเมลและ SMS ก่อนนัด 15 นาที' },
+          { n:4, title:'พบแพทย์ผ่านวิดีโอคอล', desc:'คลิกลิงก์ พบแพทย์ได้ทันที ไม่ต้องติดตั้งแอปใดๆ' },
+        ].map(s => (
+          <div class="step-row">
+            <div class="step-num">{s.n}</div>
+            <div>
+              <strong style="color:var(--primary)">{s.title}</strong>
+              <p style="font-size:.875rem;color:var(--gray-600);margin-top:4px">{s.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="reveal-right" style="background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:24px;padding:40px;color:#fff;text-align:center">
+        <Icon name="fa6-solid:video" style="font-size:4rem;margin-bottom:20px;opacity:.8" />
+        <h3 style="font-size:1.5rem;margin-bottom:8px">พร้อมให้บริการ</h3>
+        <div style="font-size:2rem;font-weight:800;margin-bottom:4px">06:00 – 22:00</div>
+        <p style="opacity:.8;margin-bottom:24px">ทุกวัน รวมวันหยุดนักขัตฤกษ์</p>
+        <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:16px;margin-bottom:16px">
+          <div style="font-size:.875rem;opacity:.8">เฉลี่ยเวลารอ</div>
+          <div style="font-size:1.5rem;font-weight:700">&lt; 15 นาที</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:16px">
+          <div style="font-size:.875rem;opacity:.8">แพทย์ที่พร้อม</div>
+          <div style="font-size:1.5rem;font-weight:700">50+ ท่าน</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="section-header text-center reveal" style="margin-bottom:48px">
+      <span class="tag">ค่าบริการ</span>
+      <h2>ราคาโปร่งใส ไม่มีค่าใช้จ่ายแอบแฝง</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto">
+      {[
+        { plan:'ปรึกษาทั่วไป', price:'590', unit:'บาท / ครั้ง', features:['พบแพทย์อายุรกรรมทั่วไป','30 นาที','e-Prescription','สรุปผลส่งอีเมล'], featured:false },
+        { plan:'แพทย์เชี่ยวชาญ', price:'990', unit:'บาท / ครั้ง', features:['เลือกแพทย์เชี่ยวชาญ','45 นาที','e-Prescription','สรุปผลส่งอีเมล','นัด Follow-up ฟรี 1 ครั้ง'], featured:true },
+        { plan:'ปรึกษาต่อเนื่อง', price:'1,590', unit:'บาท / เดือน', features:['ปรึกษาไม่จำกัดครั้ง','แพทย์ประจำตัว','Chat กับแพทย์ได้ตลอด','รายงานสุขภาพรายเดือน'], featured:false },
+      ].map(p => (
+        <div class={`price-card reveal${p.featured?' featured':''}`}>
+          {p.featured && <div style="background:var(--secondary);color:#fff;font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:12px">แนะนำ</div>}
+          <div style="font-size:1rem;font-weight:600;color:var(--gray-700);margin-bottom:8px">{p.plan}</div>
+          <div style="font-size:2.5rem;font-weight:800;color:var(--primary)">{p.price}</div>
+          <div style="font-size:.8rem;color:var(--gray-500);margin-bottom:20px">{p.unit}</div>
+          <ul style="text-align:left;list-style:none;margin-bottom:24px">
+            {p.features.map(f => (
+              <li style="font-size:.875rem;color:var(--gray-700);padding:6px 0;display:flex;gap:8px;align-items:center">
+                <Icon name="fa6-solid:check" style="color:var(--secondary);flex-shrink:0" /> {f}
+              </li>
+            ))}
+          </ul>
+          <a href="#book-tele" class={`btn ${p.featured?'btn-primary':'btn-outline'}`} style="width:100%;justify-content:center">เลือกแพลน</a>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Booking Form -->
+<section class="section-pad" id="book-tele">
+  <div class="container" style="max-width:640px">
+    <div class="section-header text-center reveal" style="margin-bottom:32px">
+      <span class="tag">จองนัด</span>
+      <h2>จองนัดพบแพทย์ออนไลน์</h2>
+    </div>
+    <form class="auth-form reveal" style="background:#fff;border-radius:20px;padding:40px;box-shadow:var(--shadow-md)">
+      <div class="form-group">
+        <label>ความเชี่ยวชาญที่ต้องการปรึกษา</label>
+        <select class="filter-select" style="width:100%;height:48px">
+          <option>อายุรกรรมทั่วไป (General)</option>
+          <option>หัวใจและหลอดเลือด</option>
+          <option>ระบบประสาท</option>
+          <option>กระดูกและข้อ</option>
+          <option>ผิวหนัง</option>
+          <option>สูตินรีเวช</option>
+          <option>กุมารเวช (เด็ก)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>วันที่ต้องการ</label>
+        <input type="date" required />
+      </div>
+      <div class="form-group">
+        <label>เวลา</label>
+        <select class="filter-select" style="width:100%;height:48px">
+          {['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'].map(t => <option>{t}</option>)}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>อาการเบื้องต้น / เรื่องที่ต้องการปรึกษา</label>
+        <textarea rows="3" placeholder="อธิบายอาการหรือคำถามที่ต้องการปรึกษาแพทย์..."></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">
+        <Icon name="fa6-solid:video" /> ยืนยันการจองนัด
+      </button>
+      <p style="font-size:.8rem;color:var(--gray-500);text-align:center;margin-top:12px">ท่านจะได้รับลิงก์เข้าห้องประชุมทางอีเมลและ SMS</p>
+    </form>
+  </div>
+</section>
+
+</Layout>

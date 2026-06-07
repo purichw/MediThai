@@ -37,27 +37,44 @@ import { Icon } from 'astro-icon/components';
         </div>
       </div>
       <div class="nav-item">
-        <a href="#" class="nav-link" data-i18n="nav_services">บริการ <Icon name="fa6-solid:chevron-down" /></a>
+        <a href="#" class="nav-link">บริการ <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/appointments"><Icon name="fa6-solid:calendar-check" /><span data-i18n="dd_appt">นัดหมายแพทย์</span></a>
-          <a href="/appointments#virtual"><Icon name="fa6-solid:video" /><span data-i18n="dd_virtual">Virtual Visit</span></a>
-          <a href="/appointments#second"><Icon name="fa6-solid:magnifying-glass-plus" /><span data-i18n="dd_second">Second Opinion</span></a>
-          <a href="#"><Icon name="fa6-solid:file-medical" /><span data-i18n="dd_records">เวชระเบียน</span></a>
-          <a href="#"><Icon name="fa6-solid:receipt" /><span data-i18n="dd_billing">ตรวจสอบค่าบริการ</span></a>
-          <a href="#"><Icon name="fa6-solid:shield-halved" /><span data-i18n="dd_insurance">ประกันสุขภาพ</span></a>
+          <a href="/appointments"><Icon name="fa6-solid:calendar-check" /><span>นัดหมายแพทย์</span></a>
+          <a href="/telehealth"><Icon name="fa6-solid:video" /><span>พบแพทย์ออนไลน์</span></a>
+          <a href="/symptoms"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>
+          <a href="/medical-records"><Icon name="fa6-solid:file-medical" /><span>ขอเวชระเบียน</span></a>
+          <a href="/bill-payment"><Icon name="fa6-solid:receipt" /><span>ชำระค่าบริการ</span></a>
+          <a href="/executive-health"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>
         </div>
       </div>
       <div class="nav-item">
-        <a href="/doctors" class="nav-link" data-i18n="nav_doctors">แพทย์</a>
+        <a href="/doctors" class="nav-link">แพทย์</a>
       </div>
       <div class="nav-item">
-        <a href="/packages" class="nav-link" data-i18n="nav_packages">แพ็กเกจ</a>
+        <a href="#" class="nav-link">แพ็กเกจ <Icon name="fa6-solid:chevron-down" /></a>
+        <div class="dropdown">
+          <a href="/packages"><Icon name="fa6-solid:box-open" /><span>แพ็กเกจสุขภาพ</span></a>
+          <a href="/executive-health"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>
+          <a href="/loyalty"><Icon name="fa6-solid:id-card" /><span>MediThai Card</span></a>
+          <a href="/corporate"><Icon name="fa6-solid:building" /><span>บริการองค์กร</span></a>
+        </div>
       </div>
       <div class="nav-item">
-        <a href="/health-library" class="nav-link" data-i18n="nav_library">คลังความรู้</a>
+        <a href="#" class="nav-link">ข้อมูลสุขภาพ <Icon name="fa6-solid:chevron-down" /></a>
+        <div class="dropdown">
+          <a href="/health-library"><Icon name="fa6-solid:book-medical" /><span>คลังความรู้</span></a>
+          <a href="/symptoms"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>
+          <a href="/patient-stories"><Icon name="fa6-solid:heart" /><span>เรื่องราวผู้ป่วย</span></a>
+        </div>
       </div>
       <div class="nav-item">
-        <a href="/about" class="nav-link" data-i18n="nav_about">เกี่ยวกับเรา</a>
+        <a href="#" class="nav-link">เกี่ยวกับ <Icon name="fa6-solid:chevron-down" /></a>
+        <div class="dropdown">
+          <a href="/about"><Icon name="fa6-solid:circle-info" /><span>เกี่ยวกับเรา</span></a>
+          <a href="/expat-hub"><Icon name="fa6-solid:globe" /><span>Expat Hub</span></a>
+          <a href="/careers"><Icon name="fa6-solid:briefcase" /><span>ร่วมงานกับเรา</span></a>
+          <a href="/giving"><Icon name="fa6-solid:hand-holding-heart" /><span>ร่วมสนับสนุน</span></a>
+        </div>
       </div>
     </nav>
 
@@ -88,14 +105,23 @@ import { Icon } from 'astro-icon/components';
 
 <!-- Mobile Nav -->
 <nav class="mobile-nav">
-  <a href="/" data-i18n="nav_home">หน้าแรก <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/locations" data-i18n="nav_hospitals">โรงพยาบาล <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/appointments" data-i18n="nav_services">บริการ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/doctors" data-i18n="nav_doctors">แพทย์ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/packages" data-i18n="nav_packages">แพ็กเกจ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/health-library" data-i18n="nav_library">คลังความรู้ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/about" data-i18n="nav_about">เกี่ยวกับเรา <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/contact" style="margin-top:12px;background:var(--primary);color:#fff;padding:14px;border-radius:12px;justify-content:center" data-i18n="nav_appt">นัดหมายออนไลน์</a>
+  <a href="/">หน้าแรก <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/locations">โรงพยาบาล <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/appointments">นัดหมาย <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/telehealth">พบแพทย์ออนไลน์ <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/doctors">แพทย์ <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/packages">แพ็กเกจ <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/executive-health">Executive Health <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/loyalty">MediThai Card <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/health-library">คลังความรู้ <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/symptoms">ตรวจสอบอาการ <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/patient-stories">เรื่องราวผู้ป่วย <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/expat-hub">Expat Hub <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/corporate">บริการองค์กร <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/careers">ร่วมงานกับเรา <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/bill-payment">ชำระค่าบริการ <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/giving">ร่วมสนับสนุน <Icon name="fa6-solid:arrow-right" /></a>
+  <a href="/contact" style="margin-top:12px;background:var(--primary);color:#fff;padding:14px;border-radius:12px;justify-content:center">นัดหมายออนไลน์</a>
 </nav>
 
 <script>

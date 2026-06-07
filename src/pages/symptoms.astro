@@ -1,0 +1,171 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="ตรวจสอบอาการ | MediThai" description="ระบุอาการของคุณเพื่อรับคำแนะนำเบื้องต้นจาก MediThai"
+  extraHead={`<style>
+  .symptom-btn { background:#fff; border:2px solid var(--gray-200); border-radius:12px; padding:12px 16px; cursor:pointer; font-family:inherit; font-size:.875rem; color:var(--gray-700); display:flex; align-items:center; gap:8px; transition:all .2s; text-align:left; }
+  .symptom-btn:hover, .symptom-btn.selected { border-color:var(--secondary); color:var(--secondary); background:#EFF6FF; }
+  .body-map { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  @media(max-width:640px){ .body-map{grid-template-columns:repeat(2,1fr);} }
+  .result-card { background:#fff; border-radius:16px; padding:24px; box-shadow:var(--shadow-md); border-left:4px solid var(--secondary); margin-bottom:16px; }
+  .urgency-badge { display:inline-block; padding:4px 12px; border-radius:20px; font-size:.75rem; font-weight:700; }
+  .urgency-low { background:#D1FAE5; color:#065F46; }
+  .urgency-med { background:#FEF3C7; color:#92400E; }
+  .urgency-high { background:#FEE2E2; color:#991B1B; }
+  </style>`}
+  extraScripts={`<script>
+  const symptoms = [
+    { area:'head', label:'ศีรษะ', icon:'🧠' },
+    { area:'eyes', label:'ตา', icon:'👁️' },
+    { area:'ear', label:'หู คอ จมูก', icon:'👂' },
+    { area:'chest', label:'หน้าอก', icon:'🫀' },
+    { area:'stomach', label:'ท้อง', icon:'🫃' },
+    { area:'back', label:'หลัง', icon:'🦴' },
+    { area:'arms', label:'แขน มือ', icon:'💪' },
+    { area:'legs', label:'ขา เข่า เท้า', icon:'🦵' },
+    { area:'skin', label:'ผิวหนัง', icon:'🩹' },
+    { area:'urinary', label:'ทางเดินปัสสาวะ', icon:'🫘' },
+    { area:'mental', label:'สุขภาพจิต', icon:'🧘' },
+    { area:'general', label:'ทั่วไป/อื่นๆ', icon:'🏥' },
+  ];
+
+  const database = {
+    head: [
+      { symptom:'ปวดหัวรุนแรงฉับพลัน', urgency:'high', dept:'ฉุกเฉิน / ระบบประสาท', tip:'อาจเป็นอาการหลอดเลือดสมอง ควรไปโรงพยาบาลทันที', deptKey:'neuro' },
+      { symptom:'ปวดหัวเรื้อรัง / ไมเกรน', urgency:'med', dept:'อายุรกรรม / ระบบประสาท', tip:'พบแพทย์เพื่อวินิจฉัยและรักษาที่ถูกต้อง', deptKey:'neuro' },
+      { symptom:'เวียนหัว บ้านหมุน', urgency:'med', dept:'อายุรกรรม / หู คอ จมูก', tip:'อาจมีหลายสาเหตุ ควรพบแพทย์เพื่อตรวจหา', deptKey:'internal' },
+    ],
+    chest: [
+      { symptom:'เจ็บหน้าอกเฉียบพลัน หายใจลำบาก', urgency:'high', dept:'ฉุกเฉิน / หัวใจ', tip:'โทร 1669 ทันที อาจเป็นหัวใจวาย', deptKey:'heart' },
+      { symptom:'ใจสั่น หัวใจเต้นผิดจังหวะ', urgency:'med', dept:'ศูนย์หัวใจ', tip:'ควรพบแพทย์เพื่อทำ EKG ประเมิน', deptKey:'heart' },
+      { symptom:'ไอเรื้อรัง > 3 สัปดาห์', urgency:'med', dept:'อายุรกรรม / ปอด', tip:'อาจเป็นโรคปอด หรือสัญญาณมะเร็งปอดระยะแรก', deptKey:'cancer' },
+    ],
+    stomach: [
+      { symptom:'ปวดท้องรุนแรง คลื่นไส้อาเจียน', urgency:'high', dept:'ฉุกเฉิน / ศัลยกรรม', tip:'อาจเป็นไส้ติ่งอักเสบหรือฉุกเฉินทางศัลยกรรม', deptKey:'internal' },
+      { symptom:'ถ่ายมีเลือด อุจจาระสีดำ', urgency:'high', dept:'ฉุกเฉิน / ทางเดินอาหาร', tip:'ต้องพบแพทย์ด่วน', deptKey:'internal' },
+      { symptom:'ปวดท้องเรื้อรัง แน่นท้อง', urgency:'med', dept:'ทางเดินอาหาร', tip:'ควรพบแพทย์เพื่อส่องกล้องตรวจ', deptKey:'internal' },
+    ],
+    skin: [
+      { symptom:'ก้อนหรือเนื้องอกที่ผิวหนัง', urgency:'med', dept:'ผิวหนัง / มะเร็ง', tip:'ควรพบแพทย์เพื่อตรวจวินิจฉัย', deptKey:'cancer' },
+      { symptom:'ผื่นคัน แพ้ผิวหนัง', urgency:'low', dept:'ผิวหนัง / อายุรกรรม', tip:'พบแพทย์เพื่อรับยารักษา', deptKey:'internal' },
+    ],
+    general: [
+      { symptom:'ไข้สูง > 38.5°C เกิน 3 วัน', urgency:'med', dept:'อายุรกรรม / ฉุกเฉิน', tip:'ควรพบแพทย์เพื่อหาสาเหตุ', deptKey:'internal' },
+      { symptom:'น้ำหนักลดไม่มีสาเหตุ', urgency:'med', dept:'อายุรกรรม / มะเร็ง', tip:'อาจเป็นสัญญาณของโรคหลายชนิด', deptKey:'internal' },
+      { symptom:'อ่อนเพลียเรื้อรัง ไม่หายแม้นอนหลับ', urgency:'low', dept:'อายุรกรรม', tip:'อาจเกิดจากหลายสาเหตุ เช่น โลหิตจาง หรือต่อมไทรอยด์', deptKey:'internal' },
+    ],
+  };
+
+  let selectedArea = null;
+  let selectedSymptom = null;
+
+  function renderAreas() {
+    const grid = document.getElementById('body-grid');
+    if(!grid) return;
+    symptoms.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'symptom-btn' + (selectedArea===s.area?' selected':'');
+      btn.innerHTML = '<span style="font-size:1.5rem">' + s.icon + '</span><span>' + s.label + '</span>';
+      btn.onclick = () => selectArea(s.area, s.label);
+      grid.appendChild(btn);
+    });
+  }
+
+  function selectArea(area, label) {
+    selectedArea = area;
+    document.querySelectorAll('#body-grid .symptom-btn').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    const symSection = document.getElementById('symptom-section');
+    const symList = document.getElementById('symptom-list');
+    const symTitle = document.getElementById('symptom-area-title');
+    symSection.style.display = 'block';
+    symTitle.textContent = 'อาการที่พบบ่อย: ' + label;
+    symList.innerHTML = '';
+    const items = database[area] || database['general'];
+    items.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'symptom-btn';
+      btn.style.width = '100%';
+      btn.style.marginBottom = '8px';
+      btn.innerHTML = '<Icon name="fa6-solid:circle-dot" style="color:var(--secondary)" />' + item.symptom;
+      btn.onclick = () => showResult(item);
+      symList.appendChild(btn);
+    });
+    document.getElementById('result-section').style.display = 'none';
+    symSection.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function showResult(item) {
+    const sec = document.getElementById('result-section');
+    sec.style.display = 'block';
+    document.getElementById('res-symptom').textContent = item.symptom;
+    const badge = document.getElementById('res-urgency');
+    badge.textContent = item.urgency==='high'?'⚠️ ควรพบแพทย์ด่วน':item.urgency==='med'?'📋 ควรพบแพทย์':'💊 ดูแลตนเองได้เบื้องต้น';
+    badge.className = 'urgency-badge urgency-' + item.urgency;
+    document.getElementById('res-dept').textContent = item.dept;
+    document.getElementById('res-tip').textContent = item.tip;
+    sec.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  document.addEventListener('DOMContentLoaded', renderAreas);
+  </script>`}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ตรวจสอบอาการ</span></div>
+    <h1>ตรวจสอบอาการเบื้องต้น</h1>
+    <p>เลือกส่วนของร่างกายที่มีอาการ เพื่อรับคำแนะนำในการพบแพทย์</p>
+    <div style="background:rgba(255,200,0,.2);border:1px solid rgba(255,200,0,.5);border-radius:12px;padding:12px 16px;margin-top:16px;font-size:.875rem;color:rgba(255,255,255,.9)">
+      <Icon name="fa6-solid:triangle-exclamation" style="color:#F59E0B" /> ข้อมูลนี้เป็นเพียงคำแนะนำเบื้องต้นเท่านั้น ไม่สามารถแทนการวินิจฉัยของแพทย์ได้
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container" style="max-width:800px">
+
+    <!-- Step 1: Body Area -->
+    <div style="background:#fff;border-radius:20px;padding:32px;box-shadow:var(--shadow-md);margin-bottom:24px">
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:20px;display:flex;align-items:center;gap:8px">
+        <span style="background:var(--secondary);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700">1</span>
+        เลือกส่วนของร่างกายที่มีอาการ
+      </h2>
+      <div class="body-map" id="body-grid"></div>
+    </div>
+
+    <!-- Step 2: Symptoms -->
+    <div id="symptom-section" style="display:none;background:#fff;border-radius:20px;padding:32px;box-shadow:var(--shadow-md);margin-bottom:24px">
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:20px;display:flex;align-items:center;gap:8px">
+        <span style="background:var(--secondary);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700">2</span>
+        <span id="symptom-area-title">เลือกอาการ</span>
+      </h2>
+      <div id="symptom-list"></div>
+    </div>
+
+    <!-- Step 3: Result -->
+    <div id="result-section" style="display:none;background:#fff;border-radius:20px;padding:32px;box-shadow:var(--shadow-md)">
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:20px;display:flex;align-items:center;gap:8px">
+        <span style="background:var(--accent);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700">3</span>
+        คำแนะนำเบื้องต้น
+      </h2>
+      <div class="result-card">
+        <div style="font-weight:600;color:var(--primary);margin-bottom:8px" id="res-symptom"></div>
+        <div style="margin-bottom:12px"><span class="urgency-badge urgency-med" id="res-urgency"></span></div>
+        <div style="font-size:.875rem;color:var(--gray-600);margin-bottom:8px">
+          <strong>แผนกที่แนะนำ:</strong> <span id="res-dept"></span>
+        </div>
+        <div style="font-size:.875rem;color:var(--gray-600)" id="res-tip"></div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px">
+        <a href="/appointments" class="btn btn-primary"><Icon name="fa6-solid:calendar-check" /> นัดหมายแพทย์</a>
+        <a href="/telehealth" class="btn btn-outline"><Icon name="fa6-solid:video" /> ปรึกษาออนไลน์</a>
+        <a href="tel:02-310-3000" class="btn btn-outline"><Icon name="fa6-solid:phone" /> โทรปรึกษา</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</Layout>

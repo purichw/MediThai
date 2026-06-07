@@ -1,0 +1,116 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+---
+<Layout title="ชำระค่าบริการออนไลน์ | MediThai" description="ชำระค่าบริการทางการแพทย์ออนไลน์ สะดวก รวดเร็ว ปลอดภัย">
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ชำระค่าบริการ</span></div>
+    <h1>ชำระค่าบริการออนไลน์</h1>
+    <p>ชำระค่ารักษาพยาบาลได้สะดวกจากที่บ้าน ปลอดภัยด้วยระบบเข้ารหัส SSL 256-bit</p>
+  </div>
+</section>
+
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container" style="max-width:700px">
+
+    <!-- Payment methods -->
+    <div style="background:#fff;border-radius:20px;padding:32px;box-shadow:var(--shadow-md);margin-bottom:24px">
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:20px">วิธีชำระเงินที่รองรับ</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        {[
+          { icon:'fa6-solid:credit-card', label:'บัตรเครดิต / เดบิต', detail:'Visa, Mastercard, Amex' },
+          { icon:'fa6-solid:qrcode', label:'QR Code', detail:'PromptPay, SCB, KBank' },
+          { icon:'fa6-brands:line', label:'LINE Pay', detail:'LINE Pay' },
+        ].map(m => (
+          <div style="background:var(--gray-50);border-radius:12px;padding:16px;text-align:center">
+            <Icon name={m.icon} style="font-size:1.5rem;color:var(--secondary);margin-bottom:8px" />
+            <div style="font-size:.85rem;font-weight:600;color:var(--primary)">{m.label}</div>
+            <div style="font-size:.75rem;color:var(--gray-500)">{m.detail}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Payment form -->
+    <div class="reveal" style="background:#fff;border-radius:20px;padding:40px;box-shadow:var(--shadow-md)">
+      <div style="display:flex;gap:12px;margin-bottom:28px">
+        <button onclick="setTab(this,'opd')" id="tab-opd" class="btn btn-primary btn-sm" style="flex:1;justify-content:center">ผู้ป่วยนอก (OPD)</button>
+        <button onclick="setTab(this,'ipd')" id="tab-ipd" class="btn btn-outline btn-sm" style="flex:1;justify-content:center">ผู้ป่วยใน (IPD)</button>
+      </div>
+
+      <form>
+        <div class="form-group">
+          <label>หมายเลข HN (Hospital Number)</label>
+          <input type="text" required placeholder="เช่น HN-2024-001234" />
+        </div>
+        <div class="form-group">
+          <label>ชื่อ-นามสกุล</label>
+          <input type="text" required placeholder="ตามบัตรประชาชน" />
+        </div>
+        <div id="ipd-field" style="display:none" class="form-group">
+          <label>หมายเลขห้อง (สำหรับผู้ป่วยใน)</label>
+          <input type="text" placeholder="เช่น 502A" />
+        </div>
+        <div class="form-group">
+          <label>วันที่รับบริการ</label>
+          <input type="date" required />
+        </div>
+
+        <!-- Bill lookup result (mock) -->
+        <div style="background:var(--gray-50);border-radius:12px;padding:20px;margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <span style="font-weight:600;color:var(--primary)">รายละเอียดค่าบริการ</span>
+            <span style="font-size:.8rem;color:var(--gray-500)">กรุณากรอกข้อมูลด้านบน</span>
+          </div>
+          <div style="border-top:1px dashed var(--gray-200);padding-top:12px">
+            <div style="display:flex;justify-content:space-between;font-size:.875rem;color:var(--gray-600);margin-bottom:6px">
+              <span>ค่าแพทย์</span><span>—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.875rem;color:var(--gray-600);margin-bottom:6px">
+              <span>ค่ายาและเวชภัณฑ์</span><span>—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.875rem;color:var(--gray-600);margin-bottom:12px">
+              <span>ค่าบริการอื่นๆ</span><span>—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-weight:700;color:var(--primary);font-size:1rem;border-top:1px solid var(--gray-200);padding-top:12px">
+              <span>ยอดรวมทั้งหมด</span><span>฿—</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">
+          <Icon name="fa6-solid:lock" /> ชำระเงินอย่างปลอดภัย
+        </button>
+        <p style="text-align:center;font-size:.78rem;color:var(--gray-500);margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px">
+          <Icon name="fa6-solid:shield-halved" style="color:var(--success)" /> ระบบเข้ารหัส SSL 256-bit · PCI DSS Compliant
+        </p>
+      </form>
+    </div>
+
+    <!-- Help -->
+    <div style="background:var(--primary)10;border-radius:16px;padding:20px;margin-top:20px;display:flex;gap:16px;align-items:center">
+      <Icon name="fa6-solid:circle-question" style="font-size:1.5rem;color:var(--primary);flex-shrink:0" />
+      <div>
+        <strong style="font-size:.9rem;color:var(--primary)">ต้องการความช่วยเหลือ?</strong>
+        <p style="font-size:.8rem;color:var(--gray-600);margin-top:2px">ติดต่อฝ่ายการเงิน <a href="tel:02-310-3000" style="color:var(--secondary);font-weight:600">02-310-3000</a> กด 2 หรืออีเมล <a href="mailto:billing@medithai.th" style="color:var(--secondary)">billing@medithai.th</a></p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script is:inline>
+function setTab(el, type) {
+  document.getElementById('tab-opd').className = type==='opd' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
+  document.getElementById('tab-ipd').className = type==='ipd' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
+  document.getElementById('tab-opd').style.flex = '1';
+  document.getElementById('tab-opd').style.justifyContent = 'center';
+  document.getElementById('tab-ipd').style.flex = '1';
+  document.getElementById('tab-ipd').style.justifyContent = 'center';
+  document.getElementById('ipd-field').style.display = type==='ipd' ? 'block' : 'none';
+}
+</script>
+
+</Layout>

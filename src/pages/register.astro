@@ -8,18 +8,26 @@ const { data: { user } } = await supabase.auth.getUser();
 if (user) return Astro.redirect('/dashboard');
 
 let error = '';
+let pendingConfirm = false;
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const email = form.get('email') as string;
   const password = form.get('password') as string;
   const fullName = form.get('full_name') as string;
   const phone = form.get('phone') as string;
-  const { error: err } = await supabase.auth.signUp({
+  const { data, error: err } = await supabase.auth.signUp({
     email, password,
     options: { data: { full_name: fullName, phone } }
   });
-  if (err) error = err.message;
-  else return Astro.redirect('/dashboard');
+  if (err) {
+    error = err.message;
+  } else if (data.session) {
+    // Email confirmation disabled — logged in immediately
+    return Astro.redirect('/dashboard');
+  } else {
+    // Email confirmation required
+    pendingConfirm = true;
+  }
 }
 ---
 <Layout title="สมัครสมาชิก | MediThai">
@@ -28,7 +36,15 @@ if (Astro.request.method === 'POST') {
       <div class="auth-logo"><a href="/">MediThai</a></div>
       <h1 class="auth-title">สมัครสมาชิก</h1>
       {error && <div class="auth-error">{error}</div>}
-      <form method="POST" class="auth-form">
+      {pendingConfirm && (
+        <div class="auth-success">
+          <div style="font-size:2rem;margin-bottom:8px">📧</div>
+          <strong>ตรวจสอบอีเมลของคุณ</strong>
+          <p style="margin-top:8px;font-size:.875rem;color:var(--gray-600)">เราส่งลิงก์ยืนยันไปที่อีเมลของคุณแล้ว กรุณาคลิกลิงก์เพื่อเปิดใช้งานบัญชี</p>
+          <a href="/login" class="btn btn-primary btn-sm" style="margin-top:16px">ไปหน้าเข้าสู่ระบบ</a>
+        </div>
+      )}
+      {!pendingConfirm && <form method="POST" class="auth-form">
         <div class="form-group">
           <label>ชื่อ-นามสกุล</label>
           <input type="text" name="full_name" required placeholder="สมชาย ใจดี" />
@@ -46,7 +62,7 @@ if (Astro.request.method === 'POST') {
           <input type="password" name="password" required placeholder="อย่างน้อย 6 ตัวอักษร" minlength="6" />
         </div>
         <button type="submit" class="btn btn-primary btn-full">สมัครสมาชิก</button>
-      </form>
+      </form>}
       <p class="auth-switch">มีบัญชีแล้ว? <a href="/login">เข้าสู่ระบบ</a></p>
     </div>
   </main>

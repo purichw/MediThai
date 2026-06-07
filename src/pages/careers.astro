@@ -1,0 +1,99 @@
+---
+import Layout from '../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+
+const jobs = [
+  { dept:'ศูนย์หัวใจ', title:'พยาบาลวิชาชีพ (ICU หัวใจ)', type:'Full-time', location:'MediThai หัวใจ', color:'#EF4444', urgent:true },
+  { dept:'ศูนย์มะเร็ง', title:'นักรังสีการแพทย์', type:'Full-time', location:'MediThai มะเร็ง', color:'#8B5CF6', urgent:false },
+  { dept:'เทคโนโลยีสารสนเทศ', title:'Full Stack Developer', type:'Full-time', location:'MediThai กรุงเทพ / Remote', color:'#0891B2', urgent:false },
+  { dept:'ศูนย์กระดูกและข้อ', title:'นักกายภาพบำบัด', type:'Full-time', location:'MediThai สมองและกระดูก', color:'#2554A0', urgent:false },
+  { dept:'อายุรกรรม', title:'แพทย์ประจำบ้าน (Resident Doctor)', type:'Full-time', location:'MediThai กรุงเทพ', color:'#16A34A', urgent:true },
+  { dept:'บริหาร', title:'เจ้าหน้าที่ประสานงานผู้ป่วยต่างชาติ (EN/CN/JP)', type:'Full-time', location:'MediThai กรุงเทพ', color:'#F59E0B', urgent:false },
+  { dept:'ศูนย์เด็ก', title:'กุมารแพทย์', type:'Full-time', location:'MediThai เด็ก', color:'#10B981', urgent:false },
+  { dept:'การตลาด', title:'Digital Marketing Specialist', type:'Full-time', location:'MediThai กรุงเทพ', color:'#1B3A6B', urgent:false },
+];
+---
+<Layout title="ร่วมงานกับเรา | MediThai" description="ร่วมเป็นส่วนหนึ่งของทีม MediThai เปิดรับสมัครงานหลายตำแหน่ง"
+  extraHead={`<style>
+  .job-card { background:#fff; border-radius:16px; padding:24px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-100); display:flex; align-items:flex-start; gap:16px; transition:all .3s; }
+  .job-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-2px); border-color:var(--secondary); }
+  .benefit-card { background:#fff; border-radius:16px; padding:28px; text-align:center; box-shadow:var(--shadow-sm); }
+  .benefit-icon { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; }
+  </style>`}
+>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ร่วมงานกับเรา</span></div>
+    <h1>ร่วมเป็นส่วนหนึ่งของ MediThai</h1>
+    <p>เราเชื่อว่าบุคลากรที่ดีคือหัวใจของการรักษาพยาบาลที่ดี มาร่วมสร้างอนาคตทางการแพทย์ไปด้วยกัน</p>
+  </div>
+</section>
+
+<!-- Why join us -->
+<section class="section-pad" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="section-header text-center reveal" style="margin-bottom:48px">
+      <span class="tag">ทำไมต้อง MediThai</span>
+      <h2>สิทธิประโยชน์ที่คุณจะได้รับ</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+      {[
+        { icon:'fa6-solid:hand-holding-medical', bg:'#EFF6FF', color:'#0891B2', title:'ตรวจสุขภาพฟรีทุกปี', desc:'พนักงานและครอบครัวได้รับสิทธิ์ตรวจสุขภาพฟรีทุกปี' },
+        { icon:'fa6-solid:graduation-cap', bg:'#F5F3FF', color:'#8B5CF6', title:'ทุนการศึกษา', desc:'ทุนสนับสนุนการอบรมและพัฒนาวิชาชีพต่อเนื่อง' },
+        { icon:'fa6-solid:coins', bg:'#FFFBEB', color:'#F59E0B', title:'โบนัสและสวัสดิการ', desc:'โบนัสประจำปี เบี้ยเลี้ยง และสวัสดิการที่แข่งขันได้' },
+        { icon:'fa6-solid:scale-balanced', bg:'#F0FDF4', color:'#10B981', title:'Work-Life Balance', desc:'วันหยุดพักร้อน ลาป่วย และความยืดหยุ่นในการทำงาน' },
+        { icon:'fa6-solid:users', bg:'#FFF1F2', color:'#EF4444', title:'ทีมที่แข็งแกร่ง', desc:'ทำงานร่วมกับแพทย์และผู้เชี่ยวชาญระดับนานาชาติ' },
+        { icon:'fa6-solid:chart-line', bg:'#EFF6FF', color:'#1B3A6B', title:'ความก้าวหน้าในสายอาชีพ', desc:'เส้นทางอาชีพที่ชัดเจนและโอกาสเติบโต' },
+        { icon:'fa6-solid:building-columns', bg:'#FFF7ED', color:'#EA580C', title:'เทคโนโลยีล้ำสมัย', desc:'ทำงานกับเครื่องมือและเทคโนโลยีการแพทย์ที่ทันสมัยที่สุด' },
+        { icon:'fa6-solid:earth-asia', bg:'#F0FDF4', color:'#059669', title:'เครือข่ายระดับโลก', desc:'โอกาสแลกเปลี่ยนกับโรงพยาบาลชั้นนำต่างประเทศ' },
+      ].map((b,i) => (
+        <div class={`benefit-card reveal${i%4===1?' reveal-delay-1':i%4===2?' reveal-delay-2':i%4===3?' reveal-delay-3':''}`}>
+          <div class="benefit-icon" style={`background:${b.bg}`}>
+            <Icon name={b.icon} style={`color:${b.color};width:1.4rem;height:1.4rem`} />
+          </div>
+          <h3 style="font-size:.9rem;font-weight:700;color:var(--primary);margin-bottom:6px">{b.title}</h3>
+          <p style="font-size:.8rem;color:var(--gray-600);line-height:1.6">{b.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Job listings -->
+<section class="section-pad">
+  <div class="container">
+    <div class="section-header text-center reveal" style="margin-bottom:32px">
+      <span class="tag">ตำแหน่งที่เปิดรับ</span>
+      <h2>ตำแหน่งงานว่าง</h2>
+      <p>{jobs.length} ตำแหน่งที่เปิดรับสมัครในขณะนี้</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;max-width:800px;margin:0 auto">
+      {jobs.map((j,i) => (
+        <div class={`job-card reveal${i%2===1?' reveal-delay-1':''}`}>
+          <div style={`width:48px;height:48px;border-radius:12px;background:${j.color}15;display:flex;align-items:center;justify-content:center;flex-shrink:0`}>
+            <Icon name="fa6-solid:briefcase-medical" style={`color:${j.color};width:1.2rem;height:1.2rem`} />
+          </div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+              <span style="font-weight:700;color:var(--primary)">{j.title}</span>
+              {j.urgent && <span style="background:#FEE2E2;color:#991B1B;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px">ด่วน</span>}
+            </div>
+            <div style="font-size:.8rem;color:var(--gray-500);display:flex;gap:16px;flex-wrap:wrap">
+              <span><Icon name="fa6-solid:tag" style={`color:${j.color}`} /> {j.dept}</span>
+              <span><Icon name="fa6-solid:location-dot" /> {j.location}</span>
+              <span><Icon name="fa6-solid:clock" /> {j.type}</span>
+            </div>
+          </div>
+          <a href="/contact?subject=สมัครงาน: " class="btn btn-outline btn-sm" style="white-space:nowrap">สมัครงาน</a>
+        </div>
+      ))}
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <p style="color:var(--gray-600);margin-bottom:16px">ไม่พบตำแหน่งที่ต้องการ? ส่ง Resume มาเพื่อพิจารณาสำหรับตำแหน่งอนาคต</p>
+      <a href="/contact" class="btn btn-primary"><Icon name="fa6-solid:paper-plane" /> ส่ง Resume</a>
+    </div>
+  </div>
+</section>
+
+</Layout>

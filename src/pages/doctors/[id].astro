@@ -1,0 +1,161 @@
+---
+export const prerender = false;
+import Layout from '../../components/Layout.astro';
+import { Icon } from 'astro-icon/components';
+import { getDoctorById } from '../../lib/doctorsData';
+
+const { id } = Astro.params;
+const doctor = getDoctorById(id!);
+if (!doctor) return Astro.redirect('/doctors');
+---
+<Layout title={`${doctor.nameTh} | MediThai`} description={doctor.bioTh}
+  extraHead={`<style>
+  .profile-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, var(--secondary) 100%); padding: 80px 0 0; }
+  .profile-card { background: #fff; border-radius: 24px 24px 0 0; margin-top: 40px; padding: 48px 56px; display: grid; grid-template-columns: 280px 1fr; gap: 48px; }
+  @media(max-width:900px){ .profile-card { grid-template-columns:1fr; padding:32px 24px; } }
+  .profile-photo { width:200px; height:200px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:5rem; }
+  .profile-photo svg { width:5rem; height:5rem; }
+  .schedule-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--gray-100); font-size:.9rem; }
+  .schedule-row:last-child { border-bottom:none; }
+  .lang-chip { display:inline-block; padding:3px 10px; background:var(--gray-100); border-radius:20px; font-size:.8rem; margin:2px; }
+  .edu-item { display:flex; gap:12px; margin-bottom:12px; }
+  .edu-dot { width:8px; height:8px; border-radius:50%; background:var(--secondary); flex-shrink:0; margin-top:6px; }
+  .award-item { display:flex; gap:12px; margin-bottom:12px; }
+  .award-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:6px; }
+  .exp-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(8,145,178,.1); color:var(--secondary); padding:6px 16px; border-radius:20px; font-weight:600; font-size:.875rem; }
+  .tag-chip { display:inline-block; padding:4px 12px; border-radius:20px; font-size:.8rem; font-weight:600; margin:3px; border: 1px solid; }
+  </style>`}
+>
+
+<section class="profile-hero">
+  <div class="container">
+    <div class="breadcrumb" style="color:rgba(255,255,255,.7)">
+      <a href="/" style="color:rgba(255,255,255,.7)">หน้าแรก</a>
+      <Icon name="fa6-solid:chevron-right" />
+      <a href="/doctors" style="color:rgba(255,255,255,.7)">แพทย์</a>
+      <Icon name="fa6-solid:chevron-right" />
+      <span style="color:#fff">{doctor.nameTh}</span>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--gray-50); padding-bottom:80px">
+  <div class="container">
+    <div class="profile-card shadow-md">
+
+      <!-- Left column -->
+      <div style="text-align:center">
+        <div class="profile-photo" style={`background:linear-gradient(135deg,${doctor.color}22,${doctor.color}44)`}>
+          <Icon name="fa6-solid:user-doctor" style={`color:${doctor.color}`} />
+        </div>
+
+        <div class="exp-badge" style="margin-bottom:12px">
+          <Icon name="fa6-solid:star" />
+          ประสบการณ์ {doctor.experience} ปี
+        </div>
+
+        <h1 style="font-size:1.35rem;font-weight:700;color:var(--primary);margin-bottom:4px">{doctor.nameTh}</h1>
+        <p style="font-size:.8rem;color:var(--gray-500);margin-bottom:8px">{doctor.nameEn}</p>
+        <p style="font-size:.9rem;color:var(--gray-700);font-weight:500;margin-bottom:4px">{doctor.titleTh}</p>
+        <p style="font-size:.8rem;color:var(--gray-500);margin-bottom:16px">{doctor.titleEn}</p>
+
+        <div style={`display:inline-flex;align-items:center;gap:6px;background:${doctor.color}15;color:${doctor.color};padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:600;margin-bottom:8px`}>
+          <Icon name="fa6-solid:hospital" /> {doctor.hospital}
+        </div>
+
+        <div style="margin-bottom:16px">
+          {doctor.tags.map(tag => (
+            <span class="tag-chip" style={`color:${doctor.color};border-color:${doctor.color}44;background:${doctor.color}0d`}>{tag}</span>
+          ))}
+        </div>
+
+        <div style="margin-bottom:24px; text-align:left">
+          <p style="font-size:.8rem;font-weight:600;color:var(--gray-500);margin-bottom:8px">ภาษาที่สื่อสาร</p>
+          {doctor.languages.map(l => <span class="lang-chip">{l}</span>)}
+        </div>
+
+        <a href={`/appointments?doctor=${doctor.id}`} class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:8px">
+          <Icon name="fa6-solid:calendar-check" /> นัดหมายแพทย์ท่านนี้
+        </a>
+        <a href="/telehealth" class="btn btn-outline" style="width:100%;justify-content:center;font-size:.875rem">
+          <Icon name="fa6-solid:video" /> ปรึกษาออนไลน์
+        </a>
+      </div>
+
+      <!-- Right column -->
+      <div>
+        <!-- Bio -->
+        <div style="margin-bottom:32px">
+          <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+            <Icon name="fa6-solid:circle-info" style="color:var(--secondary)" /> ประวัติแพทย์
+          </h2>
+          <p style="color:var(--gray-700);line-height:1.8" data-th={doctor.bioTh} data-en={doctor.bioEn}>{doctor.bioTh}</p>
+        </div>
+
+        <!-- Education -->
+        <div style="margin-bottom:32px">
+          <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+            <Icon name="fa6-solid:graduation-cap" style="color:var(--secondary)" /> การศึกษาและการฝึกอบรม
+          </h2>
+          {doctor.education.map(e => (
+            <div class="edu-item">
+              <div class="edu-dot"></div>
+              <p style="font-size:.9rem;color:var(--gray-700)" data-th={e.th} data-en={e.en}>{e.th}</p>
+            </div>
+          ))}
+        </div>
+
+        <!-- Awards -->
+        {doctor.awards.length > 0 && (
+          <div style="margin-bottom:32px">
+            <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+              <Icon name="fa6-solid:trophy" style="color:var(--accent)" /> รางวัลและความสำเร็จ
+            </h2>
+            {doctor.awards.map(a => (
+              <div class="award-item">
+                <div class="award-dot"></div>
+                <p style="font-size:.9rem;color:var(--gray-700)" data-th={a.th} data-en={a.en}>{a.th}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <!-- Schedule -->
+        <div style="background:var(--gray-50);border-radius:16px;padding:24px">
+          <h2 style="font-size:1.1rem;font-weight:700;color:var(--primary);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+            <Icon name="fa6-solid:clock" style="color:var(--secondary)" /> ตารางออกตรวจ
+          </h2>
+          {doctor.schedule.map(s => (
+            <div class="schedule-row">
+              <span style="font-weight:600;color:var(--gray-700)"
+                data-th={s.day} data-en={s.dayEn}>{s.day}</span>
+              <span style="color:var(--secondary);font-weight:600">{s.time}</span>
+            </div>
+          ))}
+          <p style="font-size:.8rem;color:var(--gray-500);margin-top:12px">
+            <Icon name="fa6-solid:circle-exclamation" /> ตารางออกตรวจอาจเปลี่ยนแปลงได้ กรุณายืนยันเมื่อนัดหมาย
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section-pad-sm" style="background:var(--primary);color:#fff;text-align:center">
+  <div class="container">
+    <h2 style="font-size:1.5rem;margin-bottom:12px">พร้อมให้บริการดูแลสุขภาพของคุณ</h2>
+    <p style="opacity:.8;margin-bottom:24px">นัดหมายกับ{doctor.nameTh} หรือพูดคุยกับทีมแพทย์ของเราได้เลย</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href={`/appointments?doctor=${doctor.id}`} class="btn btn-accent">
+        <Icon name="fa6-solid:calendar-check" /> นัดหมายออนไลน์
+      </a>
+      <a href="/contact" class="btn btn-outline" style="color:#fff;border-color:#fff">
+        <Icon name="fa6-solid:phone" /> โทรนัดหมาย
+      </a>
+    </div>
+  </div>
+</section>
+
+</Layout>
