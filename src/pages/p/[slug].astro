@@ -1,0 +1,63 @@
+---
+export const prerender = false;
+import Layout from '../../components/Layout.astro';
+import { createAdminSupabase } from '../../lib/supabase-server';
+
+const { slug } = Astro.params;
+const supabase = createAdminSupabase();
+
+const { data: page } = await supabase
+  .from('custom_pages')
+  .select('*')
+  .eq('slug', slug)
+  .eq('visible', true)
+  .single();
+
+if (!page) {
+  return Astro.redirect('/404');
+}
+
+// Read lang from cookie/header — default Thai
+const langCookie = Astro.cookies.get('lang')?.value;
+const lang = langCookie === 'en' ? 'en' : 'th';
+
+const title = lang === 'en' ? (page.title_en || page.title_th) : (page.title_th || page.title_en);
+const content = lang === 'en' ? (page.content_en || page.content_th) : (page.content_th || page.content_en);
+---
+<Layout title={title} description={title}>
+  <div class="custom-page-wrap">
+    <div class="custom-page-header">
+      <div class="container">
+        <h1 class="custom-page-title">{title}</h1>
+      </div>
+    </div>
+    <div class="custom-page-body">
+      <div class="container">
+        <div class="custom-page-content" set:html={content} />
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .custom-page-wrap { min-height: 60vh; }
+  .custom-page-header {
+    background: linear-gradient(135deg, var(--primary, #1a56db) 0%, var(--primary-dark, #1e40af) 100%);
+    padding: 60px 0 40px;
+    color: #fff;
+  }
+  .custom-page-title {
+    font-size: 2rem; font-weight: 800; margin: 0;
+  }
+  .custom-page-body { padding: 48px 0 80px; }
+  .custom-page-content {
+    font-size: 1rem; line-height: 1.8; color: #374151; max-width: 800px;
+  }
+  .custom-page-content h2 { font-size: 1.4rem; font-weight: 700; margin: 1.5em 0 .5em; color: #111827; }
+  .custom-page-content h3 { font-size: 1.15rem; font-weight: 600; margin: 1.2em 0 .4em; color: #1f2937; }
+  .custom-page-content p { margin: 0 0 1em; }
+  .custom-page-content ul, .custom-page-content ol { padding-left: 1.5em; margin: 0 0 1em; }
+  .custom-page-content li { margin-bottom: .35em; }
+  .custom-page-content a { color: var(--primary, #1a56db); text-decoration: underline; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+</style>

@@ -1,0 +1,227 @@
+---
+export const prerender = false;
+import { createAdminSupabase } from '../../../lib/supabase-server';
+import { CMS_PAGES } from '../../../lib/cmsSchema';
+
+// Default homepage section order from CMS schema
+const homePage = CMS_PAGES.find(p => p.slug === 'home')!;
+const defaultOrder = homePage.sections.map(s => s.key);
+
+// Load saved layout from site_content
+const supabase = createAdminSupabase();
+const { data: layoutRow } = await supabase
+  .from('site_content')
+  .select('content')
+  .eq('page_slug', 'home')
+  .eq('section_key', '_layout')
+  .single();
+
+const savedOrder: string[] = layoutRow?.content?.meta?.section_order
+  ? JSON.parse(layoutRow.content.meta.section_order)
+  : defaultOrder;
+const hiddenSections: string[] = layoutRow?.content?.meta?.hidden_sections
+  ? JSON.parse(layoutRow.content.meta.hidden_sections)
+  : [];
+
+// Build section list in saved order, merging any missing keys at the end
+const sectionMap = Object.fromEntries(homePage.sections.map(s => [s.key, s]));
+const orderedKeys = [
+  ...savedOrder.filter(k => k in sectionMap),
+  ...defaultOrder.filter(k => !savedOrder.includes(k)),
+];
+---
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>จัดเรียง Sections | MediThai Admin</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/admin-cms.css" />
+  <style>
+    .layout-list { display: flex; flex-direction: column; gap: 8px; max-width: 600px; }
+    .layout-item {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+      padding: 12px 16px; cursor: grab; user-select: none;
+      transition: box-shadow .15s, opacity .15s;
+    }
+    .layout-item.dragging { opacity: .4; }
+    .layout-item.drag-over { border-color: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; }
+    .layout-item.hidden-section { opacity: .5; background: #f8fafc; }
+    .drag-handle { color: #94a3b8; font-size: 18px; cursor: grab; }
+    .layout-item-icon { font-size: 20px; width: 28px; text-align: center; }
+    .layout-item-label { flex: 1; font-weight: 600; font-size: .9rem; color: #1e293b; }
+    .layout-item-key { font-size: .72rem; color: #94a3b8; }
+    .toggle-btn {
+      background: none; border: none; cursor: pointer; font-size: 18px; padding: 4px;
+      color: #64748b; transition: color .15s;
+    }
+    .toggle-btn.active { color: #22c55e; }
+    .toggle-btn.inactive { color: #cbd5e1; }
+    .layout-actions { display: flex; gap: 12px; margin-top: 24px; }
+    .hero-locked { font-size: .75rem; color: #94a3b8; margin-left: 4px; }
+  </style>
+</head>
+<body>
+<div class="cms-shell">
+  <aside class="cms-sidebar">
+    <div class="cms-sidebar-header">
+      <a href="/admin" class="cms-logo">
+        <span class="cms-logo-mark">M</span>
+        <div><div class="cms-logo-name">MediThai</div><div class="cms-logo-sub">Admin Portal</div></div>
+      </a>
+    </div>
+    <nav class="cms-nav">
+      <div class="cms-nav-group-label">จัดการ</div>
+      <a href="/admin" class="cms-nav-item"><span class="cms-nav-icon">📊</span> ภาพรวม</a>
+      <a href="/admin/analytics" class="cms-nav-item"><span class="cms-nav-icon">📈</span> Analytics</a>
+      <div class="cms-nav-group-label">เนื้อหา</div>
+      <a href="/admin/cms" class="cms-nav-item"><span class="cms-nav-icon">✏️</span> แก้ไขเนื้อหา</a>
+      <a href="/admin/cms/layout" class="cms-nav-item active"><span class="cms-nav-icon">⚙️</span> จัดเรียง Sections</a>
+      <a href="/admin/cms/components" class="cms-nav-item"><span class="cms-nav-icon">🧩</span> Components</a>
+      <a href="/admin/cms/nav" class="cms-nav-item"><span class="cms-nav-icon">🔗</span> Navigation</a>
+      <a href="/admin/cms/pages" class="cms-nav-item"><span class="cms-nav-icon">📄</span> หน้าเว็บ</a>
+      <div style="margin-top:auto"></div>
+      <a href="/" target="_blank" class="cms-nav-item"><span class="cms-nav-icon">🌐</span> ดูเว็บไซต์</a>
+    </nav>
+  </aside>
+
+  <main class="cms-main">
+    <div class="cms-topbar">
+      <div class="cms-topbar-left">
+        <a href="/admin/cms" class="cms-back-btn">← กลับ</a>
+        <div>
+          <h1 class="cms-page-title">📐 จัดเรียง Sections — หน้าแรก</h1>
+          <p class="cms-page-sub">ลากเพื่อเรียงลำดับ หรือกดปุ่มซ่อน/แสดง section</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="cms-save-bar" class="cms-save-bar" style="display:none">
+      <span id="cms-save-msg"></span>
+    </div>
+
+    <div id="layout-list" class="layout-list">
+      {orderedKeys.map((key, i) => {
+        const sec = sectionMap[key];
+        if (!sec) return null;
+        const isHidden = hiddenSections.includes(key);
+        const isHero = key === 'hero';
+        return (
+          <div class={`layout-item ${isHidden ? 'hidden-section' : ''}`}
+               data-key={key} draggable={isHero ? 'false' : 'true'}>
+            <span class="drag-handle">{isHero ? '🔒' : '⣿'}</span>
+            <span class="layout-item-icon">{sec.icon}</span>
+            <div style="flex:1">
+              <div class="layout-item-label">{sec.label} {isHero && <span class="hero-locked">(ล็อก)</span>}</div>
+              <div class="layout-item-key">{key}</div>
+            </div>
+            {!isHero && (
+              <button
+                class={`toggle-btn ${isHidden ? 'inactive' : 'active'}`}
+                onclick={`toggleSection('${key}', this)`}
+                title={isHidden ? 'แสดง section' : 'ซ่อน section'}
+              >
+                {isHidden ? '👁️‍🗨️' : '👁️'}
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="layout-actions">
+      <button class="cms-btn cms-btn-primary" onclick="saveLayout()">💾 บันทึกการจัดเรียง</button>
+      <button class="cms-btn cms-btn-ghost" onclick="resetLayout()">↺ รีเซ็ตเป็นค่าเริ่มต้น</button>
+    </div>
+  </main>
+</div>
+
+<script is:inline>
+const list = document.getElementById('layout-list');
+let dragEl = null;
+
+list.addEventListener('dragstart', e => {
+  dragEl = e.target.closest('.layout-item');
+  if (!dragEl || dragEl.dataset.key === 'hero') { e.preventDefault(); return; }
+  dragEl.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+});
+list.addEventListener('dragend', () => {
+  if (dragEl) dragEl.classList.remove('dragging');
+  dragEl = null;
+  document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+});
+list.addEventListener('dragover', e => {
+  e.preventDefault();
+  const target = e.target.closest('.layout-item');
+  if (target && target !== dragEl && target.dataset.key !== 'hero') {
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    target.classList.add('drag-over');
+  }
+});
+list.addEventListener('drop', e => {
+  e.preventDefault();
+  const target = e.target.closest('.layout-item');
+  if (!target || target === dragEl || target.dataset.key === 'hero') return;
+  target.classList.remove('drag-over');
+  // Insert dragEl before or after target based on cursor position
+  const rect = target.getBoundingClientRect();
+  const after = e.clientY > rect.top + rect.height / 2;
+  if (after) target.after(dragEl);
+  else target.before(dragEl);
+});
+
+function toggleSection(key, btn) {
+  const item = btn.closest('.layout-item');
+  const isHidden = item.classList.toggle('hidden-section');
+  btn.classList.toggle('active', !isHidden);
+  btn.classList.toggle('inactive', isHidden);
+  btn.textContent = isHidden ? '👁️‍🗨️' : '👁️';
+  btn.title = isHidden ? 'แสดง section' : 'ซ่อน section';
+}
+
+async function saveLayout() {
+  const items = [...document.querySelectorAll('.layout-item')];
+  const order = items.map(el => el.dataset.key);
+  const hidden = items.filter(el => el.classList.contains('hidden-section')).map(el => el.dataset.key);
+
+  showSaveBar('กำลังบันทึก...', 'saving');
+  const res = await fetch('/api/admin/content', {
+    method: 'PUT', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      page_slug: 'home', section_key: '_layout',
+      content: { meta: {
+        section_order: JSON.stringify(order),
+        hidden_sections: JSON.stringify(hidden),
+      }}
+    }),
+  });
+  const d = await res.json();
+  if (res.ok) showSaveBar('✓ บันทึกสำเร็จ — รีโหลดหน้าเว็บเพื่อดูผล', 'success');
+  else showSaveBar('❌ ' + d.error, 'error');
+}
+
+async function resetLayout() {
+  if (!confirm('รีเซ็ตการจัดเรียงทั้งหมดกลับเป็นค่าเริ่มต้น?')) return;
+  const res = await fetch('/api/admin/content?page=home&section=_layout', {
+    method: 'DELETE', credentials: 'include'
+  });
+  if (res.ok) { showSaveBar('✓ รีเซ็ตแล้ว', 'success'); setTimeout(() => location.reload(), 1000); }
+}
+
+let saveBarTimer;
+function showSaveBar(msg, type) {
+  const bar = document.getElementById('cms-save-bar');
+  const msgEl = document.getElementById('cms-save-msg');
+  msgEl.textContent = msg;
+  bar.style.display = 'flex';
+  bar.className = `cms-save-bar cms-save-bar--${type}`;
+  clearTimeout(saveBarTimer);
+  if (type !== 'saving') saveBarTimer = setTimeout(() => bar.style.display = 'none', 3500);
+}
+</script>
+</body>
+</html>

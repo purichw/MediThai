@@ -1,0 +1,217 @@
+---
+export const prerender = false;
+import { createAdminSupabase } from '../../lib/supabase-server';
+import { createServerSupabase } from '../../lib/supabase-server';
+
+// Auth check
+const supabaseUser = createServerSupabase(Astro.request, Astro.cookies);
+const { data: { user } } = await supabaseUser.auth.getUser();
+if (!user) return Astro.redirect('/login');
+const { data: profile } = await supabaseUser.from('profiles').select('role').eq('id', user.id).single();
+if (!profile || !['admin', 'staff'].includes(profile.role)) return Astro.redirect('/');
+
+// Fetch analytics summary from our API
+const host = Astro.url.origin;
+const analyticsRes = await fetch(`${host}/api/admin/analytics`, {
+  headers: { cookie: Astro.request.headers.get('cookie') || '' },
+});
+const analytics = analyticsRes.ok ? await analyticsRes.json() : null;
+---
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics | MediThai Admin</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/admin-cms.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .analytics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    @media (max-width: 768px) { .analytics-grid { grid-template-columns: 1fr 1fr; } }
+    .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; }
+    .stat-card-label { font-size: .78rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .stat-card-value { font-size: 2.2rem; font-weight: 800; color: #1e293b; line-height: 1; }
+    .stat-card-sub { font-size: .8rem; color: #94a3b8; margin-top: 6px; }
+    .stat-card.highlight { background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%); border-color: transparent; }
+    .stat-card.highlight .stat-card-label, .stat-card.highlight .stat-card-value, .stat-card.highlight .stat-card-sub { color: #fff; }
+    .analytics-panels { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 28px; }
+    @media (max-width: 900px) { .analytics-panels { grid-template-columns: 1fr; } }
+    .panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px 22px; }
+    .panel-title { font-weight: 700; font-size: .95rem; margin-bottom: 16px; color: #1e293b; }
+    .chart-wrap { position: relative; height: 220px; }
+    .top-pages-list { display: flex; flex-direction: column; gap: 10px; }
+    .top-page-row { display: flex; align-items: center; gap: 10px; }
+    .top-page-path { flex: 1; font-size: .85rem; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .top-page-bar-wrap { width: 80px; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+    .top-page-bar { height: 100%; background: #3b82f6; border-radius: 4px; }
+    .top-page-count { font-size: .8rem; color: #64748b; width: 40px; text-align: right; }
+    .breakdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .donut-wrap { position: relative; height: 160px; display: flex; align-items: center; justify-content: center; }
+    .legend { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: #374151; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .no-data { text-align: center; padding: 40px; color: #94a3b8; font-size: .9rem; }
+  </style>
+</head>
+<body>
+<div class="cms-shell">
+  <aside class="cms-sidebar">
+    <div class="cms-sidebar-header">
+      <a href="/admin" class="cms-logo">
+        <span class="cms-logo-mark">M</span>
+        <div><div class="cms-logo-name">MediThai</div><div class="cms-logo-sub">Admin Portal</div></div>
+      </a>
+    </div>
+    <nav class="cms-nav">
+      <div class="cms-nav-group-label">จัดการ</div>
+      <a href="/admin" class="cms-nav-item"><span class="cms-nav-icon">📊</span> ภาพรวม</a>
+      <a href="/admin/analytics" class="cms-nav-item active"><span class="cms-nav-icon">📈</span> Analytics</a>
+      <div class="cms-nav-group-label">เนื้อหา</div>
+      <a href="/admin/cms" class="cms-nav-item"><span class="cms-nav-icon">✏️</span> แก้ไขเนื้อหา</a>
+      <a href="/admin/cms/layout" class="cms-nav-item"><span class="cms-nav-icon">⚙️</span> จัดเรียง Sections</a>
+      <a href="/admin/cms/components" class="cms-nav-item"><span class="cms-nav-icon">🧩</span> Components</a>
+      <a href="/admin/cms/nav" class="cms-nav-item"><span class="cms-nav-icon">🔗</span> Navigation</a>
+      <a href="/admin/cms/pages" class="cms-nav-item"><span class="cms-nav-icon">📄</span> หน้าเว็บ</a>
+      <div style="margin-top:auto"></div>
+      <a href="/" target="_blank" class="cms-nav-item"><span class="cms-nav-icon">🌐</span> ดูเว็บไซต์</a>
+      <form method="POST" action="/logout">
+        <button type="submit" class="cms-nav-item cms-nav-logout"><span class="cms-nav-icon">🚪</span> ออกจากระบบ</button>
+      </form>
+    </nav>
+  </aside>
+
+  <main class="cms-main">
+    <div class="cms-topbar">
+      <div>
+        <h1 class="cms-page-title">📈 Analytics</h1>
+        <p class="cms-page-sub">สถิติการเข้าชมเว็บไซต์ (เก็บโดย MediThai เอง)</p>
+      </div>
+      <button class="cms-btn cms-btn-ghost" onclick="location.reload()">↺ รีเฟรช</button>
+    </div>
+
+    {!analytics ? (
+      <div class="no-data">ไม่สามารถโหลดข้อมูล Analytics ได้ กรุณาลองใหม่</div>
+    ) : (
+      <>
+        <!-- Summary cards -->
+        <div class="analytics-grid">
+          <div class="stat-card highlight">
+            <div class="stat-card-label">วันนี้</div>
+            <div class="stat-card-value">{analytics.today?.toLocaleString() ?? 0}</div>
+            <div class="stat-card-sub">Page views</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">7 วันที่ผ่านมา</div>
+            <div class="stat-card-value">{analytics.week?.toLocaleString() ?? 0}</div>
+            <div class="stat-card-sub">Page views</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">30 วันที่ผ่านมา</div>
+            <div class="stat-card-value">{analytics.month?.toLocaleString() ?? 0}</div>
+            <div class="stat-card-sub">Page views</div>
+          </div>
+        </div>
+
+        <!-- Chart + Top pages -->
+        <div class="analytics-panels">
+          <div class="panel">
+            <div class="panel-title">📅 Page Views 14 วันย้อนหลัง</div>
+            <div class="chart-wrap">
+              <canvas id="chart-daily"></canvas>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🏆 หน้าที่เข้าชมมากสุด</div>
+            <div class="top-pages-list" id="top-pages">
+              <!-- filled by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Device + Lang breakdown -->
+        <div class="breakdown-grid">
+          <div class="panel">
+            <div class="panel-title">📱 อุปกรณ์</div>
+            <div class="donut-wrap"><canvas id="chart-device"></canvas></div>
+            <div class="legend" id="device-legend"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">🌐 ภาษา</div>
+            <div class="donut-wrap"><canvas id="chart-lang"></canvas></div>
+            <div class="legend" id="lang-legend"></div>
+          </div>
+        </div>
+      </>
+    )}
+  </main>
+</div>
+
+{analytics && (
+  <script is:inline define:vars={{ analytics }}>
+    // Daily chart
+    const daily = analytics.daily || [];
+    new Chart(document.getElementById('chart-daily'), {
+      type: 'line',
+      data: {
+        labels: daily.map(d => {
+          const dt = new Date(d.day);
+          return dt.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+        }),
+        datasets: [{
+          label: 'Views', data: daily.map(d => d.count),
+          borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.12)',
+          tension: .3, fill: true, pointRadius: 3,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+
+    // Top pages
+    const topPages = analytics.topPages || [];
+    const maxPV = topPages[0]?.count || 1;
+    document.getElementById('top-pages').innerHTML = topPages.map(p => `
+      <div class="top-page-row">
+        <div class="top-page-path" title="${p.page_path}">${p.page_path}</div>
+        <div class="top-page-bar-wrap"><div class="top-page-bar" style="width:${Math.round(p.count/maxPV*100)}%"></div></div>
+        <div class="top-page-count">${p.count}</div>
+      </div>
+    `).join('') || '<div style="color:#94a3b8;font-size:.85rem">ยังไม่มีข้อมูล</div>';
+
+    // Device donut
+    const deviceData = analytics.devices || [];
+    const devColors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444'];
+    new Chart(document.getElementById('chart-device'), {
+      type: 'doughnut',
+      data: {
+        labels: deviceData.map(d => d.device_type),
+        datasets: [{ data: deviceData.map(d => d.count), backgroundColor: devColors, borderWidth: 2 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+    document.getElementById('device-legend').innerHTML = deviceData.map((d, i) => `
+      <div class="legend-item"><div class="legend-dot" style="background:${devColors[i]}"></div>${d.device_type}: ${d.count}</div>
+    `).join('');
+
+    // Lang donut
+    const langData = analytics.langs || [];
+    const langColors = ['#8b5cf6', '#f97316', '#06b6d4', '#84cc16'];
+    new Chart(document.getElementById('chart-lang'), {
+      type: 'doughnut',
+      data: {
+        labels: langData.map(d => d.lang === 'th' ? 'ภาษาไทย' : 'English'),
+        datasets: [{ data: langData.map(d => d.count), backgroundColor: langColors, borderWidth: 2 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+    document.getElementById('lang-legend').innerHTML = langData.map((d, i) => `
+      <div class="legend-item"><div class="legend-dot" style="background:${langColors[i]}"></div>${d.lang === 'th' ? 'ภาษาไทย' : 'English'}: ${d.count}</div>
+    `).join('');
+  </script>
+)}
+</body>
+</html>

@@ -159,20 +159,151 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(r => r.ok ? r.json() : null)
     .then(data => {
       if (!data || typeof T === 'undefined') return;
-      // Merge TH overrides
       if (data.th) Object.assign(T.th, data.th);
-      // Merge EN overrides
       if (data.en) Object.assign(T.en, data.en);
-      // Apply hero background image override if present
       const bgUrl = data.meta?.hero_bg_url || data.th?.hero_bg_url;
       if (bgUrl) {
         const heroImg = document.querySelector('.hero-image');
         if (heroImg) heroImg.style.backgroundImage = `url('${bgUrl}')`;
       }
-      // Re-apply translations with updated content
       if (typeof applyTranslations !== 'undefined') applyTranslations();
     })
-    .catch(() => {}); // silently fail — static translations.js is the fallback
+    .catch(() => {});
+
+  // Phase 2: Apply section layout (order + visibility) from CMS _layout override
+  if (pageSlug === 'home') {
+    fetch('/api/content?page=home')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        try {
+          const layout = data?.th?._section_order || data?.en?._section_order;
+          const hidden = data?.th?._hidden_sections || data?.en?._hidden_sections;
+          if (!layout && !hidden) return;
+
+          const order = layout ? JSON.parse(layout) : null;
+          const hiddenSet = hidden ? new Set(JSON.parse(hidden)) : new Set();
+
+          const sections = document.querySelectorAll('[data-section-key]');
+          sections.forEach(el => {
+            const key = el.dataset.sectionKey;
+            if (hiddenSet.has(key)) { el.style.display = 'none'; return; }
+            if (order) {
+              const idx = order.indexOf(key);
+              el.style.order = idx >= 0 ? idx : 99;
+            }
+          });
+
+          // Make the page body a flex-column so order takes effect
+          if (order) {
+            const body = document.querySelector('.page-body, main') || document.body;
+            body.style.display = 'flex';
+            body.style.flexDirection = 'column';
+          }
+        } catch (e) {}
+      })
+      .catch(() => {});
+  }
+})();
+
+/* ----------------------------------------------------------------
+   Phase 4: Dynamic Component Rendering
+   Fetches DB components and injects them into sections when defined.
+   Falls back to hardcoded HTML if no DB components exist.
+   ---------------------------------------------------------------- */
+(function _loadComponents() {
+  if (window.location.pathname !== '/') return;
+
+  const SECTIONS = ['specialties', 'quick_actions', 'trust', 'testimonials', 'stats'];
+  const lang = typeof currentLang !== 'undefined' ? currentLang : (localStorage.getItem('lang') || 'th');
+
+  SECTIONS.forEach(section => {
+    fetch(`/api/components?page=home&section=${section}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data || !data.components || data.components.length === 0) return;
+        const el = document.querySelector(`[data-section-key="${section}"]`);
+        if (!el) return;
+        const comps = data.components;
+
+        if (section === 'specialties') {
+          const grid = el.querySelector('.specialties-grid, .specialties-list, [class*="specialty"]');
+          if (!grid) return;
+          grid.innerHTML = comps.map(c => {
+            const name = lang === 'en' ? (c.content.name_en || c.content.name_th) : (c.content.name_th || c.content.name_en);
+            const desc = lang === 'en' ? (c.content.desc_en || c.content.desc_th) : (c.content.desc_th || c.content.desc_en);
+            return `<div class="specialty-card">
+              ${c.content.icon_url ? `<img src="${c.content.icon_url}" alt="${name}" class="specialty-icon" />` : `<div class="specialty-icon">${c.content.icon_emoji || '🏥'}</div>`}
+              <div class="specialty-name">${name || ''}</div>
+              ${desc ? `<div class="specialty-desc">${desc}</div>` : ''}
+            </div>`;
+          }).join('');
+        }
+
+        if (section === 'quick_actions') {
+          const grid = el.querySelector('.quick-actions-grid, [class*="quick"]');
+          if (!grid) return;
+          grid.innerHTML = comps.map(c => {
+            const label = lang === 'en' ? (c.content.label_en || c.content.label_th) : (c.content.label_th || c.content.label_en);
+            return `<a href="${c.content.href || '#'}" class="quick-action-card">
+              <div class="quick-action-icon">${c.content.icon_emoji || '🔗'}</div>
+              <div class="quick-action-label">${label || ''}</div>
+            </a>`;
+          }).join('');
+        }
+
+        if (section === 'trust') {
+          const list = el.querySelector('.trust-list, [class*="trust"]');
+          if (!list) return;
+          list.innerHTML = comps.map(c => {
+            const text = lang === 'en' ? (c.content.text_en || c.content.text_th) : (c.content.text_th || c.content.text_en);
+            return `<div class="trust-item">
+              <div class="trust-icon">${c.content.icon_emoji || '✓'}</div>
+              <div class="trust-text">${text || ''}</div>
+            </div>`;
+          }).join('');
+        }
+
+        if (section === 'testimonials') {
+          const list = el.querySelector('.testimonials-list, [class*="testimonial"]');
+          if (!list) return;
+          list.innerHTML = comps.map(c => {
+            const quote = lang === 'en' ? (c.content.quote_en || c.content.quote_th) : (c.content.quote_th || c.content.quote_en);
+            return `<div class="testimonial-card">
+              ${c.content.avatar_url ? `<img src="${c.content.avatar_url}" alt="${c.content.author_name || ''}" class="testimonial-avatar" />` : ''}
+              <blockquote class="testimonial-quote">${quote || ''}</blockquote>
+              <div class="testimonial-author">${c.content.author_name || ''}</div>
+              ${c.content.rating ? `<div class="testimonial-stars">${'★'.repeat(parseInt(c.content.rating))}${'☆'.repeat(5-parseInt(c.content.rating))}</div>` : ''}
+            </div>`;
+          }).join('');
+        }
+
+        if (section === 'stats') {
+          const grid = el.querySelector('.stats-grid, [class*="stat"]');
+          if (!grid) return;
+          grid.innerHTML = comps.map(c => {
+            const label = lang === 'en' ? (c.content.label_en || c.content.label_th) : (c.content.label_th || c.content.label_en);
+            return `<div class="stat-item">
+              <div class="stat-number">${c.content.number || ''}</div>
+              <div class="stat-label">${label || ''}</div>
+            </div>`;
+          }).join('');
+        }
+      })
+      .catch(() => {});
+  });
+})();
+
+/* ----------------------------------------------------------------
+   Phase 5: Page View Tracking
+   ---------------------------------------------------------------- */
+(function _trackPageView() {
+  const path = window.location.pathname;
+  // Don't track admin pages
+  if (path.startsWith('/admin')) return;
+  const lang = typeof currentLang !== 'undefined' ? currentLang : (localStorage.getItem('lang') || 'th');
+  navigator.sendBeacon
+    ? navigator.sendBeacon('/api/track', JSON.stringify({ page_path: path, lang, referrer: document.referrer }))
+    : fetch('/api/track', { method: 'POST', body: JSON.stringify({ page_path: path, lang, referrer: document.referrer }), keepalive: true }).catch(() => {});
 })();
 
 /* ----------------------------------------------------------------

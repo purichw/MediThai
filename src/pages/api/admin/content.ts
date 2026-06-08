@@ -29,11 +29,15 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
 
   const { page_slug, section_key, content } = body;
 
-  // Validate page/section exists in schema
-  const pageDef = CMS_PAGE_MAP[page_slug];
-  if (!pageDef) return json({ error: `Unknown page: ${page_slug}` }, 400);
-  if (!pageDef.sections.find(s => s.key === section_key)) {
-    return json({ error: `Unknown section: ${section_key}` }, 400);
+  // Special system section keys: _layout (Phase 2), _nav_config (Phase 3) — allowed on any page_slug
+  const SYSTEM_KEYS = ['_layout', '_nav_config'];
+  if (!SYSTEM_KEYS.includes(section_key)) {
+    // Validate page/section exists in schema
+    const pageDef = CMS_PAGE_MAP[page_slug];
+    if (!pageDef) return json({ error: `Unknown page: ${page_slug}` }, 400);
+    if (!pageDef.sections.find(s => s.key === section_key)) {
+      return json({ error: `Unknown section: ${section_key}` }, 400);
+    }
   }
 
   // Basic content validation
