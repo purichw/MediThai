@@ -1,5 +1,40 @@
 ---
 import { Icon } from 'astro-icon/components';
+import { createAdminSupabase } from '../lib/supabase-server';
+
+// Fix 2 + Fix 4: SSR nav config + custom pages — no flash, real dynamic nav
+const supabase = createAdminSupabase();
+
+const [{ data: navRow }, { data: customPages }] = await Promise.all([
+  supabase.from('site_content').select('content')
+    .eq('page_slug', 'global').eq('section_key', '_nav_config').single(),
+  supabase.from('custom_pages').select('id,slug,nav_label_th,nav_label_en,nav_parent,show_in_nav,title_th,title_en')
+    .eq('show_in_nav', true).eq('visible', true),
+]);
+
+// Parse saved nav config — build a lookup of {id: {visible, label_th, label_en}}
+interface NavItem { id: string; visible: boolean; label_th: string; label_en: string; children?: NavItem[] }
+const navConfig: Record<string, NavItem> = {};
+if (navRow?.content?.meta?.nav_items) {
+  try {
+    const items: NavItem[] = JSON.parse(navRow.content.meta.nav_items);
+    for (const item of items) {
+      navConfig[item.id] = item;
+      for (const child of item.children ?? []) navConfig[child.id] = child;
+    }
+  } catch {}
+}
+
+function navVisible(id: string): boolean { return navConfig[id]?.visible !== false; }
+function navLabel(id: string, defaultTh: string): string { return navConfig[id]?.label_th || defaultTh; }
+
+// Custom pages grouped by nav_parent
+const customByParent: Record<string, typeof customPages> = {};
+for (const p of customPages ?? []) {
+  const parent = p.nav_parent || '_top';
+  if (!customByParent[parent]) customByParent[parent] = [];
+  customByParent[parent].push(p);
+}
 ---
 <!-- Announcement Bar -->
 <div class="announcement-bar">
@@ -22,61 +57,66 @@ import { Icon } from 'astro-icon/components';
 
     <!-- Desktop Nav -->
     <nav class="nav">
-      <div class="nav-item" data-nav-id="home">
-        <a href="/" class="nav-link" data-i18n="nav_home">หน้าแรก</a>
-      </div>
-      <div class="nav-item" data-nav-id="hospitals">
-        <a href="#" class="nav-link" data-i18n="nav_hospitals">โรงพยาบาล <Icon name="fa6-solid:chevron-down" /></a>
+      {navVisible('home') && <div class="nav-item" data-nav-id="home">
+        <a href="/" class="nav-link" data-i18n="nav_home">{navLabel('home','หน้าแรก')}</a>
+      </div>}
+      {navVisible('hospitals') && <div class="nav-item" data-nav-id="hospitals">
+        <a href="#" class="nav-link" data-i18n="nav_hospitals">{navLabel('hospitals','โรงพยาบาล')} <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/hospitals/medithai-bangkok" data-nav-id="h-bkk"><Icon name="fa6-solid:building-columns" /><span data-i18n="dd_bkk">MediThai กรุงเทพ</span></a>
-          <a href="/hospitals/medithai-heart" data-nav-id="h-heart"><Icon name="fa6-solid:heart-pulse" /><span data-i18n="dd_heart">MediThai หัวใจ</span></a>
-          <a href="/hospitals/medithai-cancer" data-nav-id="h-cancer"><Icon name="fa6-solid:ribbon" /><span data-i18n="dd_cancer">MediThai มะเร็ง</span></a>
-          <a href="/hospitals/medithai-spine" data-nav-id="h-spine"><Icon name="fa6-solid:brain" /><span data-i18n="dd_spine">MediThai สมองและกระดูก</span></a>
-          <a href="/hospitals/medithai-children" data-nav-id="h-child"><Icon name="fa6-solid:child" /><span data-i18n="dd_kids">MediThai เด็ก</span></a>
-          <a href="/hospitals/medithai-chiangmai" data-nav-id="h-cm"><Icon name="fa6-solid:mountain" /><span data-i18n="dd_chiang">MediThai เชียงใหม่</span></a>
+          {navVisible('h-bkk') && <a href="/hospitals/medithai-bangkok" data-nav-id="h-bkk"><Icon name="fa6-solid:building-columns" /><span data-i18n="dd_bkk">MediThai กรุงเทพ</span></a>}
+          {navVisible('h-heart') && <a href="/hospitals/medithai-heart" data-nav-id="h-heart"><Icon name="fa6-solid:heart-pulse" /><span data-i18n="dd_heart">MediThai หัวใจ</span></a>}
+          {navVisible('h-cancer') && <a href="/hospitals/medithai-cancer" data-nav-id="h-cancer"><Icon name="fa6-solid:ribbon" /><span data-i18n="dd_cancer">MediThai มะเร็ง</span></a>}
+          {navVisible('h-spine') && <a href="/hospitals/medithai-spine" data-nav-id="h-spine"><Icon name="fa6-solid:brain" /><span data-i18n="dd_spine">MediThai สมองและกระดูก</span></a>}
+          {navVisible('h-child') && <a href="/hospitals/medithai-children" data-nav-id="h-child"><Icon name="fa6-solid:child" /><span data-i18n="dd_kids">MediThai เด็ก</span></a>}
+          {navVisible('h-cm') && <a href="/hospitals/medithai-chiangmai" data-nav-id="h-cm"><Icon name="fa6-solid:mountain" /><span data-i18n="dd_chiang">MediThai เชียงใหม่</span></a>}
+          {(customByParent['hospitals'] ?? []).map(p => <a href={`/p/${p.slug}`}><Icon name="fa6-solid:star" /><span>{p.nav_label_th || p.title_th}</span></a>)}
         </div>
-      </div>
-      <div class="nav-item" data-nav-id="services">
-        <a href="#" class="nav-link">บริการ <Icon name="fa6-solid:chevron-down" /></a>
+      </div>}
+      {navVisible('services') && <div class="nav-item" data-nav-id="services">
+        <a href="#" class="nav-link">{navLabel('services','บริการ')} <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/appointments" data-nav-id="s-appt"><Icon name="fa6-solid:calendar-check" /><span>นัดหมายแพทย์</span></a>
-          <a href="/telehealth" data-nav-id="s-tele"><Icon name="fa6-solid:video" /><span>พบแพทย์ออนไลน์</span></a>
-          <a href="/symptoms" data-nav-id="s-sym"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>
-          <a href="/medical-records" data-nav-id="s-rec"><Icon name="fa6-solid:file-medical" /><span>ขอเวชระเบียน</span></a>
-          <a href="/bill-payment" data-nav-id="s-bill"><Icon name="fa6-solid:receipt" /><span>ชำระค่าบริการ</span></a>
-          <a href="/executive-health" data-nav-id="s-exec"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>
+          {navVisible('s-appt') && <a href="/appointments" data-nav-id="s-appt"><Icon name="fa6-solid:calendar-check" /><span>นัดหมายแพทย์</span></a>}
+          {navVisible('s-tele') && <a href="/telehealth" data-nav-id="s-tele"><Icon name="fa6-solid:video" /><span>พบแพทย์ออนไลน์</span></a>}
+          {navVisible('s-sym') && <a href="/symptoms" data-nav-id="s-sym"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>}
+          {navVisible('s-rec') && <a href="/medical-records" data-nav-id="s-rec"><Icon name="fa6-solid:file-medical" /><span>ขอเวชระเบียน</span></a>}
+          {navVisible('s-bill') && <a href="/bill-payment" data-nav-id="s-bill"><Icon name="fa6-solid:receipt" /><span>ชำระค่าบริการ</span></a>}
+          {navVisible('s-exec') && <a href="/executive-health" data-nav-id="s-exec"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>}
+          {(customByParent['services'] ?? []).map(p => <a href={`/p/${p.slug}`}><Icon name="fa6-solid:star" /><span>{p.nav_label_th || p.title_th}</span></a>)}
         </div>
-      </div>
-      <div class="nav-item" data-nav-id="doctors">
-        <a href="/doctors" class="nav-link">แพทย์</a>
-      </div>
-      <div class="nav-item" data-nav-id="packages">
-        <a href="#" class="nav-link">แพ็กเกจ <Icon name="fa6-solid:chevron-down" /></a>
+      </div>}
+      {navVisible('doctors') && <div class="nav-item" data-nav-id="doctors">
+        <a href="/doctors" class="nav-link">{navLabel('doctors','แพทย์')}</a>
+      </div>}
+      {navVisible('packages') && <div class="nav-item" data-nav-id="packages">
+        <a href="#" class="nav-link">{navLabel('packages','แพ็กเกจ')} <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/packages" data-nav-id="p-pkg"><Icon name="fa6-solid:box-open" /><span>แพ็กเกจสุขภาพ</span></a>
-          <a href="/executive-health" data-nav-id="p-exec"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>
-          <a href="/loyalty" data-nav-id="p-card"><Icon name="fa6-solid:id-card" /><span>MediThai Card</span></a>
-          <a href="/corporate" data-nav-id="p-corp"><Icon name="fa6-solid:building" /><span>บริการองค์กร</span></a>
+          {navVisible('p-pkg') && <a href="/packages" data-nav-id="p-pkg"><Icon name="fa6-solid:box-open" /><span>แพ็กเกจสุขภาพ</span></a>}
+          {navVisible('p-exec') && <a href="/executive-health" data-nav-id="p-exec"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>}
+          {navVisible('p-card') && <a href="/loyalty" data-nav-id="p-card"><Icon name="fa6-solid:id-card" /><span>MediThai Card</span></a>}
+          {navVisible('p-corp') && <a href="/corporate" data-nav-id="p-corp"><Icon name="fa6-solid:building" /><span>บริการองค์กร</span></a>}
+          {(customByParent['packages'] ?? []).map(p => <a href={`/p/${p.slug}`}><Icon name="fa6-solid:star" /><span>{p.nav_label_th || p.title_th}</span></a>)}
         </div>
-      </div>
-      <div class="nav-item" data-nav-id="health">
-        <a href="#" class="nav-link">ข้อมูลสุขภาพ <Icon name="fa6-solid:chevron-down" /></a>
+      </div>}
+      {navVisible('health') && <div class="nav-item" data-nav-id="health">
+        <a href="#" class="nav-link">{navLabel('health','ข้อมูลสุขภาพ')} <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/health-library" data-nav-id="hl-lib"><Icon name="fa6-solid:book-medical" /><span>คลังความรู้</span></a>
-          <a href="/symptoms" data-nav-id="hl-sym"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>
-          <a href="/calculators" data-nav-id="hl-calc"><Icon name="fa6-solid:calculator" /><span>โปรแกรมคำนวณสุขภาพ</span></a>
-          <a href="/patient-stories" data-nav-id="hl-story"><Icon name="fa6-solid:heart" /><span>เรื่องราวผู้ป่วย</span></a>
+          {navVisible('hl-lib') && <a href="/health-library" data-nav-id="hl-lib"><Icon name="fa6-solid:book-medical" /><span>คลังความรู้</span></a>}
+          {navVisible('hl-sym') && <a href="/symptoms" data-nav-id="hl-sym"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>}
+          {navVisible('hl-calc') && <a href="/calculators" data-nav-id="hl-calc"><Icon name="fa6-solid:calculator" /><span>โปรแกรมคำนวณสุขภาพ</span></a>}
+          {navVisible('hl-story') && <a href="/patient-stories" data-nav-id="hl-story"><Icon name="fa6-solid:heart" /><span>เรื่องราวผู้ป่วย</span></a>}
+          {(customByParent['health'] ?? []).map(p => <a href={`/p/${p.slug}`}><Icon name="fa6-solid:star" /><span>{p.nav_label_th || p.title_th}</span></a>)}
         </div>
-      </div>
-      <div class="nav-item" data-nav-id="about">
-        <a href="#" class="nav-link">เกี่ยวกับ <Icon name="fa6-solid:chevron-down" /></a>
+      </div>}
+      {navVisible('about') && <div class="nav-item" data-nav-id="about">
+        <a href="#" class="nav-link">{navLabel('about','เกี่ยวกับ')} <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/about" data-nav-id="a-about"><Icon name="fa6-solid:circle-info" /><span>เกี่ยวกับเรา</span></a>
-          <a href="/expat-hub" data-nav-id="a-expat"><Icon name="fa6-solid:globe" /><span>Expat Hub</span></a>
-          <a href="/careers" data-nav-id="a-career"><Icon name="fa6-solid:briefcase" /><span>ร่วมงานกับเรา</span></a>
-          <a href="/giving" data-nav-id="a-give"><Icon name="fa6-solid:hand-holding-heart" /><span>ร่วมสนับสนุน</span></a>
+          {navVisible('a-about') && <a href="/about" data-nav-id="a-about"><Icon name="fa6-solid:circle-info" /><span>เกี่ยวกับเรา</span></a>}
+          {navVisible('a-expat') && <a href="/expat-hub" data-nav-id="a-expat"><Icon name="fa6-solid:globe" /><span>Expat Hub</span></a>}
+          {navVisible('a-career') && <a href="/careers" data-nav-id="a-career"><Icon name="fa6-solid:briefcase" /><span>ร่วมงานกับเรา</span></a>}
+          {navVisible('a-give') && <a href="/giving" data-nav-id="a-give"><Icon name="fa6-solid:hand-holding-heart" /><span>ร่วมสนับสนุน</span></a>}
+          {(customByParent['about'] ?? []).map(p => <a href={`/p/${p.slug}`}><Icon name="fa6-solid:star" /><span>{p.nav_label_th || p.title_th}</span></a>)}
         </div>
-      </div>
+      </div>}
     </nav>
 
     <!-- Actions -->
@@ -104,25 +144,26 @@ import { Icon } from 'astro-icon/components';
   </div>
 </header>
 
-<!-- Mobile Nav -->
+<!-- Mobile Nav — Fix 1: mirrors desktop nav config via SSR -->
 <nav class="mobile-nav">
-  <a href="/">หน้าแรก <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/locations">โรงพยาบาล <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/appointments">นัดหมาย <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/telehealth">พบแพทย์ออนไลน์ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/doctors">แพทย์ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/packages">แพ็กเกจ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/executive-health">Executive Health <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/loyalty">MediThai Card <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/health-library">คลังความรู้ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/symptoms">ตรวจสอบอาการ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/calculators">โปรแกรมคำนวณสุขภาพ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/patient-stories">เรื่องราวผู้ป่วย <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/expat-hub">Expat Hub <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/corporate">บริการองค์กร <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/careers">ร่วมงานกับเรา <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/bill-payment">ชำระค่าบริการ <Icon name="fa6-solid:arrow-right" /></a>
-  <a href="/giving">ร่วมสนับสนุน <Icon name="fa6-solid:arrow-right" /></a>
+  {navVisible('home') && <a href="/" data-nav-id="home">หน้าแรก <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('hospitals') && <a href="/locations" data-nav-id="hospitals">โรงพยาบาล <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('s-appt') && <a href="/appointments" data-nav-id="s-appt">นัดหมาย <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('s-tele') && <a href="/telehealth" data-nav-id="s-tele">พบแพทย์ออนไลน์ <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('doctors') && <a href="/doctors" data-nav-id="doctors">แพทย์ <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('p-pkg') && <a href="/packages" data-nav-id="p-pkg">แพ็กเกจ <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('s-exec') && <a href="/executive-health" data-nav-id="s-exec">Executive Health <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('p-card') && <a href="/loyalty" data-nav-id="p-card">MediThai Card <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('hl-lib') && <a href="/health-library" data-nav-id="hl-lib">คลังความรู้ <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('hl-sym') && <a href="/symptoms" data-nav-id="hl-sym">ตรวจสอบอาการ <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('hl-calc') && <a href="/calculators" data-nav-id="hl-calc">โปรแกรมคำนวณสุขภาพ <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('hl-story') && <a href="/patient-stories" data-nav-id="hl-story">เรื่องราวผู้ป่วย <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('a-expat') && <a href="/expat-hub" data-nav-id="a-expat">Expat Hub <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('p-corp') && <a href="/corporate" data-nav-id="p-corp">บริการองค์กร <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('a-career') && <a href="/careers" data-nav-id="a-career">ร่วมงานกับเรา <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('s-bill') && <a href="/bill-payment" data-nav-id="s-bill">ชำระค่าบริการ <Icon name="fa6-solid:arrow-right" /></a>}
+  {navVisible('a-give') && <a href="/giving" data-nav-id="a-give">ร่วมสนับสนุน <Icon name="fa6-solid:arrow-right" /></a>}
+  {(customPages ?? []).map(p => <a href={`/p/${p.slug}`}>{p.nav_label_th || p.title_th} <Icon name="fa6-solid:arrow-right" /></a>)}
   <a href="/contact" style="margin-top:12px;background:var(--primary);color:#fff;padding:14px;border-radius:12px;justify-content:center">นัดหมายออนไลน์</a>
 </nav>
 

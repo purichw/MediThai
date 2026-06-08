@@ -17,6 +17,7 @@ const { data: pages } = await supabase
   <link rel="stylesheet" href="/css/style.css" />
   <link rel="stylesheet" href="/css/admin-cms.css" />
   <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css" />
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
   <style>
     .pages-list { display: flex; flex-direction: column; gap: 10px; max-width: 800px; }
     .page-row { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
@@ -201,7 +202,6 @@ const { data: pages } = await supabase
   </div>
 </div>
 
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script is:inline>
 const listEl = document.getElementById('pages-list');
 let pages = JSON.parse(listEl.dataset.pages);
@@ -239,7 +239,7 @@ function renderList() {
       </div>
       <div class="page-row-actions">
         <a href="/p/${escH(p.slug)}" target="_blank" class="btn-sm">🌐 ดู</a>
-        <button class="btn-sm" onclick="openEdit(${JSON.stringify(JSON.stringify(p))})">✏️ แก้ไข</button>
+        <button class="btn-sm" onclick="openEdit('${p.id}')">✏️ แก้ไข</button>
         <button class="btn-sm danger" onclick="deletePage('${p.id}')">🗑️</button>
       </div>
     </div>
@@ -264,8 +264,9 @@ function openCreate() {
   document.getElementById('page-modal').classList.add('open');
 }
 
-function openEdit(jsonStr) {
-  const p = JSON.parse(jsonStr);
+function openEdit(id) {
+  const p = pages.find(x => x.id === id);
+  if (!p) return;
   document.getElementById('modal-title').textContent = 'แก้ไขหน้า';
   document.getElementById('edit-id').value = p.id;
   document.getElementById('f-title-th').value = p.title_th || '';

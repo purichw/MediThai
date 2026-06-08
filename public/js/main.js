@@ -170,8 +170,10 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(() => {});
 
-  // Phase 2: Apply section layout (order + visibility) from CMS _layout override
-  if (pageSlug === 'home') {
+  // Phase 2: SSR already applied layout via inline styles in index.astro.
+  // This client-side block is a fallback only for non-SSR scenarios (cache hits etc).
+  // Skip if body already has flex from SSR <style> injection.
+  if (pageSlug === 'home' && getComputedStyle(document.body).display !== 'flex') {
     fetch('/api/content?page=home')
       .then(r => r.ok ? r.json() : null)
       .then(data => {
@@ -179,26 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
           const layout = data?.th?.section_order || data?.en?.section_order;
           const hidden = data?.th?.hidden_sections || data?.en?.hidden_sections;
           if (!layout && !hidden) return;
-
           const order = layout ? JSON.parse(layout) : null;
           const hiddenSet = hidden ? new Set(JSON.parse(hidden)) : new Set();
-
-          const sections = document.querySelectorAll('[data-section-key]');
-          sections.forEach(el => {
+          document.querySelectorAll('[data-section-key]').forEach(el => {
             const key = el.dataset.sectionKey;
             if (hiddenSet.has(key)) { el.style.display = 'none'; return; }
-            if (order) {
-              const idx = order.indexOf(key);
-              el.style.order = idx >= 0 ? idx : 99;
-            }
+            if (order) { const idx = order.indexOf(key); el.style.order = idx >= 0 ? idx : 99; }
           });
-
-          // Make the page body a flex-column so order takes effect
-          if (order) {
-            const body = document.querySelector('.page-body, main') || document.body;
-            body.style.display = 'flex';
-            body.style.flexDirection = 'column';
-          }
+          if (order) { const b = document.body; b.style.display = 'flex'; b.style.flexDirection = 'column'; }
         } catch (e) {}
       })
       .catch(() => {});
@@ -262,56 +252,58 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!comps.length) return;
         const el = document.querySelector(`[data-section-key="${section}"]`);
         if (!el) return;
+        // Fix 3: Use data-comp-target for reliable targeting
+        const target = el.querySelector(`[data-comp-target="${section}"]`);
 
         if (section === 'specialties') {
-          const grid = el.querySelector('.specialties-grid, .specialties-list, [class*="specialty"]');
+          const grid = target || el.querySelector('.specialties-grid');
           if (!grid) return;
           grid.innerHTML = comps.map(c => {
             const name = lang === 'en' ? (c.content.name_en || c.content.name_th) : (c.content.name_th || c.content.name_en);
             const desc = lang === 'en' ? (c.content.desc_en || c.content.desc_th) : (c.content.desc_th || c.content.desc_en);
             return `<div class="specialty-card">
-              ${c.content.icon_url ? `<img src="${c.content.icon_url}" alt="${name}" class="specialty-icon" />` : `<div class="specialty-icon">${c.content.icon_emoji || '🏥'}</div>`}
+              ${c.content.icon_url ? `<img src="${c.content.icon_url}" alt="${name}" class="specialty-icon" />` : `<span class="specialty-icon" style="font-size:2rem">${c.content.icon_emoji || '🏥'}</span>`}
               <div class="specialty-name">${name || ''}</div>
-              ${desc ? `<div class="specialty-desc">${desc}</div>` : ''}
+              ${desc ? `<p class="specialty-desc">${desc}</p>` : ''}
             </div>`;
           }).join('');
         }
 
         if (section === 'quick_actions') {
-          const grid = el.querySelector('.quick-actions-grid, [class*="quick"]');
+          const grid = target || el.querySelector('.quick-actions-inner');
           if (!grid) return;
           grid.innerHTML = comps.map(c => {
             const label = lang === 'en' ? (c.content.label_en || c.content.label_th) : (c.content.label_th || c.content.label_en);
-            return `<a href="${c.content.href || '#'}" class="quick-action-card">
-              <div class="quick-action-icon">${c.content.icon_emoji || '🔗'}</div>
-              <div class="quick-action-label">${label || ''}</div>
+            return `<a href="${c.content.href || '#'}" class="qa-item">
+              <div class="qa-icon">${c.content.icon_emoji || '🔗'}</div>
+              <span>${label || ''}</span>
             </a>`;
           }).join('');
         }
 
         if (section === 'trust') {
-          const list = el.querySelector('.trust-list, [class*="trust"]');
+          const list = target || el.querySelector('.trust-points');
           if (!list) return;
           list.innerHTML = comps.map(c => {
             const text = lang === 'en' ? (c.content.text_en || c.content.text_th) : (c.content.text_th || c.content.text_en);
-            return `<div class="trust-item">
-              <div class="trust-icon">${c.content.icon_emoji || '✓'}</div>
-              <div class="trust-text">${text || ''}</div>
+            return `<div class="trust-point">
+              <div class="trust-point-icon">${c.content.icon_emoji || '✓'}</div>
+              <div class="trust-point-text">${text || ''}</div>
             </div>`;
           }).join('');
         }
 
         if (section === 'testimonials') {
-          const list = el.querySelector('.testimonials-list, [class*="testimonial"]');
+          const list = target || el.querySelector('.swiper-wrapper');
           if (!list) return;
           list.innerHTML = comps.map(c => {
             const quote = lang === 'en' ? (c.content.quote_en || c.content.quote_th) : (c.content.quote_th || c.content.quote_en);
-            return `<div class="testimonial-card">
+            return `<div class="swiper-slide"><div class="testimonial-card">
               ${c.content.avatar_url ? `<img src="${c.content.avatar_url}" alt="${c.content.author_name || ''}" class="testimonial-avatar" />` : ''}
               <blockquote class="testimonial-quote">${quote || ''}</blockquote>
               <div class="testimonial-author">${c.content.author_name || ''}</div>
               ${c.content.rating ? `<div class="testimonial-stars">${'★'.repeat(parseInt(c.content.rating))}${'☆'.repeat(5-parseInt(c.content.rating))}</div>` : ''}
-            </div>`;
+            </div></div>`;
           }).join('');
         }
 
