@@ -98,17 +98,17 @@ const analytics = analyticsRes.ok ? await analyticsRes.json() : null;
         <div class="analytics-grid">
           <div class="stat-card highlight">
             <div class="stat-card-label">วันนี้</div>
-            <div class="stat-card-value">{analytics.today?.toLocaleString() ?? 0}</div>
+            <div class="stat-card-value">{(analytics.summary?.viewsToday ?? 0).toLocaleString()}</div>
             <div class="stat-card-sub">Page views</div>
           </div>
           <div class="stat-card">
             <div class="stat-card-label">7 วันที่ผ่านมา</div>
-            <div class="stat-card-value">{analytics.week?.toLocaleString() ?? 0}</div>
+            <div class="stat-card-value">{(analytics.summary?.views7 ?? 0).toLocaleString()}</div>
             <div class="stat-card-sub">Page views</div>
           </div>
           <div class="stat-card">
             <div class="stat-card-label">30 วันที่ผ่านมา</div>
-            <div class="stat-card-value">{analytics.month?.toLocaleString() ?? 0}</div>
+            <div class="stat-card-value">{(analytics.summary?.views30 ?? 0).toLocaleString()}</div>
             <div class="stat-card-sub">Page views</div>
           </div>
         </div>
@@ -155,7 +155,7 @@ const analytics = analyticsRes.ok ? await analyticsRes.json() : null;
       type: 'line',
       data: {
         labels: daily.map(d => {
-          const dt = new Date(d.day);
+          const dt = new Date(d.date || d.day);
           return dt.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
         }),
         datasets: [{
@@ -171,46 +171,52 @@ const analytics = analyticsRes.ok ? await analyticsRes.json() : null;
       }
     });
 
-    // Top pages
+    // Top pages — API returns [{path, count}]
     const topPages = analytics.topPages || [];
     const maxPV = topPages[0]?.count || 1;
     document.getElementById('top-pages').innerHTML = topPages.map(p => `
       <div class="top-page-row">
-        <div class="top-page-path" title="${p.page_path}">${p.page_path}</div>
+        <div class="top-page-path" title="${p.path || p.page_path}">${p.path || p.page_path}</div>
         <div class="top-page-bar-wrap"><div class="top-page-bar" style="width:${Math.round(p.count/maxPV*100)}%"></div></div>
         <div class="top-page-count">${p.count}</div>
       </div>
     `).join('') || '<div style="color:#94a3b8;font-size:.85rem">ยังไม่มีข้อมูล</div>';
 
-    // Device donut
-    const deviceData = analytics.devices || [];
+    // Device donut — API returns {desktop:N, mobile:N, tablet:N}
+    const devRaw = analytics.devices || {};
+    const deviceData = Object.entries(devRaw).filter(([,v]) => v > 0).map(([k,v]) => ({ device_type: k, count: v }));
     const devColors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444'];
-    new Chart(document.getElementById('chart-device'), {
-      type: 'doughnut',
-      data: {
-        labels: deviceData.map(d => d.device_type),
-        datasets: [{ data: deviceData.map(d => d.count), backgroundColor: devColors, borderWidth: 2 }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-    });
+    if (deviceData.length) {
+      new Chart(document.getElementById('chart-device'), {
+        type: 'doughnut',
+        data: {
+          labels: deviceData.map(d => d.device_type),
+          datasets: [{ data: deviceData.map(d => d.count), backgroundColor: devColors, borderWidth: 2 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+    }
     document.getElementById('device-legend').innerHTML = deviceData.map((d, i) => `
       <div class="legend-item"><div class="legend-dot" style="background:${devColors[i]}"></div>${d.device_type}: ${d.count}</div>
-    `).join('');
+    `).join('') || '<div style="color:#94a3b8;font-size:.82rem">ยังไม่มีข้อมูล</div>';
 
-    // Lang donut
-    const langData = analytics.langs || [];
+    // Lang donut — API returns {th:N, en:N}
+    const langRaw = analytics.langs || {};
+    const langData = Object.entries(langRaw).filter(([,v]) => v > 0).map(([k,v]) => ({ lang: k, count: v }));
     const langColors = ['#8b5cf6', '#f97316', '#06b6d4', '#84cc16'];
-    new Chart(document.getElementById('chart-lang'), {
-      type: 'doughnut',
-      data: {
-        labels: langData.map(d => d.lang === 'th' ? 'ภาษาไทย' : 'English'),
-        datasets: [{ data: langData.map(d => d.count), backgroundColor: langColors, borderWidth: 2 }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-    });
+    if (langData.length) {
+      new Chart(document.getElementById('chart-lang'), {
+        type: 'doughnut',
+        data: {
+          labels: langData.map(d => d.lang === 'th' ? 'ภาษาไทย' : 'English'),
+          datasets: [{ data: langData.map(d => d.count), backgroundColor: langColors, borderWidth: 2 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+    }
     document.getElementById('lang-legend').innerHTML = langData.map((d, i) => `
       <div class="legend-item"><div class="legend-dot" style="background:${langColors[i]}"></div>${d.lang === 'th' ? 'ภาษาไทย' : 'English'}: ${d.count}</div>
-    `).join('');
+    `).join('') || '<div style="color:#94a3b8;font-size:.82rem">ยังไม่มีข้อมูล</div>';
   </script>
 )}
 </body>
