@@ -22,59 +22,59 @@ import { Icon } from 'astro-icon/components';
 
     <!-- Desktop Nav -->
     <nav class="nav">
-      <div class="nav-item">
+      <div class="nav-item" data-nav-id="home">
         <a href="/" class="nav-link" data-i18n="nav_home">หน้าแรก</a>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" data-nav-id="hospitals">
         <a href="#" class="nav-link" data-i18n="nav_hospitals">โรงพยาบาล <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/hospitals/medithai-bangkok"><Icon name="fa6-solid:building-columns" /><span data-i18n="dd_bkk">MediThai กรุงเทพ</span></a>
-          <a href="/hospitals/medithai-heart"><Icon name="fa6-solid:heart-pulse" /><span data-i18n="dd_heart">MediThai หัวใจ</span></a>
-          <a href="/hospitals/medithai-cancer"><Icon name="fa6-solid:ribbon" /><span data-i18n="dd_cancer">MediThai มะเร็ง</span></a>
-          <a href="/hospitals/medithai-spine"><Icon name="fa6-solid:brain" /><span data-i18n="dd_spine">MediThai สมองและกระดูก</span></a>
-          <a href="/hospitals/medithai-children"><Icon name="fa6-solid:child" /><span data-i18n="dd_kids">MediThai เด็ก</span></a>
-          <a href="/hospitals/medithai-chiangmai"><Icon name="fa6-solid:mountain" /><span data-i18n="dd_chiang">MediThai เชียงใหม่</span></a>
+          <a href="/hospitals/medithai-bangkok" data-nav-id="h-bkk"><Icon name="fa6-solid:building-columns" /><span data-i18n="dd_bkk">MediThai กรุงเทพ</span></a>
+          <a href="/hospitals/medithai-heart" data-nav-id="h-heart"><Icon name="fa6-solid:heart-pulse" /><span data-i18n="dd_heart">MediThai หัวใจ</span></a>
+          <a href="/hospitals/medithai-cancer" data-nav-id="h-cancer"><Icon name="fa6-solid:ribbon" /><span data-i18n="dd_cancer">MediThai มะเร็ง</span></a>
+          <a href="/hospitals/medithai-spine" data-nav-id="h-spine"><Icon name="fa6-solid:brain" /><span data-i18n="dd_spine">MediThai สมองและกระดูก</span></a>
+          <a href="/hospitals/medithai-children" data-nav-id="h-child"><Icon name="fa6-solid:child" /><span data-i18n="dd_kids">MediThai เด็ก</span></a>
+          <a href="/hospitals/medithai-chiangmai" data-nav-id="h-cm"><Icon name="fa6-solid:mountain" /><span data-i18n="dd_chiang">MediThai เชียงใหม่</span></a>
         </div>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" data-nav-id="services">
         <a href="#" class="nav-link">บริการ <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/appointments"><Icon name="fa6-solid:calendar-check" /><span>นัดหมายแพทย์</span></a>
-          <a href="/telehealth"><Icon name="fa6-solid:video" /><span>พบแพทย์ออนไลน์</span></a>
-          <a href="/symptoms"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>
-          <a href="/medical-records"><Icon name="fa6-solid:file-medical" /><span>ขอเวชระเบียน</span></a>
-          <a href="/bill-payment"><Icon name="fa6-solid:receipt" /><span>ชำระค่าบริการ</span></a>
-          <a href="/executive-health"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>
+          <a href="/appointments" data-nav-id="s-appt"><Icon name="fa6-solid:calendar-check" /><span>นัดหมายแพทย์</span></a>
+          <a href="/telehealth" data-nav-id="s-tele"><Icon name="fa6-solid:video" /><span>พบแพทย์ออนไลน์</span></a>
+          <a href="/symptoms" data-nav-id="s-sym"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>
+          <a href="/medical-records" data-nav-id="s-rec"><Icon name="fa6-solid:file-medical" /><span>ขอเวชระเบียน</span></a>
+          <a href="/bill-payment" data-nav-id="s-bill"><Icon name="fa6-solid:receipt" /><span>ชำระค่าบริการ</span></a>
+          <a href="/executive-health" data-nav-id="s-exec"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>
         </div>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" data-nav-id="doctors">
         <a href="/doctors" class="nav-link">แพทย์</a>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" data-nav-id="packages">
         <a href="#" class="nav-link">แพ็กเกจ <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/packages"><Icon name="fa6-solid:box-open" /><span>แพ็กเกจสุขภาพ</span></a>
-          <a href="/executive-health"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>
-          <a href="/loyalty"><Icon name="fa6-solid:id-card" /><span>MediThai Card</span></a>
-          <a href="/corporate"><Icon name="fa6-solid:building" /><span>บริการองค์กร</span></a>
+          <a href="/packages" data-nav-id="p-pkg"><Icon name="fa6-solid:box-open" /><span>แพ็กเกจสุขภาพ</span></a>
+          <a href="/executive-health" data-nav-id="p-exec"><Icon name="fa6-solid:star" /><span>Executive Health</span></a>
+          <a href="/loyalty" data-nav-id="p-card"><Icon name="fa6-solid:id-card" /><span>MediThai Card</span></a>
+          <a href="/corporate" data-nav-id="p-corp"><Icon name="fa6-solid:building" /><span>บริการองค์กร</span></a>
         </div>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" data-nav-id="health">
         <a href="#" class="nav-link">ข้อมูลสุขภาพ <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/health-library"><Icon name="fa6-solid:book-medical" /><span>คลังความรู้</span></a>
-          <a href="/symptoms"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>
-          <a href="/calculators"><Icon name="fa6-solid:calculator" /><span>โปรแกรมคำนวณสุขภาพ</span></a>
-          <a href="/patient-stories"><Icon name="fa6-solid:heart" /><span>เรื่องราวผู้ป่วย</span></a>
+          <a href="/health-library" data-nav-id="hl-lib"><Icon name="fa6-solid:book-medical" /><span>คลังความรู้</span></a>
+          <a href="/symptoms" data-nav-id="hl-sym"><Icon name="fa6-solid:stethoscope" /><span>ตรวจสอบอาการ</span></a>
+          <a href="/calculators" data-nav-id="hl-calc"><Icon name="fa6-solid:calculator" /><span>โปรแกรมคำนวณสุขภาพ</span></a>
+          <a href="/patient-stories" data-nav-id="hl-story"><Icon name="fa6-solid:heart" /><span>เรื่องราวผู้ป่วย</span></a>
         </div>
       </div>
-      <div class="nav-item">
+      <div class="nav-item" data-nav-id="about">
         <a href="#" class="nav-link">เกี่ยวกับ <Icon name="fa6-solid:chevron-down" /></a>
         <div class="dropdown">
-          <a href="/about"><Icon name="fa6-solid:circle-info" /><span>เกี่ยวกับเรา</span></a>
-          <a href="/expat-hub"><Icon name="fa6-solid:globe" /><span>Expat Hub</span></a>
-          <a href="/careers"><Icon name="fa6-solid:briefcase" /><span>ร่วมงานกับเรา</span></a>
-          <a href="/giving"><Icon name="fa6-solid:hand-holding-heart" /><span>ร่วมสนับสนุน</span></a>
+          <a href="/about" data-nav-id="a-about"><Icon name="fa6-solid:circle-info" /><span>เกี่ยวกับเรา</span></a>
+          <a href="/expat-hub" data-nav-id="a-expat"><Icon name="fa6-solid:globe" /><span>Expat Hub</span></a>
+          <a href="/careers" data-nav-id="a-career"><Icon name="fa6-solid:briefcase" /><span>ร่วมงานกับเรา</span></a>
+          <a href="/giving" data-nav-id="a-give"><Icon name="fa6-solid:hand-holding-heart" /><span>ร่วมสนับสนุน</span></a>
         </div>
       </div>
     </nav>

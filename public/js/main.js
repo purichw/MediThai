@@ -176,8 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         try {
-          const layout = data?.th?._section_order || data?.en?._section_order;
-          const hidden = data?.th?._hidden_sections || data?.en?._hidden_sections;
+          const layout = data?.th?.section_order || data?.en?.section_order;
+          const hidden = data?.th?.hidden_sections || data?.en?.hidden_sections;
           if (!layout && !hidden) return;
 
           const order = layout ? JSON.parse(layout) : null;
@@ -206,6 +206,44 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* ----------------------------------------------------------------
+   Phase 3: Nav Config Apply
+   Fetch saved nav config from DB and hide/relabel nav items.
+   ---------------------------------------------------------------- */
+(function _applyNavConfig() {
+  fetch('/api/content?page=global')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data?.th?.nav_items) return;
+      try {
+        const navItems = JSON.parse(data.th.nav_items);
+        navItems.forEach(tab => {
+          // Top-level tab
+          const tabEl = document.querySelector(`[data-nav-id="${tab.id}"]`);
+          if (tabEl) {
+            if (!tab.visible) { tabEl.style.display = 'none'; }
+            // Relabel if label changed
+            const link = tabEl.querySelector('.nav-link') || tabEl;
+            if (link && tab.label_th) {
+              const textNode = [...link.childNodes].find(n => n.nodeType === 3);
+              if (textNode) textNode.textContent = (typeof currentLang !== 'undefined' && currentLang === 'en')
+                ? (tab.label_en || tab.label_th) + ' '
+                : tab.label_th + ' ';
+            }
+          }
+          // Children
+          if (tab.children) {
+            tab.children.forEach(child => {
+              const childEl = document.querySelector(`[data-nav-id="${child.id}"]`);
+              if (childEl && !child.visible) childEl.style.display = 'none';
+            });
+          }
+        });
+      } catch(e) {}
+    })
+    .catch(() => {});
+})();
+
+/* ----------------------------------------------------------------
    Phase 4: Dynamic Component Rendering
    Fetches DB components and injects them into sections when defined.
    Falls back to hardcoded HTML if no DB components exist.
@@ -220,10 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`/api/components?page=home&section=${section}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (!data || !data.components || data.components.length === 0) return;
+        const comps = Array.isArray(data) ? data : (data?.components || []);
+        if (!comps.length) return;
         const el = document.querySelector(`[data-section-key="${section}"]`);
         if (!el) return;
-        const comps = data.components;
 
         if (section === 'specialties') {
           const grid = el.querySelector('.specialties-grid, .specialties-list, [class*="specialty"]');
