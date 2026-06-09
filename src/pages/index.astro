@@ -4,19 +4,30 @@ import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
 import { createAdminSupabase } from '../lib/supabase-server';
 
-// Fix 2: Fetch layout config server-side to prevent flash
+// Fetch ALL home content in one query (layout config + text overrides)
 const supabase = createAdminSupabase();
-const { data: layoutRow } = await supabase
+const { data: homeRows } = await supabase
   .from('site_content')
-  .select('content')
-  .eq('page_slug', 'home')
-  .eq('section_key', '_layout')
-  .single();
+  .select('section_key, content')
+  .eq('page_slug', 'home');
 
+const layoutRow = homeRows?.find(r => r.section_key === '_layout');
 const sectionOrder: string[] = layoutRow?.content?.meta?.section_order
   ? JSON.parse(layoutRow.content.meta.section_order) : [];
 const hiddenSections: Set<string> = layoutRow?.content?.meta?.hidden_sections
   ? new Set(JSON.parse(layoutRow.content.meta.hidden_sections)) : new Set();
+
+// Build CMS page overrides for translation merge (window.__CMS_P__)
+const pTh: Record<string, string> = {};
+const pEn: Record<string, string> = {};
+for (const row of homeRows ?? []) {
+  if (row.section_key.startsWith('_')) continue;
+  Object.assign(pTh, row.content?.th ?? {});
+  Object.assign(pEn, row.content?.en ?? {});
+}
+const cmsPageScript = (Object.keys(pTh).length || Object.keys(pEn).length)
+  ? `<script>window.__CMS_P__=${JSON.stringify({th:pTh,en:pEn})};<\/script>`
+  : '';
 
 function sectionStyle(key: string): string {
   const styles: string[] = [];
@@ -37,6 +48,7 @@ const hasLayout = sectionOrder.length > 0 || hiddenSections.size > 0;
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     ${hasLayout ? `<style>body{display:flex;flex-direction:column}${sectionOrder.map((k,i)=>`[data-section-key="${k}"]{order:${i}}`).join('')}</style>` : ''}
+    ${cmsPageScript}
   `}
   extraScripts={`
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>

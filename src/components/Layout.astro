@@ -1,6 +1,7 @@
 ---
 import Header from './Header.astro';
 import Footer from './Footer.astro';
+import { createAdminSupabase } from '../lib/supabase-server';
 
 interface Props {
   title?: string;
@@ -44,6 +45,25 @@ const defaultSchema = {
 };
 
 const activeSchema = schema ?? defaultSchema;
+
+// Fetch global CMS overrides (nav, footer, announcement)
+let cmsGlobalScript = '';
+try {
+  const supabase = createAdminSupabase();
+  const { data: globalRows } = await supabase
+    .from('site_content')
+    .select('section_key, content')
+    .eq('page_slug', 'global');
+  const gTh: Record<string, string> = {};
+  const gEn: Record<string, string> = {};
+  for (const row of globalRows ?? []) {
+    Object.assign(gTh, row.content?.th ?? {});
+    Object.assign(gEn, row.content?.en ?? {});
+  }
+  if (Object.keys(gTh).length || Object.keys(gEn).length) {
+    cmsGlobalScript = `<script>window.__CMS_G__=${JSON.stringify({th:gTh,en:gEn})};<\/script>`;
+  }
+} catch { /* non-fatal */ }
 ---
 <!DOCTYPE html>
 <html lang="th">
@@ -111,6 +131,7 @@ const activeSchema = schema ?? defaultSchema;
 
   <!-- Common scripts -->
   <script is:inline src="https://cdn.jsdelivr.net/npm/lenis@1.1.9/dist/lenis.min.js"></script>
+  <Fragment set:html={cmsGlobalScript} />
   <script is:inline src="/js/translations.js"></script>
   <script is:inline src="/js/main.js"></script>
 

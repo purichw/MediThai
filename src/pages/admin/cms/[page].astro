@@ -2,6 +2,7 @@
 export const prerender = false;
 import { createAdminSupabase } from '../../../lib/supabase-server';
 import { CMS_PAGE_MAP, CMS_PAGES } from '../../../lib/cmsSchema';
+import { DEFAULT_TH, DEFAULT_EN } from '../../../lib/cmsDefaults';
 
 const { page: pageSlug } = Astro.params;
 const pageDef = pageSlug ? CMS_PAGE_MAP[pageSlug] : null;
@@ -174,6 +175,7 @@ for (const sec of pageDef.sections) {
                                 class="cms-textarea"
                                 data-lang="th" data-field={field.key}
                                 rows={field.type === 'number' ? 1 : 2}
+                                placeholder={DEFAULT_TH[field.key] ?? ''}
                                 set:text={thVal}
                               ></textarea>
                             )}
@@ -203,6 +205,7 @@ for (const sec of pageDef.sections) {
                                 class="cms-textarea"
                                 data-lang="en" data-field={field.key}
                                 rows={field.type === 'number' ? 1 : 2}
+                                placeholder={DEFAULT_EN[field.key] ?? ''}
                                 set:text={enVal}
                               ></textarea>
                             )}
@@ -237,6 +240,7 @@ for (const sec of pageDef.sections) {
                               class="cms-textarea cms-textarea-full"
                               data-lang="meta" data-field={field.key}
                               rows={field.type === 'number' ? 1 : 2}
+                              placeholder={DEFAULT_TH[field.key] ?? ''}
                               set:text={metaVal || thVal}
                             ></textarea>
                           )}

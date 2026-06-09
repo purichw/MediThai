@@ -351,6 +351,16 @@ const T = {
   }
 };
 
+// Merge CMS DB overrides (injected server-side before this script runs)
+if (typeof window.__CMS_G__ !== 'undefined') {
+  if (window.__CMS_G__.th) Object.assign(T.th, window.__CMS_G__.th);
+  if (window.__CMS_G__.en) Object.assign(T.en, window.__CMS_G__.en);
+}
+if (typeof window.__CMS_P__ !== 'undefined') {
+  if (window.__CMS_P__.th) Object.assign(T.th, window.__CMS_P__.th);
+  if (window.__CMS_P__.en) Object.assign(T.en, window.__CMS_P__.en);
+}
+
 let currentLang = localStorage.getItem('lang') || 'th';
 
 function applyTranslations() {
