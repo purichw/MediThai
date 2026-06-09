@@ -1,7 +1,10 @@
 // GET /api/admin/page-content?slug=home
 // Returns current DB overrides for a CMS page (used by inline admin editor).
+// Auth is handled by middleware (all /api/admin routes require admin/staff).
 import type { APIRoute } from 'astro';
-import { createAdminSupabase, createServerSupabase } from '../../../lib/supabase-server';
+import { createAdminSupabase } from '../../../lib/supabase-server';
+
+export const prerender = false;
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -10,22 +13,17 @@ function json(data: unknown, status = 200) {
   });
 }
 
-export const GET: APIRoute = async ({ url, request, cookies }) => {
-  // Auth check
-  const supabase = createServerSupabase(request, cookies);
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return json({ error: 'Unauthorized' }, 401);
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (!profile || !['admin', 'staff'].includes(profile.role)) return json({ error: 'Forbidden' }, 403);
-
+export const GET: APIRoute = async ({ url }) => {
   const slug = url.searchParams.get('slug') ?? '';
   if (!slug) return json({ error: 'Missing slug' }, 400);
 
   const adminSupa = createAdminSupabase();
-  const { data: rows } = await adminSupa
+  const { data: rows, error } = await adminSupa
     .from('site_content')
     .select('section_key, content, updated_at')
     .eq('page_slug', slug);
+
+  if (error) return json({ error: error.message }, 500);
 
   const sections: Record<string, unknown> = {};
   for (const row of rows ?? []) {

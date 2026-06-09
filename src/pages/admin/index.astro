@@ -1462,13 +1462,14 @@ function escH(s) {
 
 <!-- ══ Inline page CMS data + functions ════════════════════════ -->
 <script is:inline define:vars={{ navCmsMapJson, cmsPageDefsJson, cmsDefaultThJson, cmsDefaultEnJson }}>
+// Data — local to the IIFE so closures below can access them
 const _NAV_CMS_MAP  = JSON.parse(navCmsMapJson);
 const _CMS_PAGE_DEFS = JSON.parse(cmsPageDefsJson);  // { home:[...sections], global:[...sections] }
 const _CMS_DEF_TH   = JSON.parse(cmsDefaultThJson);
 const _CMS_DEF_EN   = JSON.parse(cmsDefaultEnJson);
 
 // ── Switch to a page in the sidebar ──────────────────────────
-async function switchToPage(navId) {
+const switchToPage = window.switchToPage = async function(navId) {
   // Deactivate all tabs
   TABS.forEach(t => {
     document.getElementById('panel-' + t)?.classList.remove('active');
@@ -1487,7 +1488,7 @@ async function switchToPage(navId) {
 }
 
 // ── Render inline CMS for a nav ID ───────────────────────────
-async function renderPageCMS(navId) {
+const renderPageCMS = window.renderPageCMS = async function(navId) {
   const map = _NAV_CMS_MAP[navId];
   const titleEl = document.getElementById('pagecms-title');
   const subEl   = document.getElementById('pagecms-sub');
@@ -1509,10 +1510,14 @@ async function renderPageCMS(navId) {
   subEl.textContent = 'กำลังโหลด...';
   sectEl.innerHTML = '<div style="padding:32px 24px;color:#64748b;font-size:.9rem">⏳ กำลังโหลด...</div>';
 
-  // Fetch current DB overrides
+  // Fetch current DB overrides (8s timeout — renders defaults if slow)
   let dbSections = {};
   try {
-    const res = await fetch('/api/admin/page-content?slug=' + encodeURIComponent(map.slug), { credentials:'include' });
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch('/api/admin/page-content?slug=' + encodeURIComponent(map.slug),
+      { credentials:'include', signal: ctrl.signal });
+    clearTimeout(tid);
     if (res.ok) { const j = await res.json(); dbSections = j.sections || {}; }
   } catch {}
 
@@ -1531,7 +1536,7 @@ async function renderPageCMS(navId) {
 }
 
 // ── Render a single CMS section accordion ────────────────────
-function renderCMSSection(pageSlug, sec, dbData) {
+const renderCMSSection = window.renderCMSSection = function(pageSlug, sec, dbData) {
   const isCustomized = !!dbData;
   const updatedAt = dbData?.updated_at
     ? new Date(dbData.updated_at).toLocaleDateString('th-TH', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
@@ -1601,7 +1606,7 @@ function renderCMSSection(pageSlug, sec, dbData) {
 }
 
 // ── Toggle section accordion open/closed ─────────────────────
-function inlineToggleSec(key) {
+const inlineToggleSec = window.inlineToggleSec = function(key) {
   const body = document.getElementById('inline-body-' + key);
   const chev = document.getElementById('inline-chev-' + key);
   if (!body) return;
@@ -1613,7 +1618,7 @@ function inlineToggleSec(key) {
 }
 
 // ── Save a section ────────────────────────────────────────────
-async function inlineSaveSec(pageSlug, sectionKey) {
+const inlineSaveSec = window.inlineSaveSec = async function(pageSlug, sectionKey) {
   const bodyEl = document.getElementById('inline-body-' + sectionKey);
   if (!bodyEl) return;
 
@@ -1643,7 +1648,7 @@ async function inlineSaveSec(pageSlug, sectionKey) {
 }
 
 // ── Reset a section back to defaults ─────────────────────────
-async function inlineResetSec(pageSlug, sectionKey) {
+const inlineResetSec = window.inlineResetSec = async function(pageSlug, sectionKey) {
   if (!confirm('Reset section นี้กลับเป็นค่าเริ่มต้น?')) return;
   showSaveBar('กำลัง reset...', 'saving');
   const res = await fetch(`/api/admin/content?page=${encodeURIComponent(pageSlug)}&section=${encodeURIComponent(sectionKey)}`, {
