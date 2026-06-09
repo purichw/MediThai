@@ -252,30 +252,59 @@ const COMP_TYPES = [
     .add-comp-panel select { padding:8px 12px; border-radius:8px; border:1px solid #e2e8f0;
       font-size:.9rem; margin-right:8px; }
 
-    /* ── Nav editor ── */
-    .nav-tree-inner { display:flex; flex-direction:column; gap:12px; max-width:700px; }
-    .nav-tab-item { background:#fff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; }
-    .nav-tab-header { display:flex; align-items:center; gap:12px; padding:14px 16px; background:#f8fafc; cursor:pointer; }
-    .nav-tab-header:hover { background:#f1f5f9; }
-    .nav-tab-chevron { color:#94a3b8; transition:transform .2s; }
-    .nav-tab-item.open .nav-tab-chevron { transform:rotate(90deg); }
-    .nav-tab-label { flex:1; font-weight:700; }
-    .nav-tab-body { display:none; padding:0 16px 16px; }
-    .nav-tab-item.open .nav-tab-body { display:block; }
-    .nav-item-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f1f5f9; }
-    .nav-item-row:last-child { border-bottom:none; }
-    .nav-item-indent { width:20px; color:#cbd5e1; }
-    .nav-item-label { flex:1; font-size:.88rem; }
-    .nav-label-edit { font-size:.8rem; border:1px solid #e2e8f0; border-radius:6px; padding:4px 8px; width:140px; }
-    .vis-switch { position:relative; display:inline-flex; align-items:center; cursor:pointer; }
+    /* ── Nav editor — tree style ── */
+    .nav-tree-inner { display:flex; flex-direction:column; gap:8px; max-width:760px; }
+
+    /* Parent node */
+    .nav-tree-node { background:#fff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; transition:border-color .15s,box-shadow .15s; }
+    .nav-tree-node.expanded { border-color:#cbd5e1; }
+    .nav-tree-node:focus-within { border-color:#0891b2; box-shadow:0 0 0 3px rgba(8,145,178,.07); }
+
+    .nav-node-header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:#f8fafc; cursor:pointer; user-select:none; transition:background .15s; }
+    .nav-node-header:hover { background:#f1f5f9; }
+    .nav-tree-node.expanded .nav-node-header { background:#f8fafc; }
+
+    .nav-node-icon { font-size:15px; flex-shrink:0; opacity:.7; }
+    .nav-node-inputs { display:flex; gap:6px; flex:1; min-width:0; }
+    .nav-label-edit { font-size:.8rem; border:1px solid #e2e8f0; border-radius:6px; padding:5px 8px; background:#fff; font-family:inherit; transition:border-color .15s; min-width:0; }
+    .nav-label-th { width:140px; }
+    .nav-label-en { width:140px; }
+    .nav-label-edit:focus { outline:none; border-color:#0891b2; box-shadow:0 0 0 2px rgba(8,145,178,.1); }
+    .nav-node-href { font-size:.71rem; color:#64748b; background:#f1f5f9; padding:2px 7px; border-radius:4px; white-space:nowrap; max-width:200px; overflow:hidden; text-overflow:ellipsis; font-family:monospace; }
+    .nav-dropdown-tag { font-size:.67rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#7c3aed; background:#f5f3ff; padding:2px 7px; border-radius:4px; flex-shrink:0; }
+    .nav-node-chevron { color:#94a3b8; font-size:11px; flex-shrink:0; transition:transform .2s; }
+    .nav-tree-node.expanded .nav-node-chevron { transform:rotate(90deg); color:#0891b2; }
+    .nav-child-count { font-size:.7rem; color:#94a3b8; flex-shrink:0; }
+
+    /* Toggle switch */
+    .vis-switch { position:relative; display:inline-flex; align-items:center; cursor:pointer; flex-shrink:0; }
     .vis-switch input { opacity:0; width:0; }
-    .vis-slider { width:36px; height:20px; background:#e2e8f0; border-radius:10px;
-      display:inline-block; position:relative; transition:background .2s; }
-    .vis-slider::after { content:''; position:absolute; top:3px; left:3px;
-      width:14px; height:14px; border-radius:50%; background:#fff; transition:transform .2s; }
+    .vis-slider { width:36px; height:20px; background:#e2e8f0; border-radius:10px; display:inline-block; position:relative; transition:background .2s; }
+    .vis-slider::after { content:''; position:absolute; top:3px; left:3px; width:14px; height:14px; border-radius:50%; background:#fff; transition:transform .2s; }
     .vis-switch input:checked + .vis-slider { background:#22c55e; }
     .vis-switch input:checked + .vis-slider::after { transform:translateX(16px); }
-    .custom-page-badge { font-size:.7rem; background:#dbeafe; color:#1e40af; padding:2px 6px; border-radius:4px; }
+
+    /* Children area */
+    .nav-node-children { display:none; background:#f8fafc; border-top:1px solid #e2e8f0; }
+    .nav-tree-node.expanded .nav-node-children { display:block; }
+
+    .nav-child-row { display:flex; align-items:center; gap:10px; padding:9px 16px 9px 20px; border-bottom:1px solid #f1f5f9; position:relative; }
+    .nav-child-row:last-child { border-bottom:none; }
+    .nav-child-row.nav-child-dimmed { opacity:.45; }
+
+    /* Tree connector lines */
+    .nav-child-vline { position:absolute; left:30px; top:0; bottom:0; width:1px; background:#d1d5db; }
+    .nav-child-row:last-child .nav-child-vline { height:50%; bottom:auto; }
+    .nav-child-hline { position:absolute; left:30px; top:50%; width:12px; height:1px; background:#d1d5db; }
+    .nav-child-icon { font-size:12px; margin-left:20px; flex-shrink:0; opacity:.6; }
+
+    /* Custom page child */
+    .nav-child-row.is-custom { background:#fffbeb; }
+    .nav-child-row.is-custom .nav-child-vline,
+    .nav-child-row.is-custom .nav-child-hline { background:#fbbf24; }
+
+    .custom-page-badge { font-size:.67rem; font-weight:700; background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; flex-shrink:0; }
+    .nav-live-tag { font-size:.68rem; color:#15803d; background:#dcfce7; padding:2px 6px; border-radius:4px; flex-shrink:0; }
     .save-nav-bar { display:flex; gap:12px; margin-top:24px; }
 
     /* ── Pages (custom) ── */
@@ -1136,47 +1165,72 @@ function renderNav() {
   navData = JSON.parse(treeEl.dataset.nav || '[]');
   const customPages = JSON.parse(treeEl.dataset.custom || '[]');
 
-  treeEl.innerHTML = navData.map((tab, ti) => `
-    <div class="nav-tab-item ${tab.visible ? 'open' : ''}" data-ntab="${tab.id}">
-      <div class="nav-tab-header" onclick="toggleNavTab('${tab.id}')">
-        <span class="nav-tab-chevron">▶</span>
-        <div class="nav-tab-label">
-          <input class="nav-label-edit" data-path="${ti}.label_th" value="${escH(tab.label_th)}" placeholder="ชื่อไทย" onclick="event.stopPropagation()" />
-          <input class="nav-label-edit" data-path="${ti}.label_en" value="${escH(tab.label_en)}" placeholder="English" onclick="event.stopPropagation()" style="margin-left:6px" />
+  treeEl.innerHTML = navData.map((tab, ti) => {
+    const children  = tab.children || [];
+    const customs   = customPages.filter(p => p.nav_parent === tab.id);
+    const hasKids   = children.length > 0 || customs.length > 0;
+    const allKids   = [...children, ...customs];
+
+    const childrenHtml = hasKids ? `
+      <div class="nav-node-children">
+        ${children.map((child, ci) => {
+          const isLast = ci === allKids.length - 1;
+          return `
+          <div class="nav-child-row ${child.visible ? '' : 'nav-child-dimmed'}">
+            <div class="nav-child-vline"></div>
+            <div class="nav-child-hline"></div>
+            <span class="nav-child-icon">🔗</span>
+            <div class="nav-node-inputs">
+              <input class="nav-label-edit nav-label-th" data-path="${ti}.children.${ci}.label_th"
+                value="${escH(child.label_th)}" placeholder="ชื่อไทย" />
+              <input class="nav-label-edit nav-label-en" data-path="${ti}.children.${ci}.label_en"
+                value="${escH(child.label_en)}" placeholder="English" />
+            </div>
+            <code class="nav-node-href">${child.href || ''}</code>
+            <label class="vis-switch">
+              <input type="checkbox" ${child.visible?'checked':''} onchange="setNavPath('${ti}.children.${ci}.visible',this.checked)" />
+              <span class="vis-slider"></span>
+            </label>
+          </div>`;
+        }).join('')}
+        ${customs.map(p => `
+        <div class="nav-child-row is-custom">
+          <div class="nav-child-vline"></div>
+          <div class="nav-child-hline"></div>
+          <span class="nav-child-icon">⭐</span>
+          <span class="custom-page-badge">Custom</span>
+          <span style="flex:1;font-size:.84rem;color:#1e293b">
+            ${escH(p.nav_label_th||p.title_th)}
+            <span style="color:#94a3b8"> / ${escH(p.nav_label_en||p.title_en)}</span>
+          </span>
+          <code class="nav-node-href">/p/${p.slug}</code>
+          <span class="nav-live-tag">✓ Live</span>
+        </div>`).join('')}
+      </div>` : '';
+
+    return `
+    <div class="nav-tree-node${hasKids ? ' expanded' : ''}" data-ntab="${tab.id}">
+      <div class="nav-node-header" onclick="toggleNavTab('${tab.id}')">
+        <span class="nav-node-icon">${hasKids ? '📂' : '📄'}</span>
+        <div class="nav-node-inputs">
+          <input class="nav-label-edit nav-label-th" data-path="${ti}.label_th"
+            value="${escH(tab.label_th)}" placeholder="ชื่อไทย" onclick="event.stopPropagation()" />
+          <input class="nav-label-edit nav-label-en" data-path="${ti}.label_en"
+            value="${escH(tab.label_en)}" placeholder="English" onclick="event.stopPropagation()" />
         </div>
-        ${tab.href ? `<span style="font-size:.75rem;color:#94a3b8">${tab.href}</span>` : ''}
+        ${tab.href
+          ? `<code class="nav-node-href">${tab.href}</code>`
+          : `<span class="nav-dropdown-tag">dropdown</span>`}
+        ${hasKids ? `<span class="nav-child-count">${allKids.length} items</span>` : ''}
         <label class="vis-switch" onclick="event.stopPropagation()">
-          <input type="checkbox" ${tab.visible?'checked':''} onchange="setNavPath('${ti}.visible', this.checked)" />
+          <input type="checkbox" ${tab.visible?'checked':''} onchange="setNavPath('${ti}.visible',this.checked)" />
           <span class="vis-slider"></span>
         </label>
+        ${hasKids ? `<span class="nav-node-chevron">▸</span>` : ''}
       </div>
-      ${tab.children && tab.children.length ? `
-      <div class="nav-tab-body">
-        ${tab.children.map((child, ci) => `
-        <div class="nav-item-row">
-          <span class="nav-item-indent">└</span>
-          <div class="nav-item-label">
-            <input class="nav-label-edit" data-path="${ti}.children.${ci}.label_th" value="${escH(child.label_th)}" placeholder="ชื่อไทย" />
-            <input class="nav-label-edit" data-path="${ti}.children.${ci}.label_en" value="${escH(child.label_en)}" placeholder="English" style="margin-left:4px" />
-            <span style="font-size:.75rem;color:#94a3b8;margin-left:6px">${child.href||''}</span>
-          </div>
-          <label class="vis-switch">
-            <input type="checkbox" ${child.visible?'checked':''} onchange="setNavPath('${ti}.children.${ci}.visible', this.checked)" />
-            <span class="vis-slider"></span>
-          </label>
-        </div>`).join('')}
-        ${customPages.filter(p => p.nav_parent === tab.id).map(p => `
-        <div class="nav-item-row">
-          <span class="nav-item-indent">└</span>
-          <div class="nav-item-label">
-            <span class="custom-page-badge">Custom</span>
-            <span style="margin-left:6px">${escH(p.nav_label_th||p.title_th)} / ${escH(p.nav_label_en||p.title_en)}</span>
-          </div>
-          <span style="font-size:.75rem;color:#22c55e">✓</span>
-        </div>`).join('')}
-      </div>` : ''}
-    </div>
-  `).join('');
+      ${childrenHtml}
+    </div>`;
+  }).join('');
 
   treeEl.querySelectorAll('[data-path]').forEach(inp => {
     inp.addEventListener('input', () => setNavPath(inp.dataset.path, inp.value));
@@ -1184,7 +1238,7 @@ function renderNav() {
 }
 
 function toggleNavTab(id) {
-  document.querySelector(`[data-ntab="${id}"]`)?.classList.toggle('open');
+  document.querySelector(`[data-ntab="${id}"]`)?.classList.toggle('expanded');
 }
 
 function setNavPath(path, value) {
