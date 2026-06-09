@@ -1,13 +1,39 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { createAdminSupabase } from '../lib/supabase-server';
+
+const supabase = createAdminSupabase();
+const { data: rows } = await supabase
+  .from('site_content').select('section_key, content').eq('page_slug', 'packages');
+const db: Record<string, any> = {};
+for (const row of rows ?? []) db[row.section_key] = row.content;
+const heroDb = db.hero ?? {}; const promoDb = db.promo ?? {};
+
+const th = {
+  pg_title:    heroDb.th?.pg_title   ?? 'แพ็กเกจสุขภาพ',
+  pg_desc:     heroDb.th?.pg_desc    ?? 'ดูแลสุขภาพที่นี่ เช็กราคา หาโปรจากโรงพยาบาลในเครือ MediThai',
+  promo_title: promoDb.th?.promo_title ?? 'MediThai Health Pass — ตรวจสุขภาพรายปี ซื้อครั้งเดียวตรวจได้ทั้งปี',
+  promo_sub:   promoDb.th?.promo_sub   ?? 'เริ่มต้น ฿2,990/ปี · เลือกตรวจได้หลายรายการ · ทุกสาขาในเครือ',
+  promo_btn:   promoDb.th?.promo_btn   ?? 'ดูรายละเอียด',
+};
+const en = {
+  pg_title:    heroDb.en?.pg_title   ?? 'Health Packages',
+  pg_desc:     heroDb.en?.pg_desc    ?? 'Browse health packages & promotions from MediThai hospitals.',
+  promo_title: promoDb.en?.promo_title ?? 'MediThai Health Pass — Annual check-up, one purchase all year.',
+  promo_sub:   promoDb.en?.promo_sub   ?? 'From ฿2,990/year · Multiple tests available · All branches',
+  promo_btn:   promoDb.en?.promo_btn   ?? 'See details',
+};
+const cmsScript = `<script>window.__CMS_P__=${JSON.stringify({th,en})}<\/script>`;
 ---
 <Layout
-  title="แพ็กเกจสุขภาพ | MediThai Hospital Network"
-  description="ดูแลสุขภาพที่นี่ เช็กราคา หาโปรจากโรงพยาบาลในเครือ MediThai"
+  title={`${th.pg_title} | MediThai Hospital Network`}
+  description={th.pg_desc}
   extraHead={`
     <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
+    ${cmsScript}
   `}
   extraScripts={`
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -91,9 +117,9 @@ import { Icon } from 'astro-icon/components';
 
 <section class="page-hero">
   <div class="container">
-    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>แพ็กเกจสุขภาพ</span></div>
-    <h1>แพ็กเกจสุขภาพ</h1>
-    <p>ดูแลสุขภาพที่นี่ เช็กราคา หาโปรจากโรงพยาบาลในเครือ MediThai</p>
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span data-i18n="pg_title">{th.pg_title}</span></div>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:28px">
       <a href="#" onclick="setCategory('checkup',this);return false" class="btn btn-secondary btn-sm cat-hero-btn active-hero"><Icon name="fa6-solid:clipboard-list" /> ตรวจสุขภาพ</a>
       <a href="#" onclick="setCategory('cancer',this);return false" class="btn btn-secondary btn-sm cat-hero-btn"><Icon name="fa6-solid:ribbon" /> มะเร็ง</a>
@@ -110,11 +136,11 @@ import { Icon } from 'astro-icon/components';
     <div style="display:flex;align-items:center;gap:12px;color:#fff">
       <Icon name="fa6-solid:infinity" style="font-size:1.3rem;color:#F59E0B" />
       <div>
-        <div style="font-family:var(--font-heading);font-weight:600;font-size:.92rem">MediThai Health Pass — ตรวจสุขภาพรายปี ซื้อครั้งเดียวตรวจได้ทั้งปี</div>
-        <div style="font-size:.75rem;opacity:.75">เริ่มต้น ฿2,990/ปี · เลือกตรวจได้หลายรายการ · ทุกสาขาในเครือ</div>
+        <div style="font-family:var(--font-heading);font-weight:600;font-size:.92rem" data-i18n="promo_title">{th.promo_title}</div>
+        <div style="font-size:.75rem;opacity:.75" data-i18n="promo_sub">{th.promo_sub}</div>
       </div>
     </div>
-    <a href="#health-pass" class="btn btn-white btn-sm">ดูรายละเอียด <Icon name="fa6-solid:arrow-right" /></a>
+    <a href="#health-pass" class="btn btn-white btn-sm" data-i18n="promo_btn">{th.promo_btn} <Icon name="fa6-solid:arrow-right" /></a>
   </div>
 </div>
 

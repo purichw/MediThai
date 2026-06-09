@@ -350,6 +350,37 @@ function hospitalSections(): SectionDef[] {
   ];
 }
 
+// ─── OTHER PAGES ──────────────────────────────────────────────────────────────
+const OTHER_PAGES: PageDef[] = [
+  {
+    slug: 'packages',
+    label: 'แพ็กเกจสุขภาพ',
+    description: 'หน้ารวมแพ็กเกจ — hero, promo bar, filter labels',
+    icon: '📦',
+    sections: [
+      {
+        key: 'hero',
+        label: 'Page Hero',
+        icon: '🎯',
+        fields: [
+          bi('pg_title', 'ชื่อหน้า (h1)'),
+          bi('pg_desc',  'คำอธิบาย'),
+        ],
+      },
+      {
+        key: 'promo',
+        label: 'Promo Bar (Health Pass)',
+        icon: '🎟️',
+        fields: [
+          bi('promo_title', 'ชื่อ Promo'),
+          bi('promo_sub',   'คำอธิบาย Promo'),
+          bi('promo_btn',   'ปุ่ม Promo'),
+        ],
+      },
+    ],
+  },
+];
+
 const HOSPITAL_PAGES: PageDef[] = [
   { slug:'hospital-heart',     label:'MediThai หัวใจ',           description:'หน้าโรงพยาบาลเฉพาะทางโรคหัวใจ',        icon:'❤️',  sections: hospitalSections() },
   { slug:'hospital-bkk',       label:'MediThai กรุงเทพ',          description:'หน้าโรงพยาบาลสำนักงานใหญ่',             icon:'🏥',  sections: hospitalSections() },
@@ -359,7 +390,7 @@ const HOSPITAL_PAGES: PageDef[] = [
   { slug:'hospital-chiangmai', label:'MediThai เชียงใหม่',         description:'หน้าโรงพยาบาลสาขาเชียงใหม่',           icon:'🌸',  sections: hospitalSections() },
 ];
 
-export const CMS_PAGES_ALL = [...CMS_PAGES, ...HOSPITAL_PAGES];
+export const CMS_PAGES_ALL = [...CMS_PAGES, ...OTHER_PAGES, ...HOSPITAL_PAGES];
 
 // Quick lookup by slug
 export const CMS_PAGE_MAP: Record<string, PageDef> =
