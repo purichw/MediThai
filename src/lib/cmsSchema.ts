@@ -316,6 +316,51 @@ export const CMS_PAGES: PageDef[] = [
   },
 ];
 
+// ─── HOSPITAL PAGES (shared section template) ─────────────────────────────
+function hospitalSections(): SectionDef[] {
+  return [
+    {
+      key: 'hero',
+      label: 'Hero Section',
+      icon: '🏥',
+      fields: [
+        bi('hero_badge', 'Badge (แท็กบน Hero)'),
+        bi('hero_title', 'ชื่อโรงพยาบาล'),
+        bi('hero_desc',  'คำอธิบายหลัก', 'richtext'),
+        mono('stat1_num', 'Stat 1 — ตัวเลข'),
+        bi('stat1_lbl',  'Stat 1 — ป้ายกำกับ'),
+        mono('stat2_num', 'Stat 2 — ตัวเลข'),
+        bi('stat2_lbl',  'Stat 2 — ป้ายกำกับ'),
+        mono('stat3_num', 'Stat 3 — ตัวเลข'),
+        bi('stat3_lbl',  'Stat 3 — ป้ายกำกับ'),
+        mono('stat4_num', 'Stat 4 — ตัวเลข (rating)'),
+        bi('stat4_lbl',  'Stat 4 — ป้ายกำกับ'),
+      ],
+    },
+    {
+      key: 'contact',
+      label: 'ข้อมูลติดต่อ',
+      icon: '📞',
+      fields: [
+        bi('address', 'ที่อยู่'),
+        mono('phone', 'เบอร์โทร'),
+        bi('hours', 'เวลาทำการ'),
+      ],
+    },
+  ];
+}
+
+const HOSPITAL_PAGES: PageDef[] = [
+  { slug:'hospital-heart',     label:'MediThai หัวใจ',           description:'หน้าโรงพยาบาลเฉพาะทางโรคหัวใจ',        icon:'❤️',  sections: hospitalSections() },
+  { slug:'hospital-bkk',       label:'MediThai กรุงเทพ',          description:'หน้าโรงพยาบาลสำนักงานใหญ่',             icon:'🏥',  sections: hospitalSections() },
+  { slug:'hospital-cancer',    label:'MediThai มะเร็ง',            description:'หน้าโรงพยาบาลเฉพาะทางโรคมะเร็ง',       icon:'🎗️', sections: hospitalSections() },
+  { slug:'hospital-spine',     label:'MediThai สมองและกระดูก',    description:'หน้าโรงพยาบาลเฉพาะทางระบบประสาท',      icon:'🧠',  sections: hospitalSections() },
+  { slug:'hospital-children',  label:'MediThai เด็ก',              description:'หน้าโรงพยาบาลเด็กเฉพาะทาง',            icon:'👶',  sections: hospitalSections() },
+  { slug:'hospital-chiangmai', label:'MediThai เชียงใหม่',         description:'หน้าโรงพยาบาลสาขาเชียงใหม่',           icon:'🌸',  sections: hospitalSections() },
+];
+
+export const CMS_PAGES_ALL = [...CMS_PAGES, ...HOSPITAL_PAGES];
+
 // Quick lookup by slug
 export const CMS_PAGE_MAP: Record<string, PageDef> =
-  Object.fromEntries(CMS_PAGES.map(p => [p.slug, p]));
+  Object.fromEntries(CMS_PAGES_ALL.map(p => [p.slug, p]));

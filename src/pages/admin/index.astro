@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import { createAdminSupabase, createServerSupabase } from '../../lib/supabase-server';
-import { CMS_PAGES } from '../../lib/cmsSchema';
+import { CMS_PAGES, CMS_PAGES_ALL } from '../../lib/cmsSchema';
 import { DEFAULT_TH, DEFAULT_EN } from '../../lib/cmsDefaults';
 
 // Map nav item IDs → which CMS page (+ optional section filter) to load inline
@@ -10,6 +10,13 @@ const NAV_CMS_MAP: Record<string, { slug: string; filter?: string[]; title?: str
   'home':      { slug: 'home',   title: '🏠 หน้าแรก' },
   'hospitals': { slug: 'global', filter: ['nav_hospitals'], title: '🏥 โรงพยาบาล — ชื่อ Dropdown' },
   'services':  { slug: 'global', filter: ['nav_services'],  title: '⚕️ บริการ — ชื่อ Dropdown' },
+  // Hospital branch pages
+  'h-bkk':    { slug: 'hospital-bkk',       title: '🏥 MediThai กรุงเทพ' },
+  'h-heart':  { slug: 'hospital-heart',     title: '❤️ MediThai หัวใจ' },
+  'h-cancer': { slug: 'hospital-cancer',    title: '🎗️ MediThai มะเร็ง' },
+  'h-spine':  { slug: 'hospital-spine',     title: '🧠 MediThai สมองและกระดูก' },
+  'h-child':  { slug: 'hospital-children',  title: '👶 MediThai เด็ก' },
+  'h-cm':     { slug: 'hospital-chiangmai', title: '🌸 MediThai เชียงใหม่' },
 };
 
 // === AUTH ===
@@ -123,7 +130,7 @@ const statusLabel: Record<string, string> = { pending: 'รอยืนยัน
 // Serialized for inline JS
 const navCmsMapJson = JSON.stringify(NAV_CMS_MAP);
 const cmsPageDefsJson = JSON.stringify(
-  Object.fromEntries(CMS_PAGES.map(p => [p.slug, p.sections]))
+  Object.fromEntries(CMS_PAGES_ALL.map(p => [p.slug, p.sections]))
 );
 const cmsDefaultThJson = JSON.stringify(DEFAULT_TH);
 const cmsDefaultEnJson = JSON.stringify(DEFAULT_EN);
@@ -275,9 +282,15 @@ const COMP_TYPES = [
     .cms-page-no-cms:hover { opacity:1; }
     .cms-nav-subtree { padding-left:14px; margin-left:18px; border-left:2px solid #e2e8f0;
       display:flex; flex-direction:column; gap:1px; margin-bottom:2px; }
-    .cms-nav-subitem { display:flex; align-items:center; gap:6px; padding:3px 6px;
+    .cms-nav-subitem { display:flex; align-items:center; gap:6px; padding:2px 6px;
       font-size:.76rem; color:#94a3b8; }
     .cms-nav-subitem-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .cms-nav-subitem-no-cms { opacity:.55; font-style:italic; }
+    .cms-nav-subitem-btn { background:none; border:none; cursor:pointer; padding:3px 7px;
+      font-size:.76rem; color:#334155; border-radius:5px; text-align:left; white-space:nowrap;
+      overflow:hidden; text-overflow:ellipsis; transition:background .12s,color .12s; }
+    .cms-nav-subitem-btn:hover { background:#e0f2fe; color:#0891b2; }
+    .cms-nav-subitem-btn.active { background:#0891b2; color:#fff; font-weight:600; }
 
     /* ── Inline page CMS editor ── */
     .cms-no-cms-placeholder { text-align:center; padding:80px 24px; color:#94a3b8; }
@@ -385,7 +398,16 @@ const COMP_TYPES = [
                 <div class="cms-nav-subitem">
                   <span class="cms-nav-subitem-line"></span>
                   <span class="cms-nav-subitem-dot"></span>
-                  <span class="cms-nav-subitem-label">{child.label_th}</span>
+                  {NAV_CMS_MAP[child.id] ? (
+                    <button
+                      class="cms-nav-subitem-btn cms-page-item"
+                      data-page={child.id}
+                      onclick={`switchToPage('${child.id}')`}>
+                      {child.label_th}
+                    </button>
+                  ) : (
+                    <span class="cms-nav-subitem-label cms-nav-subitem-no-cms">{child.label_th}</span>
+                  )}
                 </div>
               ))}
             </div>

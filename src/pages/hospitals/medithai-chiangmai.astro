@@ -1,10 +1,36 @@
 ---
+export const prerender = false;
 import Layout from '../../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { createAdminSupabase } from '../../lib/supabase-server';
+
+const supabase = createAdminSupabase();
+const { data: rows } = await supabase
+  .from('site_content').select('section_key, content').eq('page_slug', 'hospital-chiangmai');
+const db: Record<string, any> = {};
+for (const row of rows ?? []) db[row.section_key] = row.content;
+const hero = db.hero ?? {}; const contact = db.contact ?? {};
+
+const th = {
+  hero_badge: hero.th?.hero_badge ?? 'สาขาใหม่ ภาคเหนือ ✨',
+  hero_title: hero.th?.hero_title ?? 'MediThai เชียงใหม่',
+  hero_desc:  hero.th?.hero_desc  ?? 'โรงพยาบาลล่าสุดในเครือ รองรับผู้ป่วยนานาชาติ Medical Tourism ทีมแพทย์ 6 ภาษา ไทย อังกฤษ จีน ญี่ปุ่น เกาหลี อาหรับ',
+  stat1_num: hero.meta?.stat1_num ?? '50+', stat1_lbl: hero.th?.stat1_lbl ?? 'แพทย์',
+  stat2_num: hero.meta?.stat2_num ?? '4.8 ⭐', stat2_lbl: hero.th?.stat2_lbl ?? 'Rating',
+  phone: contact.meta?.phone ?? '053-310-3000',
+};
+const en = {
+  hero_badge: hero.en?.hero_badge ?? 'New Branch · Northern Thailand ✨',
+  hero_title: hero.en?.hero_title ?? 'MediThai Chiang Mai',
+  hero_desc:  hero.en?.hero_desc  ?? 'The newest hospital in the network, serving international patients with multilingual doctors in 6 languages.',
+  stat1_lbl: hero.en?.stat1_lbl ?? 'Specialists', stat2_lbl: hero.en?.stat2_lbl ?? 'Rating',
+};
+const cmsScript = `<script>window.__CMS_P__=${JSON.stringify({th:{hero_badge:th.hero_badge,hero_title:th.hero_title,hero_desc:th.hero_desc,stat1_lbl:th.stat1_lbl,stat2_lbl:th.stat2_lbl},en:{hero_badge:en.hero_badge,hero_title:en.hero_title,hero_desc:en.hero_desc,stat1_lbl:en.stat1_lbl,stat2_lbl:en.stat2_lbl}})}<\/script>`;
 ---
 <Layout
   title="MediThai เชียงใหม่ | เครือโรงพยาบาล MediThai"
-  description="โรงพยาบาลล่าสุดในเครือ รองรับผู้ป่วยนานาชาติ Medical Tourism"
+  description={th.hero_desc.replace(/<[^>]+>/g,'').slice(0,155)}
+  extraHead={cmsScript}
   extraScripts={`
     <script src="/js/hospital-page.js"></script>
     <script>initHospitalPage({id:'chiangmai'});</script>
@@ -13,21 +39,21 @@ import { Icon } from 'astro-icon/components';
 
 <section class="hosp-hero" style="background:linear-gradient(135deg,#F59E0B 0%,#D97706 100%)">
   <div class="container">
-    <div class="breadcrumb" style="margin-bottom:20px"><a href="/" style="color:rgba(255,255,255,.6)">หน้าแรก</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><a href="/locations" style="color:rgba(255,255,255,.6)">โรงพยาบาล</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><span style="color:#fff">MediThai เชียงใหม่</span></div>
+    <div class="breadcrumb" style="margin-bottom:20px"><a href="/" style="color:rgba(255,255,255,.6)">หน้าแรก</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><a href="/locations" style="color:rgba(255,255,255,.6)">โรงพยาบาล</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><span style="color:#fff" data-i18n="hero_title">{th.hero_title}</span></div>
     <div class="hosp-hero-inner">
       <div>
-        <div class="hosp-badge"><Icon name="fa6-solid:mountain-city" /> สาขาใหม่ ภาคเหนือ ✨</div>
-        <h1 class="hosp-title">MediThai เชียงใหม่</h1>
-        <p class="hosp-desc">โรงพยาบาลล่าสุดในเครือ รองรับผู้ป่วยนานาชาติ Medical Tourism ทีมแพทย์ 6 ภาษา ไทย อังกฤษ จีน ญี่ปุ่น เกาหลี อาหรับ</p>
+        <div class="hosp-badge"><Icon name="fa6-solid:mountain-city" /> <span data-i18n="hero_badge">{th.hero_badge}</span></div>
+        <h1 class="hosp-title" data-i18n="hero_title">{th.hero_title}</h1>
+        <p class="hosp-desc" data-i18n="hero_desc" set:html={th.hero_desc} />
         <div class="hosp-accred-row"><span class="hosp-accred-chip"><Icon name="fa6-solid:certificate" /> JCI</span><span class="hosp-accred-chip"><Icon name="fa6-solid:award" /> HA Thailand</span></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px">
           <a href="/appointments" class="btn btn-primary btn-lg"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
-          <a href="tel:0533103000" class="btn btn-secondary btn-lg"><Icon name="fa6-solid:phone" /> 053-310-3000</a>
+          <a href={`tel:${th.phone.replace(/[-\s]/g,'')}`} class="btn btn-secondary btn-lg"><Icon name="fa6-solid:phone" /> {th.phone}</a>
         </div>
       </div>
       <div class="hosp-quick-stats">
-        <div class="hosp-qstat"><div class="num">50+</div><div class="lbl">แพทย์</div></div>
-        <div class="hosp-qstat"><div class="num" style="color:#FDE68A">4.8 ⭐</div><div class="lbl">Rating</div></div>
+        <div class="hosp-qstat"><div class="num">{th.stat1_num}</div><div class="lbl" data-i18n="stat1_lbl">{th.stat1_lbl}</div></div>
+        <div class="hosp-qstat"><div class="num" style="color:#FDE68A">{th.stat2_num}</div><div class="lbl" data-i18n="stat2_lbl">{th.stat2_lbl}</div></div>
       </div>
     </div>
     <div style="margin-top:24px"><div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-bottom:8px"><Icon name="fa6-solid:train-subway" style="margin-right:4px" />การเดินทาง</div>
@@ -40,7 +66,7 @@ import { Icon } from 'astro-icon/components';
 
 <section style="background:var(--gray-50);padding:32px 0">
   <div class="container">
-    <div class="contact-info-item"><div class="contact-icon" style="background:rgba(8,145,178,.1);color:#F59E0B"><Icon name="fa6-solid:phone" /></div><div><h4>ติดต่อ MediThai เชียงใหม่</h4><p>053-310-3000</p></div></div>
+    <div class="contact-info-item"><div class="contact-icon" style="background:rgba(8,145,178,.1);color:#F59E0B"><Icon name="fa6-solid:phone" /></div><div><h4>ติดต่อ MediThai เชียงใหม่</h4><p>{th.phone}</p></div></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
       <a href="/appointments" class="btn btn-primary"><Icon name="fa6-solid:calendar-check" /> นัดหมาย</a>
       <a href="/hospitals/medithai-bangkok" class="btn btn-outline"><Icon name="fa6-solid:building-columns" /> MediThai กรุงเทพ (HQ)</a>
