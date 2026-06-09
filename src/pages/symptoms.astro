@@ -1,9 +1,17 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('symptoms', {
+  pg_title: 'ตรวจสอบอาการเบื้องต้น',
+  pg_desc: 'เลือกส่วนของร่างกายที่มีอาการ เพื่อรับคำแนะนำในการพบแพทย์',
+  pg_title_en: 'Symptom Checker',
+  pg_desc_en: 'Select the body area with symptoms to receive initial guidance on seeing a doctor.',
+});
 ---
 <Layout title="ตรวจสอบอาการ | MediThai" description="ระบุอาการของคุณเพื่อรับคำแนะนำเบื้องต้นจาก MediThai"
-  extraHead={`<style>
+  extraHead={`${cmsScript}<style>
   .symptom-btn { background:#fff; border:2px solid var(--gray-200); border-radius:12px; padding:12px 16px; cursor:pointer; font-family:inherit; font-size:.875rem; color:var(--gray-700); display:flex; align-items:center; gap:8px; transition:all .2s; text-align:left; }
   .symptom-btn:hover, .symptom-btn.selected { border-color:var(--secondary); color:var(--secondary); background:#EFF6FF; }
   .body-map { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
@@ -115,8 +123,8 @@ import { Icon } from 'astro-icon/components';
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ตรวจสอบอาการ</span></div>
-    <h1>ตรวจสอบอาการเบื้องต้น</h1>
-    <p>เลือกส่วนของร่างกายที่มีอาการ เพื่อรับคำแนะนำในการพบแพทย์</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
     <div style="background:rgba(255,200,0,.2);border:1px solid rgba(255,200,0,.5);border-radius:12px;padding:12px 16px;margin-top:16px;font-size:.875rem;color:rgba(255,255,255,.9)">
       <Icon name="fa6-solid:triangle-exclamation" style="color:#F59E0B" /> ข้อมูลนี้เป็นเพียงคำแนะนำเบื้องต้นเท่านั้น ไม่สามารถแทนการวินิจฉัยของแพทย์ได้
     </div>

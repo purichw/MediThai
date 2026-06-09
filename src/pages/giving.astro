@@ -1,14 +1,23 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('giving', {
+  pg_title: 'ร่วมสร้างสุขภาพที่ดีให้ทุกคน',
+  pg_desc: 'กองทุน MediThai Care Fund ช่วยเหลือผู้ป่วยที่ขาดแคลนและด้อยโอกาสให้เข้าถึงการรักษาพยาบาลที่มีคุณภาพ',
+  pg_title_en: 'Building Better Health for All',
+  pg_desc_en: 'The MediThai Care Fund helps underprivileged patients access quality medical care.',
+});
 ---
 <Layout title="ร่วมสนับสนุน | MediThai" description="ร่วมสนับสนุนกองทุนสุขภาพ MediThai เพื่อผู้ป่วยที่ขาดแคลน">
+<Fragment set:html={cmsScript} />
 
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ร่วมสนับสนุน</span></div>
-    <h1>ร่วมสร้างสุขภาพที่ดีให้ทุกคน</h1>
-    <p>กองทุน MediThai Care Fund ช่วยเหลือผู้ป่วยที่ขาดแคลนและด้อยโอกาสให้เข้าถึงการรักษาพยาบาลที่มีคุณภาพ</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

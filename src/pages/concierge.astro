@@ -1,11 +1,19 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('concierge', {
+  pg_title: 'MediCare Concierge',
+  pg_desc: 'ดูแลคุณทุกขั้นตอน ตั้งแต่ปรึกษาจนฟื้นตัว',
+  pg_title_en: 'MediCare Concierge',
+  pg_desc_en: 'We take care of you every step — from consultation to recovery',
+});
 ---
 <Layout
   title="MediCare Concierge — บริการดูแลผ่าตัดครบวงจร | MediThai"
   description="บริการ Concierge สำหรับเคสผ่าตัดและการรักษาซับซ้อน"
-  extraHead={`
+  extraHead={`${cmsScript}
     <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
   `}
@@ -18,7 +26,7 @@ import { Icon } from 'astro-icon/components';
     <div class="breadcrumb" style="margin-bottom:20px"><a href="/" style="color:rgba(255,255,255,.6)">หน้าแรก</a><Icon name="fa6-solid:chevron-right" style="color:rgba(255,255,255,.4)" /><span style="color:#fff">MediCare Concierge</span></div>
     <div style="max-width:680px">
       <div class="tag" style="background:rgba(255,255,255,.15);color:#fff;margin-bottom:16px"><Icon name="fa6-solid:user-nurse" /> บริการดูแลผ่าตัดครบวงจร — เหมือน HDcare แต่เป็น MediThai</div>
-      <h1 style="font-size:clamp(1.8rem,4vw,3rem);font-weight:700;color:#fff;margin-bottom:16px;line-height:1.2">MediCare Concierge<br><span style="color:var(--secondary-light)">ดูแลคุณทุกขั้นตอน ตั้งแต่ปรึกษาจนฟื้นตัว</span></h1>
+      <h1 style="font-size:clamp(1.8rem,4vw,3rem);font-weight:700;color:#fff;margin-bottom:16px;line-height:1.2" data-i18n="pg_title">{th.pg_title}<br><span style="color:var(--secondary-light)" data-i18n="pg_desc">{th.pg_desc}</span></h1>
       <p style="font-size:1rem;color:rgba(255,255,255,.82);line-height:1.8;margin-bottom:32px">บริการ Concierge สำหรับเคสผ่าตัดและการรักษาซับซ้อน มีทีม Nurse Coordinator ส่วนตัวดูแลคุณตลอด 24 ชม. ได้คิวเร็ว ราคาโปร ผ่อน 0% นาน 10 เดือน และเบิกประกันได้</p>
       <div style="display:flex;gap:14px;flex-wrap:wrap">
         <a href="tel:17221" class="btn btn-primary btn-lg"><Icon name="fa6-solid:phone" /> โทร 1722 กด 1 (Concierge)</a>

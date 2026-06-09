@@ -1,9 +1,17 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('telehealth', {
+  pg_title: 'พบแพทย์ออนไลน์',
+  pg_desc: 'ปรึกษาแพทย์เชี่ยวชาญจาก MediThai ผ่านวิดีโอคอล จากที่ใดก็ได้ ตลอด 24 ชั่วโมง',
+  pg_title_en: 'Online Doctor Consultation',
+  pg_desc_en: 'Consult MediThai specialists via video call from anywhere, 24 hours a day.',
+});
 ---
 <Layout title="Telehealth / พบแพทย์ออนไลน์ | MediThai" description="พบแพทย์เชี่ยวชาญออนไลน์จากที่ใดก็ได้ ผ่านวิดีโอคอล — สะดวก รวดเร็ว ปลอดภัย"
-  extraHead={`<style>
+  extraHead={`${cmsScript}<style>
   .tele-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
   @media(max-width:900px){ .tele-grid{grid-template-columns:repeat(2,1fr);} }
   @media(max-width:600px){ .tele-grid{grid-template-columns:1fr;} }
@@ -20,8 +28,8 @@ import { Icon } from 'astro-icon/components';
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>Telehealth</span></div>
-    <h1>พบแพทย์ออนไลน์</h1>
-    <p>ปรึกษาแพทย์เชี่ยวชาญจาก MediThai ผ่านวิดีโอคอล จากที่ใดก็ได้ ตลอด 24 ชั่วโมง</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px">
       <a href="#book-tele" class="btn btn-accent"><Icon name="fa6-solid:video" /> จองนัดพบแพทย์ออนไลน์</a>
       <a href="#how-it-works" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5)">ขั้นตอนการใช้งาน</a>

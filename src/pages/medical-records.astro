@@ -1,14 +1,23 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('medical-records', {
+  pg_title: 'ขอสำเนาเวชระเบียน',
+  pg_desc: 'ยื่นคำร้องขอเวชระเบียน ผลตรวจ และเอกสารทางการแพทย์ได้ออนไลน์ — รับภายใน 3–5 วันทำการ',
+  pg_title_en: 'Request Medical Records',
+  pg_desc_en: 'Submit a request for medical records, test results, and documents online — received within 3–5 business days.',
+});
 ---
 <Layout title="ขอเวชระเบียน | MediThai" description="ขอสำเนาเวชระเบียน ผลตรวจ และเอกสารทางการแพทย์ออนไลน์">
+<Fragment set:html={cmsScript} />
 
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ขอเวชระเบียน</span></div>
-    <h1>ขอสำเนาเวชระเบียน</h1>
-    <p>ยื่นคำร้องขอเวชระเบียน ผลตรวจ และเอกสารทางการแพทย์ได้ออนไลน์ — รับภายใน 3–5 วันทำการ</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

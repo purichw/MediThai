@@ -1,9 +1,17 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('about', {
+  pg_title: 'เกี่ยวกับ MediThai',
+  pg_desc: '25 ปีแห่งความไว้วางใจ มาตรฐานระดับนานาชาติ',
+  pg_title_en: 'About MediThai',
+  pg_desc_en: '25 years of trust, international medical standards',
+});
 ---
 <Layout title="เกี่ยวกับเรา | MediThai Hospital Network" description="25 ปีแห่งความไว้วางใจ มาตรฐานระดับนานาชาติ"
-  extraHead={`
+  extraHead={`${cmsScript}
     <style>
     .timeline{position:relative;padding-left:32px;}
     .timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--primary),var(--secondary));}
@@ -25,8 +33,8 @@ import { Icon } from 'astro-icon/components';
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>เกี่ยวกับเรา</span></div>
-    <h1 data-i18n="pg_about_title">เกี่ยวกับ MediThai</h1>
-    <p data-i18n="pg_about_sub">25 ปีแห่งความไว้วางใจ มาตรฐานระดับนานาชาติ</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

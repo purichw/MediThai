@@ -1,9 +1,17 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('appointments', {
+  pg_title: 'นัดหมายออนไลน์',
+  pg_desc: 'จองคิวได้ง่าย สะดวก รวดเร็ว ตลอด 24 ชั่วโมง',
+  pg_title_en: 'Book an Appointment',
+  pg_desc_en: 'Easy, convenient, and fast booking — available 24 hours a day',
+});
 ---
 <Layout title="นัดหมายออนไลน์ | MediThai Hospital Network" description="จองคิวได้ง่าย สะดวก รวดเร็ว ตลอด 24 ชั่วโมง"
-  extraHead={`
+  extraHead={`${cmsScript}
     <style>
     .service-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
     @media(max-width:600px){.service-type-grid{grid-template-columns:1fr;}}
@@ -111,8 +119,8 @@ import { Icon } from 'astro-icon/components';
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>นัดหมาย</span></div>
-    <h1 data-i18n="pg_appt_title">นัดหมายออนไลน์</h1>
-    <p data-i18n="pg_appt_sub">จองคิวได้ง่าย สะดวก รวดเร็ว ตลอด 24 ชั่วโมง</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

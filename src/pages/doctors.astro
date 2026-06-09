@@ -1,12 +1,20 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
 import { getDoctorsFromDB } from '../lib/doctorsData';
+import { loadPageCMS } from '../lib/cmsPage';
 
 const doctors = await getDoctorsFromDB();
+const { th, cmsScript } = await loadPageCMS('doctors', {
+  pg_title: 'ค้นหาแพทย์',
+  pg_desc: 'ทีมแพทย์เชี่ยวชาญกว่า 200 ท่าน พร้อมดูแลคุณ',
+  pg_title_en: 'Find a Doctor',
+  pg_desc_en: 'Our team of 200+ specialist doctors, ready to care for you',
+});
 ---
 <Layout title="ค้นหาแพทย์ | MediThai Hospital Network" description="ทีมแพทย์เชี่ยวชาญกว่า 200 ท่าน พร้อมดูแลคุณ"
-  extraHead={`
+  extraHead={`${cmsScript}
     <style>
     .doctors-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
     @media(max-width:1100px){ .doctors-grid{grid-template-columns:repeat(3,1fr);} }
@@ -21,8 +29,8 @@ const doctors = await getDoctorsFromDB();
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span data-i18n="nav_doctors">แพทย์</span></div>
-    <h1 data-i18n="pg_doctors_title">ค้นหาแพทย์</h1>
-    <p data-i18n="pg_doctors_sub">ทีมแพทย์เชี่ยวชาญกว่า 200 ท่าน พร้อมดูแลคุณ</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

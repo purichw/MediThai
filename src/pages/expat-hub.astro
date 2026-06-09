@@ -1,14 +1,23 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('expat-hub', {
+  pg_title: 'Healthcare for Expats in Thailand',
+  pg_desc: 'World-class medical care, English-speaking doctors, and direct insurance billing — everything you need, all in one place.',
+  pg_title_en: 'Healthcare for Expats in Thailand',
+  pg_desc_en: 'World-class medical care, English-speaking doctors, and direct insurance billing — everything you need, all in one place.',
+});
 ---
 <Layout title="Expat Health Hub | MediThai" description="Healthcare for expats in Thailand — English-speaking doctors, international insurance, and seamless care">
+<Fragment set:html={cmsScript} />
 
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">Home</a><Icon name="fa6-solid:chevron-right" /><span>Expat Hub</span></div>
-    <h1>Healthcare for Expats in Thailand</h1>
-    <p>World-class medical care, English-speaking doctors, and direct insurance billing — everything you need, all in one place.</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px">
       <a href="/appointments" class="btn btn-accent"><Icon name="fa6-solid:calendar-check" /> Book Appointment</a>
       <a href="/telehealth" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5)"><Icon name="fa6-solid:video" /> Online Consultation</a>

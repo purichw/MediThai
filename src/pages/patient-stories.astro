@@ -1,6 +1,14 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('patient-stories', {
+  pg_title: 'เรื่องราวความสำเร็จของผู้ป่วย',
+  pg_desc: 'ฟังเรื่องราวจริงของผู้ป่วยที่ฟื้นคืนสุขภาพและคุณภาพชีวิตที่ดีกลับมา',
+  pg_title_en: 'Patient Success Stories',
+  pg_desc_en: 'Hear real stories of patients who regained their health and quality of life.',
+});
 
 const stories = [
   { name: 'คุณสมชาย วงศ์สุวรรณ', age: 58, condition: 'โรคหัวใจ', conditionEn: 'Heart Disease', hospital: 'MediThai หัวใจ', color: '#EF4444', icon: 'fa6-solid:heart-pulse',
@@ -36,7 +44,7 @@ const stories = [
 ];
 ---
 <Layout title="เรื่องราวผู้ป่วย | MediThai Hospital Network" description="ฟังเรื่องราวของผู้ป่วยที่ฟื้นคืนสุขภาพกลับมาได้ด้วยทีมแพทย์ MediThai"
-  extraHead={`<style>
+  extraHead={`${cmsScript}<style>
   .story-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
   @media(max-width:1000px){ .story-grid{grid-template-columns:repeat(2,1fr);} }
   @media(max-width:640px){ .story-grid{grid-template-columns:1fr;} }
@@ -52,8 +60,8 @@ const stories = [
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>เรื่องราวผู้ป่วย</span></div>
-    <h1>เรื่องราวความสำเร็จของผู้ป่วย</h1>
-    <p>ฟังเรื่องราวจริงของผู้ป่วยที่ฟื้นคืนสุขภาพและคุณภาพชีวิตที่ดีกลับมา</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

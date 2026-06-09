@@ -1,9 +1,17 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('health-library', {
+  pg_title: 'คลังความรู้สุขภาพ',
+  pg_desc: 'บทความสุขภาพโดยแพทย์ผู้เชี่ยวชาญ',
+  pg_title_en: 'Health Library',
+  pg_desc_en: 'Health articles by specialist doctors',
+});
 ---
 <Layout title="คลังความรู้สุขภาพ | MediThai Hospital Network" description="บทความสุขภาพโดยแพทย์ผู้เชี่ยวชาญ"
-  extraHead={`
+  extraHead={`${cmsScript}
     <style>
     .lib-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
     @media(max-width:900px){.lib-grid{grid-template-columns:repeat(2,1fr);}}
@@ -37,8 +45,8 @@ import { Icon } from 'astro-icon/components';
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>คลังความรู้</span></div>
-    <h1 data-i18n="pg_lib_title">คลังความรู้สุขภาพ</h1>
-    <p data-i18n="pg_lib_sub">บทความสุขภาพโดยแพทย์ผู้เชี่ยวชาญ</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

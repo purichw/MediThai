@@ -1,8 +1,17 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('contact', {
+  pg_title: 'ติดต่อเรา',
+  pg_desc: 'เราพร้อมตอบทุกคำถามของคุณตลอด 24 ชั่วโมง',
+  pg_title_en: 'Contact Us',
+  pg_desc_en: 'We\'re ready to answer all your questions, 24 hours a day.',
+});
 ---
 <Layout title="ติดต่อเรา | MediThai Hospital Network" description="เราพร้อมตอบทุกคำถามของคุณตลอด 24 ชั่วโมง"
+  extraHead={cmsScript}
   extraScripts={`
     <script>
     function submitContact(btn) {
@@ -17,8 +26,8 @@ import { Icon } from 'astro-icon/components';
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ติดต่อเรา</span></div>
-    <h1 data-i18n="pg_contact_title">ติดต่อเรา</h1>
-    <p data-i18n="pg_contact_sub">เราพร้อมตอบทุกคำถามของคุณตลอด 24 ชั่วโมง</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

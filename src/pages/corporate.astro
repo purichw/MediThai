@@ -1,14 +1,23 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('corporate', {
+  pg_title: 'บริการสุขภาพสำหรับองค์กร',
+  pg_desc: 'พนักงานที่มีสุขภาพดีคือรากฐานขององค์กรที่แข็งแกร่ง ให้ MediThai ดูแลทีมของคุณ',
+  pg_title_en: 'Corporate Health Services',
+  pg_desc_en: 'Healthy employees are the foundation of a strong organization. Let MediThai care for your team.',
+});
 ---
 <Layout title="บริการสุขภาพองค์กร | MediThai" description="แพ็กเกจสุขภาพสำหรับองค์กร ดูแลพนักงานของคุณด้วยมาตรฐานระดับโรงพยาบาลชั้นนำ">
+<Fragment set:html={cmsScript} />
 
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>บริการองค์กร</span></div>
-    <h1>บริการสุขภาพสำหรับองค์กร</h1>
-    <p>พนักงานที่มีสุขภาพดีคือรากฐานขององค์กรที่แข็งแกร่ง ให้ MediThai ดูแลทีมของคุณ</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
     <a href="#contact-form" class="btn btn-accent" style="margin-top:24px"><Icon name="fa6-solid:building" /> ติดต่อทีมองค์กร</a>
   </div>
 </section>

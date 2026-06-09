@@ -1,14 +1,23 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('loyalty', {
+  pg_title: 'MediThai Loyalty Card',
+  pg_desc: 'สะสมแต้มทุกครั้งที่ใช้บริการ แลกรับส่วนลด และสิทธิพิเศษในโรงพยาบาลเครือ MediThai ทั้ง 6 สาขา',
+  pg_title_en: 'MediThai Loyalty Card',
+  pg_desc_en: 'Earn points with every visit, redeem for discounts and special privileges across all 6 MediThai hospitals.',
+});
 ---
 <Layout title="MediThai Card — โปรแกรมสมาชิก | MediThai" description="สะสมแต้มทุกครั้งที่ใช้บริการ แลกรับส่วนลด และสิทธิพิเศษมากมาย">
+<Fragment set:html={cmsScript} />
 
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>MediThai Card</span></div>
-    <h1>MediThai Loyalty Card</h1>
-    <p>สะสมแต้มทุกครั้งที่ใช้บริการ แลกรับส่วนลด และสิทธิพิเศษในโรงพยาบาลเครือ MediThai ทั้ง 6 สาขา</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
     <a href="/register" class="btn btn-accent" style="margin-top:24px"><Icon name="fa6-solid:id-card" /> สมัครสมาชิกฟรี</a>
   </div>
 </section>

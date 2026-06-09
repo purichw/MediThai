@@ -351,7 +351,42 @@ function hospitalSections(): SectionDef[] {
 }
 
 // ─── OTHER PAGES ──────────────────────────────────────────────────────────────
+// Simple hero section shared by most pages
+function simpleHero(extraFields: FieldDef[] = []): SectionDef[] {
+  return [{
+    key: 'hero',
+    label: 'Page Hero',
+    icon: '🎯',
+    fields: [
+      bi('pg_title', 'ชื่อหน้า (h1)'),
+      bi('pg_desc',  'คำอธิบาย', 'richtext'),
+      ...extraFields,
+    ],
+  }];
+}
+
 const OTHER_PAGES: PageDef[] = [
+  { slug:'doctors',         label:'ค้นหาแพทย์',           description:'หน้ารายชื่อแพทย์',                    icon:'👨‍⚕️', sections: simpleHero() },
+  { slug:'appointments',    label:'นัดหมายออนไลน์',        description:'หน้าจองนัดหมาย',                      icon:'📅',  sections: simpleHero() },
+  { slug:'telehealth',      label:'พบแพทย์ออนไลน์',        description:'หน้า Telehealth',                      icon:'💻',  sections: simpleHero() },
+  { slug:'symptoms',        label:'ตรวจสอบอาการ',          description:'หน้า Symptom Checker',                icon:'🔍',  sections: simpleHero() },
+  { slug:'medical-records', label:'ขอเวชระเบียน',          description:'หน้าขอสำเนาเวชระเบียน',               icon:'📄',  sections: simpleHero() },
+  { slug:'bill-payment',    label:'ชำระค่าบริการ',         description:'หน้าชำระค่ารักษา',                    icon:'💳',  sections: simpleHero() },
+  { slug:'executive-health',label:'Executive Health',      description:'หน้า Executive Health Program',       icon:'👔',  sections: simpleHero([
+    bi('exec_tagline', 'Tagline'),
+  ]) },
+  { slug:'loyalty',         label:'MediThai Card',         description:'หน้าโปรแกรมสะสมแต้ม',                icon:'🎫',  sections: simpleHero() },
+  { slug:'corporate',       label:'บริการองค์กร',          description:'หน้าบริการสุขภาพองค์กร',              icon:'🏢',  sections: simpleHero() },
+  { slug:'health-library',  label:'คลังความรู้',           description:'หน้าบทความสุขภาพ',                    icon:'📚',  sections: simpleHero() },
+  { slug:'calculators',     label:'โปรแกรมคำนวณ',          description:'หน้าเครื่องมือคำนวณสุขภาพ',           icon:'🧮',  sections: simpleHero() },
+  { slug:'patient-stories', label:'เรื่องราวผู้ป่วย',     description:'หน้า Patient Stories',                icon:'💬',  sections: simpleHero() },
+  { slug:'about',           label:'เกี่ยวกับเรา',          description:'หน้าเกี่ยวกับ MediThai',              icon:'ℹ️',  sections: simpleHero() },
+  { slug:'expat-hub',       label:'Expat Hub',             description:'หน้า Healthcare for Expats',          icon:'🌍',  sections: simpleHero() },
+  { slug:'careers',         label:'ร่วมงานกับเรา',         description:'หน้าสมัครงาน',                        icon:'💼',  sections: simpleHero() },
+  { slug:'giving',          label:'ร่วมสนับสนุน',          description:'หน้ากองทุน MediThai Care Fund',       icon:'❤️',  sections: simpleHero() },
+  { slug:'locations',       label:'สาขาของเรา',            description:'หน้าแผนที่สาขา',                      icon:'📍',  sections: simpleHero() },
+  { slug:'contact',         label:'ติดต่อเรา',             description:'หน้าติดต่อ',                          icon:'📞',  sections: simpleHero() },
+  { slug:'concierge',       label:'Surgery Concierge',     description:'หน้า MediCare Concierge',             icon:'🏥',  sections: simpleHero() },
   {
     slug: 'packages',
     label: 'แพ็กเกจสุขภาพ',

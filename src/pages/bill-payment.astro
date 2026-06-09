@@ -1,14 +1,23 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('bill-payment', {
+  pg_title: 'ชำระค่าบริการออนไลน์',
+  pg_desc: 'ชำระค่ารักษาพยาบาลได้สะดวกจากที่บ้าน ปลอดภัยด้วยระบบเข้ารหัส SSL 256-bit',
+  pg_title_en: 'Online Bill Payment',
+  pg_desc_en: 'Pay your medical bills conveniently from home, secured with SSL 256-bit encryption',
+});
 ---
 <Layout title="ชำระค่าบริการออนไลน์ | MediThai" description="ชำระค่าบริการทางการแพทย์ออนไลน์ สะดวก รวดเร็ว ปลอดภัย">
+<Fragment set:html={cmsScript} />
 
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ชำระค่าบริการ</span></div>
-    <h1>ชำระค่าบริการออนไลน์</h1>
-    <p>ชำระค่ารักษาพยาบาลได้สะดวกจากที่บ้าน ปลอดภัยด้วยระบบเข้ารหัส SSL 256-bit</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

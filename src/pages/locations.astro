@@ -1,9 +1,17 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('locations', {
+  pg_title: 'สาขาของเรา',
+  pg_desc: '6 โรงพยาบาลในเครือ ทั่วประเทศไทย',
+  pg_title_en: 'Our Locations',
+  pg_desc_en: '6 hospitals in our network across Thailand',
+});
 ---
 <Layout title="สาขาของเรา | MediThai Hospital Network" description="6 โรงพยาบาลในเครือ ทั่วประเทศไทย"
-  extraHead={`
+  extraHead={`${cmsScript}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
     .loc-detail-card{background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);overflow:hidden;border:1px solid var(--gray-200);margin-bottom:36px;scroll-margin-top:calc(var(--header-height) + 20px);}
@@ -52,8 +60,8 @@ import { Icon } from 'astro-icon/components';
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span data-i18n="nav_hospitals">โรงพยาบาล</span></div>
-    <h1 data-i18n="pg_loc_title">สาขาของเรา</h1>
-    <p data-i18n="pg_loc_sub">6 โรงพยาบาลในเครือ ทั่วประเทศไทย</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 

@@ -1,9 +1,17 @@
 ---
+export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
+import { loadPageCMS } from '../lib/cmsPage';
+const { th, cmsScript } = await loadPageCMS('executive-health', {
+  pg_title: 'Executive Health Program',
+  pg_desc: 'โปรแกรมตรวจสุขภาพเชิงลึกสำหรับผู้บริหาร ออกแบบมาเพื่อคุณโดยเฉพาะ',
+  pg_title_en: 'Executive Health Program',
+  pg_desc_en: 'In-depth health screening for executives, designed specifically for you',
+});
 ---
 <Layout title="Executive Health Program | MediThai" description="โปรแกรมตรวจสุขภาพ VIP สำหรับผู้บริหาร ครบถ้วน แม่นยำ เป็นส่วนตัว"
-  extraHead={`<style>
+  extraHead={`${cmsScript}<style>
   .exec-package { background:#fff; border-radius:20px; overflow:hidden; box-shadow:var(--shadow-md); }
   .exec-pkg-header { padding:32px 32px 20px; }
   .exec-pkg-body { padding:0 32px 32px; }
@@ -17,8 +25,8 @@ import { Icon } from 'astro-icon/components';
 <section class="page-hero">
   <div class="container">
     <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><a href="/packages">แพ็กเกจ</a><Icon name="fa6-solid:chevron-right" /><span>Executive Health</span></div>
-    <h1>Executive Health Program</h1>
-    <p>โปรแกรมตรวจสุขภาพเชิงลึกสำหรับผู้บริหาร ออกแบบมาเพื่อคุณโดยเฉพาะ</p>
+    <h1 data-i18n="pg_title">{th.pg_title}</h1>
+    <p data-i18n="pg_desc">{th.pg_desc}</p>
   </div>
 </section>
 
