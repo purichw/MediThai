@@ -440,3 +440,58 @@
   .cms-nav { flex-direction: row; padding: 8px; gap: 4px; flex: unset; }
   .cms-nav-group-label { display: none; }
 }
+
+/* ── Nav editor (admin/index.astro) — global so JS innerHTML can use them ── */
+.nav-tree-inner { display:flex; flex-direction:column; gap:6px; max-width:740px; }
+
+.nav-tree-node { background:#fff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; transition:border-color .15s,box-shadow .15s; }
+.nav-tree-node.expanded { border-color:#0891b2; box-shadow:0 0 0 3px rgba(8,145,178,.06); }
+
+.nav-node-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px; background:#f8fafc; cursor:pointer; user-select:none; transition:background .15s; }
+.nav-node-header:hover { background:#f1f5f9; }
+.nav-tree-node.expanded .nav-node-header { background:#eff6ff; }
+
+.nav-node-left  { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
+.nav-node-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.nav-node-icon  { font-size:15px; flex-shrink:0; }
+.nav-node-name  { display:flex; gap:6px; min-width:0; }
+
+.nav-label-edit { font-size:.82rem; border:1px solid #e2e8f0; border-radius:6px; padding:5px 9px; background:#fff; font-family:inherit; transition:border-color .15s; width:130px; }
+.nav-label-edit:focus { outline:none; border-color:#0891b2; box-shadow:0 0 0 2px rgba(8,145,178,.1); }
+
+.nav-node-href { font-size:.69rem; color:#64748b; background:#f1f5f9; padding:2px 7px; border-radius:4px; white-space:nowrap; max-width:160px; overflow:hidden; text-overflow:ellipsis; font-family:monospace; }
+.nav-dropdown-tag { font-size:.67rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#7c3aed; background:#f5f3ff; padding:2px 7px; border-radius:4px; }
+.nav-node-chevron { color:#94a3b8; font-size:11px; flex-shrink:0; transition:transform .2s; width:14px; text-align:center; }
+.nav-tree-node.expanded .nav-node-chevron { transform:rotate(90deg); color:#0891b2; }
+.nav-child-count { font-size:.69rem; color:#94a3b8; background:#f1f5f9; padding:1px 6px; border-radius:4px; }
+
+.vis-switch { position:relative; display:inline-flex; align-items:center; cursor:pointer; flex-shrink:0; }
+.vis-switch input { opacity:0; width:0; height:0; position:absolute; }
+.vis-slider { width:34px; height:18px; background:#e2e8f0; border-radius:9px; display:inline-block; position:relative; transition:background .2s; flex-shrink:0; }
+.vis-slider::after { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.15); transition:transform .2s; }
+.vis-switch input:checked + .vis-slider { background:#22c55e; }
+.vis-switch input:checked + .vis-slider::after { transform:translateX(16px); }
+
+.nav-node-children { display:none; background:#fafbfc; border-top:1px solid #e9eef3; padding:4px 0; }
+.nav-tree-node.expanded .nav-node-children { display:block; }
+
+.nav-child-row { display:flex; align-items:center; gap:10px; padding:7px 14px 7px 16px; border-bottom:1px solid #f1f5f9; position:relative; }
+.nav-child-row:last-child { border-bottom:none; }
+.nav-child-row.nav-child-dimmed { opacity:.4; }
+
+.nav-child-vline { position:absolute; left:27px; top:0; bottom:0; width:1px; background:#d1d5db; }
+.nav-child-row:last-child .nav-child-vline { height:50%; bottom:auto; }
+.nav-child-hline { position:absolute; left:27px; top:50%; width:11px; height:1px; background:#d1d5db; }
+
+.nav-child-inputs { display:flex; gap:6px; flex:1; min-width:0; margin-left:14px; }
+.nav-child-labels { display:flex; align-items:center; gap:4px; flex:1; min-width:0; }
+.nav-child-lang { font-size:.65rem; font-weight:700; padding:1px 5px; border-radius:3px; background:#fef3c7; color:#92400e; flex-shrink:0; }
+.nav-child-lang.nav-child-lang-en { background:#dbeafe; color:#1e40af; }
+.nav-child-labels .nav-label-edit { flex:1; width:auto; font-size:.8rem; padding:4px 7px; }
+
+.nav-child-row.is-custom { background:#fffbeb; }
+.nav-child-row.is-custom .nav-child-vline,
+.nav-child-row.is-custom .nav-child-hline { background:#fbbf24; }
+.custom-page-badge { font-size:.67rem; font-weight:700; background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; flex-shrink:0; }
+.nav-live-tag { font-size:.68rem; color:#15803d; background:#dcfce7; padding:2px 6px; border-radius:4px; flex-shrink:0; }
+.save-nav-bar { display:flex; gap:12px; margin-top:20px; }
