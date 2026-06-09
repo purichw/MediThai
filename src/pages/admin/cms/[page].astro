@@ -59,16 +59,11 @@ for (const sec of pageDef.sections) {
     </div>
     <nav class="cms-nav">
       <div class="cms-nav-group-label">จัดการ</div>
-      <a href="/admin" class="cms-nav-item">
-        <span class="cms-nav-icon">📊</span> ภาพรวม
-      </a>
-      <a href="/admin/appointments" class="cms-nav-item">
-        <span class="cms-nav-icon">📅</span> นัดหมาย
-      </a>
+      <a href="/admin" class="cms-nav-item"><span class="cms-nav-icon">📊</span> ภาพรวม</a>
+      <a href="/admin#appointments" class="cms-nav-item"><span class="cms-nav-icon">📅</span> นัดหมาย</a>
+      <a href="/admin#analytics" class="cms-nav-item"><span class="cms-nav-icon">📈</span> Analytics</a>
       <div class="cms-nav-group-label">เนื้อหา</div>
-      <a href="/admin/cms" class="cms-nav-item">
-        <span class="cms-nav-icon">✏️</span> Content Management
-      </a>
+      <a href="/admin#content" class="cms-nav-item active"><span class="cms-nav-icon">✏️</span> แก้ไขเนื้อหา</a>
       <div class="cms-nav-group-label">หน้า</div>
       {CMS_PAGES.map(p => (
         <a href={`/admin/cms/${p.slug}`} class={`cms-nav-item cms-nav-page ${p.slug === pageSlug ? 'active' : ''}`}>
@@ -91,7 +86,7 @@ for (const sec of pageDef.sections) {
   <main class="cms-main">
     <div class="cms-topbar">
       <div class="cms-topbar-left">
-        <a href="/admin/cms" class="cms-back-btn">← กลับ</a>
+        <a href="/admin#content" class="cms-back-btn">← กลับ</a>
         <div>
           <h1 class="cms-page-title">{pageDef.icon} {pageDef.label}</h1>
           <p class="cms-page-sub">{pageDef.description}</p>
