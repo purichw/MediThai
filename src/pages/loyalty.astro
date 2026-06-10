@@ -2,13 +2,46 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('loyalty', {
-  pg_title: 'MediThai Loyalty Card',
-  pg_desc: 'สะสมแต้มทุกครั้งที่ใช้บริการ แลกรับส่วนลด และสิทธิพิเศษในโรงพยาบาลเครือ MediThai ทั้ง 6 สาขา',
-  pg_title_en: 'MediThai Loyalty Card',
-  pg_desc_en: 'Earn points with every visit, redeem for discounts and special privileges across all 6 MediThai hospitals.',
+import { makePageCms } from '../lib/cmsPage';
+
+const cms = await makePageCms('loyalty');
+const heroTitle = cms.t('hero', 'pg_title', 'MediThai Loyalty Card', 'MediThai Loyalty Card');
+const heroDesc  = cms.t('hero', 'pg_desc', 'สะสมแต้มทุกครั้งที่ใช้บริการ แลกรับส่วนลด และสิทธิพิเศษในโรงพยาบาลเครือ MediThai ทั้ง 6 สาขา', 'Earn points with every visit, redeem for discounts and special privileges across all 6 MediThai hospitals.');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th };
+
+const trTag     = cms.t('tiers', 'tag', 'ระดับสมาชิก', 'Membership Tiers');
+const trHeading = cms.t('tiers', 'heading', '4 ระดับ สิทธิประโยชน์ที่แตกต่างกัน', '4 tiers with distinct benefits');
+const CHECKT = (color: string) => `<span style="color:${color};font-weight:700;flex-shrink:0">✓</span>`;
+const perkLis = (text: string, color: string) => (text || '').split('\n').filter(Boolean).map(p =>
+  `<li style="display:flex;gap:8px;align-items:flex-start;font-size:.8rem;color:var(--gray-700);margin-bottom:6px">${CHECKT(color)} ${p}</li>`).join('');
+const tiers = cms.items('tiers', 'items').map((it, i) => {
+  const color = it.color || '#94A3B8';
+  const perks = cms.li('tiers', 'items', i, 'perks', it);
+  return {
+    name: it.name, emoji: it.emoji || '🏅', color,
+    thb:    cms.li('tiers', 'items', i, 'thb', it),
+    points: cms.li('tiers', 'items', i, 'points', it),
+    perksHtml: cms.t('tiers', `tier${i}_perks_html`, perkLis(perks.th, color), perkLis(perks.en, color)),
+  };
 });
+
+const erTag     = cms.t('earn', 'tag', 'สะสมแต้ม', 'Earning Points');
+const erHeading = cms.t('earn', 'heading', 'สะสมแต้มได้จากทุกการใช้บริการ', 'Earn points from every service');
+const earns = cms.items('earn', 'items').map((it, i) => ({
+  icon: it.icon || 'star', color: it.color || '#0891B2',
+  title: cms.li('earn', 'items', i, 'title', it),
+  desc:  cms.li('earn', 'items', i, 'desc', it),
+}));
+const redeems = cms.items('earn', 'redeem').map((it, i) => ({
+  icon: it.icon || 'tag',
+  text: cms.li('earn', 'redeem', i, 'text', it),
+}));
+
+const ctaHeading = cms.t('cta', 'heading', 'สมัครสมาชิกฟรี — เริ่มสะสมแต้มวันนี้', 'Join free — start earning today');
+const ctaSub     = cms.t('cta', 'sub', 'สมัครฟรี ไม่มีค่าใช้จ่าย สะสมแต้มได้ทันทีตั้งแต่การใช้บริการครั้งแรก', 'Free to join — earn points from your very first visit.');
+const ctaBtn     = cms.t('cta', 'btn', 'สมัครสมาชิกเลย', 'Sign Up Now');
+
+const cmsScript = cms.script();
 ---
 <Layout title="MediThai Card — โปรแกรมสมาชิก | MediThai" description="สะสมแต้มทุกครั้งที่ใช้บริการ แลกรับส่วนลด และสิทธิพิเศษมากมาย">
 <Fragment set:html={cmsScript} />
@@ -26,28 +59,17 @@ const { th, cmsScript } = await loadPageCMS('loyalty', {
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:48px">
-      <span class="tag">ระดับสมาชิก</span>
-      <h2>4 ระดับ สิทธิประโยชน์ที่แตกต่างกัน</h2>
+      <span class="tag" data-i18n={trTag.k}>{trTag.th}</span>
+      <h2 data-i18n={trHeading.k}>{trHeading.th}</h2>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
-      {[
-        { name:'Silver', thb:'0–9,999', color:'#94A3B8', bg:'#F8FAFC', points:'1 แต้ม / 100 บาท', perks:['ส่วนลด 5% แพ็กเกจ','ข่าวสารสมาชิก','Telehealth ราคาพิเศษ'] },
-        { name:'Gold', thb:'10,000–49,999', color:'#F59E0B', bg:'#FFFBEB', points:'1.5 แต้ม / 100 บาท', perks:['ส่วนลด 10% แพ็กเกจ','ตรวจสุขภาพฟรี 1 ครั้ง/ปี','Priority Queue','Telehealth ฟรี 2 ครั้ง/ปี'] },
-        { name:'Platinum', thb:'50,000–199,999', color:'#0891B2', bg:'#EFF6FF', points:'2 แต้ม / 100 บาท', perks:['ส่วนลด 15% ทุกบริการ','ตรวจสุขภาพ Premium ฟรี','ห้อง VIP หากนอนพัก','Dedicated Care Manager','Telehealth ฟรีไม่จำกัด'] },
-        { name:'Diamond', thb:'200,000+ บาท/ปี', color:'#1B3A6B', bg:'linear-gradient(135deg,#EFF6FF,#F5F3FF)', points:'3 แต้ม / 100 บาท', perks:['ส่วนลด 20% ทุกบริการ','Executive Health ฟรี','Concierge 24/7','รถรับ-ส่ง VIP','Second Opinion ฟรี 1 ครั้ง/ปี','ครอบครัวร่วมได้รับสิทธิ์'] },
-      ].map((t,i) => (
-        <div class={`reveal${i===1?' reveal-delay-1':i===2?' reveal-delay-2':i===3?' reveal-delay-3':''}`} style={`background:${t.bg};border-radius:20px;padding:28px;box-shadow:var(--shadow-sm);border:2px solid ${t.color}30`}>
-          <div style={`font-size:2rem;margin-bottom:8px`}>{t.name==='Silver'?'🥈':t.name==='Gold'?'🥇':t.name==='Platinum'?'💠':'💎'}</div>
+      {tiers.map((t,i) => (
+        <div class={`reveal${i===1?' reveal-delay-1':i===2?' reveal-delay-2':i===3?' reveal-delay-3':''}`} style={`background:${t.color}08;border-radius:20px;padding:28px;box-shadow:var(--shadow-sm);border:2px solid ${t.color}30`}>
+          <div style={`font-size:2rem;margin-bottom:8px`}>{t.emoji}</div>
           <h3 style={`font-size:1.3rem;font-weight:800;color:${t.color};margin-bottom:4px`}>{t.name}</h3>
-          <p style="font-size:.75rem;color:var(--gray-500);margin-bottom:12px">ยอดสะสม {t.thb} บาท/ปี</p>
-          <div style={`background:${t.color}15;border-radius:8px;padding:6px 12px;font-size:.8rem;font-weight:600;color:${t.color};margin-bottom:16px;display:inline-block`}>{t.points}</div>
-          <ul style="list-style:none">
-            {t.perks.map(p => (
-              <li style="display:flex;gap:8px;align-items:flex-start;font-size:.8rem;color:var(--gray-700);margin-bottom:6px">
-                <Icon name="fa6-solid:check" style={`color:${t.color};flex-shrink:0;margin-top:2px`} /> {p}
-              </li>
-            ))}
-          </ul>
+          <p style="font-size:.75rem;color:var(--gray-500);margin-bottom:12px">ยอดสะสม <span data-i18n={t.thb.k}>{t.thb.th}</span> บาท/ปี</p>
+          <div style={`background:${t.color}15;border-radius:8px;padding:6px 12px;font-size:.8rem;font-weight:600;color:${t.color};margin-bottom:16px;display:inline-block`} data-i18n={t.points.k}>{t.points.th}</div>
+          <ul style="list-style:none" data-i18n={t.perksHtml.k} set:html={t.perksHtml.th}></ul>
         </div>
       ))}
     </div>
@@ -59,22 +81,17 @@ const { th, cmsScript } = await loadPageCMS('loyalty', {
   <div class="container">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
       <div class="reveal-left">
-        <span class="tag" style="margin-bottom:16px">สะสมแต้ม</span>
-        <h2 style="margin-bottom:24px">สะสมแต้มได้จากทุกการใช้บริการ</h2>
+        <span class="tag" style="margin-bottom:16px" data-i18n={erTag.k}>{erTag.th}</span>
+        <h2 style="margin-bottom:24px" data-i18n={erHeading.k}>{erHeading.th}</h2>
         <div style="display:flex;flex-direction:column;gap:16px">
-          {[
-            { icon:'fa6-solid:stethoscope', color:'#0891B2', title:'ค่าบริการตรวจรักษา', desc:'ทุก 100 บาท = 1 แต้ม (ขึ้นอยู่กับระดับสมาชิก)' },
-            { icon:'fa6-solid:box-open', color:'#8B5CF6', title:'ซื้อแพ็กเกจสุขภาพ', desc:'แต้มโบนัส 2 เท่าสำหรับแพ็กเกจตรวจสุขภาพ' },
-            { icon:'fa6-solid:video', color:'#10B981', title:'Telehealth', desc:'ทุกครั้งที่ใช้บริการ Telehealth รับ 50 แต้ม' },
-            { icon:'fa6-solid:user-plus', color:'#F59E0B', title:'แนะนำเพื่อน', desc:'แนะนำเพื่อนสมัครสมาชิก รับ 200 แต้ม' },
-          ].map(e => (
+          {earns.map(e => (
             <div style="display:flex;gap:16px;align-items:flex-start">
               <div style={`width:48px;height:48px;border-radius:12px;background:${e.color}15;display:flex;align-items:center;justify-content:center;flex-shrink:0`}>
-                <Icon name={e.icon} style={`color:${e.color};width:1.2rem;height:1.2rem`} />
+                <Icon name={`fa6-solid:${e.icon}`} style={`color:${e.color};width:1.2rem;height:1.2rem`} />
               </div>
               <div>
-                <strong style="color:var(--primary);font-size:.9rem">{e.title}</strong>
-                <p style="font-size:.8rem;color:var(--gray-600);margin-top:2px">{e.desc}</p>
+                <strong style="color:var(--primary);font-size:.9rem" data-i18n={e.title.k}>{e.title.th}</strong>
+                <p style="font-size:.8rem;color:var(--gray-600);margin-top:2px" data-i18n={e.desc.k}>{e.desc.th}</p>
               </div>
             </div>
           ))}
@@ -105,9 +122,9 @@ const { th, cmsScript } = await loadPageCMS('loyalty', {
         </div>
         <div style="background:var(--gray-50);border-radius:16px;padding:20px;margin-top:16px">
           <p style="font-weight:600;color:var(--primary);margin-bottom:12px">แลกแต้มเป็น</p>
-          {[['100 แต้ม = ส่วนลด ฿10','fa6-solid:tag'],['500 แต้ม = ตรวจสุขภาพ Basic','fa6-solid:heart-pulse'],['1,000 แต้ม = Telehealth 1 ครั้ง','fa6-solid:video']].map(([t,i]) => (
+          {redeems.map(r => (
             <div style="display:flex;gap:8px;align-items:center;font-size:.875rem;color:var(--gray-700);margin-bottom:8px">
-              <Icon name={i} style="color:var(--secondary)" /> {t}
+              <Icon name={`fa6-solid:${r.icon}`} style="color:var(--secondary)" /> <span data-i18n={r.text.k}>{r.text.th}</span>
             </div>
           ))}
         </div>
@@ -119,9 +136,9 @@ const { th, cmsScript } = await loadPageCMS('loyalty', {
 <!-- CTA -->
 <section class="section-pad-sm" style="background:var(--primary);color:#fff;text-align:center">
   <div class="container">
-    <h2 style="margin-bottom:12px">สมัครสมาชิกฟรี — เริ่มสะสมแต้มวันนี้</h2>
-    <p style="opacity:.8;margin-bottom:24px">สมัครฟรี ไม่มีค่าใช้จ่าย สะสมแต้มได้ทันทีตั้งแต่การใช้บริการครั้งแรก</p>
-    <a href="/register" class="btn btn-accent"><Icon name="fa6-solid:id-card" /> สมัครสมาชิกเลย</a>
+    <h2 style="margin-bottom:12px" data-i18n={ctaHeading.k}>{ctaHeading.th}</h2>
+    <p style="opacity:.8;margin-bottom:24px" data-i18n={ctaSub.k}>{ctaSub.th}</p>
+    <a href="/register" class="btn btn-accent"><Icon name="fa6-solid:id-card" /> <span data-i18n={ctaBtn.k}>{ctaBtn.th}</span></a>
   </div>
 </section>
 

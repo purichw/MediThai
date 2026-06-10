@@ -2,13 +2,44 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('telehealth', {
-  pg_title: 'พบแพทย์ออนไลน์',
-  pg_desc: 'ปรึกษาแพทย์เชี่ยวชาญจาก MediThai ผ่านวิดีโอคอล จากที่ใดก็ได้ ตลอด 24 ชั่วโมง',
-  pg_title_en: 'Online Doctor Consultation',
-  pg_desc_en: 'Consult MediThai specialists via video call from anywhere, 24 hours a day.',
+import { makePageCms } from '../lib/cmsPage';
+
+const cms = await makePageCms('telehealth');
+const heroTitle = cms.t('hero', 'pg_title', 'พบแพทย์ออนไลน์', 'Online Doctor Consultation');
+const heroDesc  = cms.t('hero', 'pg_desc', 'ปรึกษาแพทย์เชี่ยวชาญจาก MediThai ผ่านวิดีโอคอล จากที่ใดก็ได้ ตลอด 24 ชั่วโมง', 'Consult MediThai specialists via video call from anywhere, 24 hours a day.');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th };
+
+const bnTag     = cms.t('benefits', 'tag', 'Telehealth Benefits', 'Telehealth Benefits');
+const bnHeading = cms.t('benefits', 'heading', 'ทำไมต้องพบแพทย์ออนไลน์?', 'Why see a doctor online?');
+const benefits = cms.items('benefits', 'items').map((it, i) => ({
+  icon: it.icon || 'circle-check', color: it.color || '#0891B2',
+  title: cms.li('benefits', 'items', i, 'title', it),
+  desc:  cms.li('benefits', 'items', i, 'desc', it),
+}));
+
+const spTag     = cms.t('steps', 'tag', 'ขั้นตอนง่ายๆ', 'Simple Steps');
+const spHeading = cms.t('steps', 'heading', 'วิธีใช้งาน Telehealth', 'How Telehealth Works');
+const steps = cms.items('steps', 'items').map((it, i) => ({
+  title: cms.li('steps', 'items', i, 'title', it),
+  desc:  cms.li('steps', 'items', i, 'desc', it),
+}));
+
+const prTag     = cms.t('pricing', 'tag', 'ค่าบริการ', 'Pricing');
+const prHeading = cms.t('pricing', 'heading', 'ราคาโปร่งใส ไม่มีค่าใช้จ่ายแอบแฝง', 'Transparent pricing, no hidden fees');
+const CHECK = '<span style="color:var(--secondary);font-weight:700;flex-shrink:0">✓</span>';
+const featLis = (text: string) => (text || '').split('\n').filter(Boolean).map(f =>
+  `<li style="font-size:.875rem;color:var(--gray-700);padding:6px 0;display:flex;gap:8px;align-items:center">${CHECK} ${f}</li>`).join('');
+const plans = cms.items('pricing', 'plans').map((it, i) => {
+  const feats = cms.li('pricing', 'plans', i, 'features', it);
+  return {
+    price: it.price, featured: it.featured === 'yes',
+    plan: cms.li('pricing', 'plans', i, 'plan', it),
+    unit: cms.li('pricing', 'plans', i, 'unit', it),
+    featHtml: cms.t('pricing', `plan${i}_feats_html`, featLis(feats.th), featLis(feats.en)),
+  };
 });
+
+const cmsScript = cms.script();
 ---
 <Layout title="Telehealth / พบแพทย์ออนไลน์ | MediThai" description="พบแพทย์เชี่ยวชาญออนไลน์จากที่ใดก็ได้ ผ่านวิดีโอคอล — สะดวก รวดเร็ว ปลอดภัย"
   extraHead={`${cmsScript}<style>
@@ -41,24 +72,17 @@ const { th, cmsScript } = await loadPageCMS('telehealth', {
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:48px">
-      <span class="tag">Telehealth Benefits</span>
-      <h2>ทำไมต้องพบแพทย์ออนไลน์?</h2>
+      <span class="tag" data-i18n={bnTag.k}>{bnTag.th}</span>
+      <h2 data-i18n={bnHeading.k}>{bnHeading.th}</h2>
     </div>
     <div class="tele-grid">
-      {[
-        { icon:'fa6-solid:house-medical', color:'#0891B2', bg:'#EFF6FF', title:'ไม่ต้องเดินทาง', desc:'พบแพทย์จากบ้าน ที่ทำงาน หรือทุกที่ที่มีอินเทอร์เน็ต ประหยัดเวลาและค่าเดินทาง' },
-        { icon:'fa6-solid:clock', color:'#10B981', bg:'#F0FDF4', title:'นัดได้ทันที', desc:'มีสล็อตนัดหมายตั้งแต่เช้าถึงค่ำ ไม่ต้องรอคิวนาน' },
-        { icon:'fa6-solid:shield-halved', color:'#8B5CF6', bg:'#F5F3FF', title:'ปลอดภัย เป็นส่วนตัว', desc:'ระบบเข้ารหัสทุกการสนทนา ปฏิบัติตามมาตรฐาน PDPA' },
-        { icon:'fa6-solid:file-medical', color:'#F59E0B', bg:'#FFFBEB', title:'รับ e-Prescription', desc:'แพทย์สามารถออกใบสั่งยาอิเล็กทรอนิกส์ได้ทันที' },
-        { icon:'fa6-solid:user-doctor', color:'#EF4444', bg:'#FFF1F2', title:'แพทย์เชี่ยวชาญตัวจริง', desc:'พบแพทย์จาก MediThai ที่มีความเชี่ยวชาญจริง ไม่ใช่ AI' },
-        { icon:'fa6-solid:globe', color:'#1B3A6B', bg:'#EFF6FF', title:'รองรับหลายภาษา', desc:'มีล่ามหรือแพทย์ที่พูดภาษาอังกฤษ จีน และญี่ปุ่นได้' },
-      ].map((b,i) => (
+      {benefits.map((b, i) => (
         <div class={`tele-card reveal${i%3===1?' reveal-delay-1':i%3===2?' reveal-delay-2':''}`}>
-          <div class="tele-icon" style={`background:${b.bg}`}>
-            <Icon name={b.icon} style={`color:${b.color};width:1.5rem;height:1.5rem`} />
+          <div class="tele-icon" style={`background:${b.color}15`}>
+            <Icon name={`fa6-solid:${b.icon}`} style={`color:${b.color};width:1.5rem;height:1.5rem`} />
           </div>
-          <h3 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:8px">{b.title}</h3>
-          <p style="font-size:.875rem;color:var(--gray-600);line-height:1.7">{b.desc}</p>
+          <h3 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:8px" data-i18n={b.title.k}>{b.title.th}</h3>
+          <p style="font-size:.875rem;color:var(--gray-600);line-height:1.7" data-i18n={b.desc.k}>{b.desc.th}</p>
         </div>
       ))}
     </div>
@@ -70,19 +94,14 @@ const { th, cmsScript } = await loadPageCMS('telehealth', {
   <div class="container">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
       <div class="reveal-left">
-        <span class="tag" style="margin-bottom:16px">ขั้นตอนง่ายๆ</span>
-        <h2 style="margin-bottom:32px">วิธีใช้งาน Telehealth</h2>
-        {[
-          { n:1, title:'เลือกแพทย์และเวลา', desc:'เลือกแพทย์ตามความเชี่ยวชาญที่ต้องการ และเลือกช่วงเวลาที่สะดวก' },
-          { n:2, title:'ชำระค่าบริการ', desc:'ชำระผ่านบัตรเครดิต / QR Code / PromptPay — ปลอดภัย 100%' },
-          { n:3, title:'รับลิงก์เข้าห้องประชุม', desc:'ระบบส่งลิงก์ไปยังอีเมลและ SMS ก่อนนัด 15 นาที' },
-          { n:4, title:'พบแพทย์ผ่านวิดีโอคอล', desc:'คลิกลิงก์ พบแพทย์ได้ทันที ไม่ต้องติดตั้งแอปใดๆ' },
-        ].map(s => (
+        <span class="tag" style="margin-bottom:16px" data-i18n={spTag.k}>{spTag.th}</span>
+        <h2 style="margin-bottom:32px" data-i18n={spHeading.k}>{spHeading.th}</h2>
+        {steps.map((s, i) => (
           <div class="step-row">
-            <div class="step-num">{s.n}</div>
+            <div class="step-num">{i + 1}</div>
             <div>
-              <strong style="color:var(--primary)">{s.title}</strong>
-              <p style="font-size:.875rem;color:var(--gray-600);margin-top:4px">{s.desc}</p>
+              <strong style="color:var(--primary)" data-i18n={s.title.k}>{s.title.th}</strong>
+              <p style="font-size:.875rem;color:var(--gray-600);margin-top:4px" data-i18n={s.desc.k}>{s.desc.th}</p>
             </div>
           </div>
         ))}
@@ -109,27 +128,17 @@ const { th, cmsScript } = await loadPageCMS('telehealth', {
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:48px">
-      <span class="tag">ค่าบริการ</span>
-      <h2>ราคาโปร่งใส ไม่มีค่าใช้จ่ายแอบแฝง</h2>
+      <span class="tag" data-i18n={prTag.k}>{prTag.th}</span>
+      <h2 data-i18n={prHeading.k}>{prHeading.th}</h2>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto">
-      {[
-        { plan:'ปรึกษาทั่วไป', price:'590', unit:'บาท / ครั้ง', features:['พบแพทย์อายุรกรรมทั่วไป','30 นาที','e-Prescription','สรุปผลส่งอีเมล'], featured:false },
-        { plan:'แพทย์เชี่ยวชาญ', price:'990', unit:'บาท / ครั้ง', features:['เลือกแพทย์เชี่ยวชาญ','45 นาที','e-Prescription','สรุปผลส่งอีเมล','นัด Follow-up ฟรี 1 ครั้ง'], featured:true },
-        { plan:'ปรึกษาต่อเนื่อง', price:'1,590', unit:'บาท / เดือน', features:['ปรึกษาไม่จำกัดครั้ง','แพทย์ประจำตัว','Chat กับแพทย์ได้ตลอด','รายงานสุขภาพรายเดือน'], featured:false },
-      ].map(p => (
+      {plans.map(p => (
         <div class={`price-card reveal${p.featured?' featured':''}`}>
           {p.featured && <div style="background:var(--secondary);color:#fff;font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:12px">แนะนำ</div>}
-          <div style="font-size:1rem;font-weight:600;color:var(--gray-700);margin-bottom:8px">{p.plan}</div>
+          <div style="font-size:1rem;font-weight:600;color:var(--gray-700);margin-bottom:8px" data-i18n={p.plan.k}>{p.plan.th}</div>
           <div style="font-size:2.5rem;font-weight:800;color:var(--primary)">{p.price}</div>
-          <div style="font-size:.8rem;color:var(--gray-500);margin-bottom:20px">{p.unit}</div>
-          <ul style="text-align:left;list-style:none;margin-bottom:24px">
-            {p.features.map(f => (
-              <li style="font-size:.875rem;color:var(--gray-700);padding:6px 0;display:flex;gap:8px;align-items:center">
-                <Icon name="fa6-solid:check" style="color:var(--secondary);flex-shrink:0" /> {f}
-              </li>
-            ))}
-          </ul>
+          <div style="font-size:.8rem;color:var(--gray-500);margin-bottom:20px" data-i18n={p.unit.k}>{p.unit.th}</div>
+          <ul style="text-align:left;list-style:none;margin-bottom:24px" data-i18n={p.featHtml.k} set:html={p.featHtml.th}></ul>
           <a href="#book-tele" class={`btn ${p.featured?'btn-primary':'btn-outline'}`} style="width:100%;justify-content:center">เลือกแพลน</a>
         </div>
       ))}

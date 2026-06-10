@@ -2,13 +2,40 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('expat-hub', {
-  pg_title: 'Healthcare for Expats in Thailand',
-  pg_desc: 'World-class medical care, English-speaking doctors, and direct insurance billing — everything you need, all in one place.',
-  pg_title_en: 'Healthcare for Expats in Thailand',
-  pg_desc_en: 'World-class medical care, English-speaking doctors, and direct insurance billing — everything you need, all in one place.',
-});
+import { makePageCms } from '../lib/cmsPage';
+
+const cms = await makePageCms('expat-hub');
+const heroTitle = cms.t('hero', 'pg_title', 'Healthcare for Expats in Thailand', 'Healthcare for Expats in Thailand');
+const heroDesc  = cms.t('hero', 'pg_desc', 'World-class medical care, English-speaking doctors, and direct insurance billing — everything you need, all in one place.', 'World-class medical care, English-speaking doctors, and direct insurance billing — everything you need, all in one place.');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th };
+
+const svTag     = cms.t('services', 'tag', 'For Expats', 'For Expats');
+const svHeading = cms.t('services', 'heading', 'Everything You Need as an Expat', 'Everything You Need as an Expat');
+const services = cms.items('services', 'items').map((it, i) => ({
+  icon: it.icon || 'circle-check', color: it.color || '#0891B2',
+  title: cms.li('services', 'items', i, 'title', it),
+  desc:  cms.li('services', 'items', i, 'desc', it),
+}));
+
+const insTag     = cms.t('insurance', 'tag', 'Insurance', 'Insurance');
+const insHeading = cms.t('insurance', 'heading', 'Accepted International Insurance', 'Accepted International Insurance');
+const insSub     = cms.t('insurance', 'sub', 'Direct billing available — no upfront payment required for covered treatments', 'Direct billing available — no upfront payment required for covered treatments');
+const insNote    = cms.t('insurance', 'note', "Don't see your insurer? Contact us — we likely work with them too.", "Don't see your insurer? Contact us — we likely work with them too.");
+const insurers = cms.items('insurance', 'items').map(it => it.name);
+
+const tsTag     = cms.t('testimonials', 'tag', 'Expat Stories', 'Expat Stories');
+const tsHeading = cms.t('testimonials', 'heading', 'What Our Expat Patients Say', 'What Our Expat Patients Say');
+const testimonials = cms.items('testimonials', 'items').map((it, i) => ({
+  name: it.name, flag: it.flag || '🌍', country: it.country || '',
+  quote: cms.li('testimonials', 'items', i, 'quote', it),
+}));
+
+const ctaHeading = cms.t('cta', 'heading', 'International Patient Center', 'International Patient Center');
+const ctaSub     = cms.t('cta', 'sub', 'Our dedicated team is available Monday–Saturday, 8am–8pm, to assist with appointments, insurance verification, and any questions.', 'Our dedicated team is available Monday–Saturday, 8am–8pm, to assist with appointments, insurance verification, and any questions.');
+const ctaPhone   = cms.m('cta', 'phone', '+66 2-310-3000');
+const ctaEmail   = cms.m('cta', 'email', 'international@medithai.th');
+
+const cmsScript = cms.script();
 ---
 <Layout title="Expat Health Hub | MediThai" description="Healthcare for expats in Thailand — English-speaking doctors, international insurance, and seamless care">
 <Fragment set:html={cmsScript} />
@@ -29,24 +56,17 @@ const { th, cmsScript } = await loadPageCMS('expat-hub', {
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:48px">
-      <span class="tag">For Expats</span>
-      <h2>Everything You Need as an Expat</h2>
+      <span class="tag" data-i18n={svTag.k}>{svTag.th}</span>
+      <h2 data-i18n={svHeading.k}>{svHeading.th}</h2>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
-      {[
-        { icon:'fa6-solid:language', color:'#0891B2', bg:'#EFF6FF', title:'English-Speaking Doctors', desc:'Our entire team communicates in English. Many doctors also speak Japanese, Chinese, Korean, and German.' },
-        { icon:'fa6-solid:shield-halved', color:'#8B5CF6', bg:'#F5F3FF', title:'International Insurance', desc:'We work directly with AXA, BUPA, Cigna, Allianz, AIA, and 50+ international insurance providers for cashless billing.' },
-        { icon:'fa6-solid:plane-arrival', color:'#10B981', bg:'#F0FDF4', title:'Medical Visa Support', desc:'We provide medical certificates and documentation required for medical visa applications and extensions.' },
-        { icon:'fa6-solid:truck-medical', color:'#EF4444', bg:'#FFF1F2', title:'Air Ambulance & Evacuation', desc:'24/7 coordination for medical evacuation to your home country if needed.' },
-        { icon:'fa6-solid:person-walking-with-cane', color:'#F59E0B', bg:'#FFFBEB', title:'Continuity of Care', desc:'We request your overseas medical records and ensure seamless continuation of your treatment plan.' },
-        { icon:'fa6-solid:video', color:'#1B3A6B', bg:'#EFF6FF', title:'Telehealth in English', desc:'Consult our English-speaking doctors online from anywhere in Thailand, 7 days a week.' },
-      ].map((s,i) => (
+      {services.map((s,i) => (
         <div class={`reveal${i%3===1?' reveal-delay-1':i%3===2?' reveal-delay-2':''}`} style="background:#fff;border-radius:20px;padding:28px;box-shadow:var(--shadow-sm)">
-          <div style={`width:56px;height:56px;border-radius:14px;background:${s.bg};display:flex;align-items:center;justify-content:center;margin-bottom:16px`}>
-            <Icon name={s.icon} style={`color:${s.color};width:1.4rem;height:1.4rem`} />
+          <div style={`width:56px;height:56px;border-radius:14px;background:${s.color}15;display:flex;align-items:center;justify-content:center;margin-bottom:16px`}>
+            <Icon name={`fa6-solid:${s.icon}`} style={`color:${s.color};width:1.4rem;height:1.4rem`} />
           </div>
-          <h3 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:8px">{s.title}</h3>
-          <p style="font-size:.875rem;color:var(--gray-600);line-height:1.7">{s.desc}</p>
+          <h3 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:8px" data-i18n={s.title.k}>{s.title.th}</h3>
+          <p style="font-size:.875rem;color:var(--gray-600);line-height:1.7" data-i18n={s.desc.k}>{s.desc.th}</p>
         </div>
       ))}
     </div>
@@ -57,16 +77,16 @@ const { th, cmsScript } = await loadPageCMS('expat-hub', {
 <section class="section-pad">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:32px">
-      <span class="tag">Insurance</span>
-      <h2>Accepted International Insurance</h2>
-      <p>Direct billing available — no upfront payment required for covered treatments</p>
+      <span class="tag" data-i18n={insTag.k}>{insTag.th}</span>
+      <h2 data-i18n={insHeading.k}>{insHeading.th}</h2>
+      <p data-i18n={insSub.k}>{insSub.th}</p>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:700px;margin:0 auto">
-      {['AXA', 'BUPA', 'Cigna', 'Allianz', 'AIA International', 'Pacific Cross', 'MSH International', 'Henner', 'APRIL International', 'Generali', 'Aetna', 'William Russell'].map(ins => (
+      {insurers.map(ins => (
         <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:10px 18px;font-size:.875rem;font-weight:600;color:var(--gray-700)">{ins}</div>
       ))}
     </div>
-    <p style="text-align:center;font-size:.8rem;color:var(--gray-500);margin-top:16px">Don't see your insurer? Contact us — we likely work with them too.</p>
+    <p style="text-align:center;font-size:.8rem;color:var(--gray-500);margin-top:16px" data-i18n={insNote.k}>{insNote.th}</p>
   </div>
 </section>
 
@@ -74,22 +94,18 @@ const { th, cmsScript } = await loadPageCMS('expat-hub', {
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:40px">
-      <span class="tag">Expat Stories</span>
-      <h2>What Our Expat Patients Say</h2>
+      <span class="tag" data-i18n={tsTag.k}>{tsTag.th}</span>
+      <h2 data-i18n={tsHeading.k}>{tsHeading.th}</h2>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
-      {[
-        { name:'James Anderson', country:'🇬🇧 UK', quote:'The English-speaking staff and same-day results made all the difference. MediThai feels as good as any hospital back home — actually better.' },
-        { name:'Yuki Tanaka', country:'🇯🇵 Japan', quote:'日本語対応のスタッフもいて、健康診断から治療まですべてスムーズでした。バンコクでの医療体験は最高です。' },
-        { name:'Michael Chen', country:'🇺🇸 USA', quote:'Cigna direct billing worked perfectly. No forms to fill, no waiting for reimbursement. The quality of care rivals any hospital in the US.' },
-      ].map((t,i) => (
+      {testimonials.map((t,i) => (
         <div class={`reveal${i===1?' reveal-delay-1':i===2?' reveal-delay-2':''}`} style="background:#fff;border-radius:20px;padding:28px;box-shadow:var(--shadow-md)">
-          <p style="font-size:.9rem;color:var(--gray-700);line-height:1.8;font-style:italic;margin-bottom:16px">"{t.quote}"</p>
+          <p style="font-size:.9rem;color:var(--gray-700);line-height:1.8;font-style:italic;margin-bottom:16px">"<span data-i18n={t.quote.k}>{t.quote.th}</span>"</p>
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:40px;height:40px;border-radius:50%;background:var(--secondary)20;display:flex;align-items:center;justify-content:center;font-size:1.2rem">{t.country.split(' ')[0]}</div>
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--secondary)20;display:flex;align-items:center;justify-content:center;font-size:1.2rem">{t.flag}</div>
             <div>
               <div style="font-weight:700;font-size:.875rem;color:var(--primary)">{t.name}</div>
-              <div style="font-size:.78rem;color:var(--gray-500)">{t.country.split(' ')[1]} Expat in Bangkok</div>
+              <div style="font-size:.78rem;color:var(--gray-500)">{t.country} Expat in Bangkok</div>
             </div>
           </div>
         </div>
@@ -101,11 +117,11 @@ const { th, cmsScript } = await loadPageCMS('expat-hub', {
 <!-- Contact for expats -->
 <section class="section-pad-sm" style="background:var(--primary);color:#fff;text-align:center">
   <div class="container">
-    <h2 style="margin-bottom:12px">International Patient Center</h2>
-    <p style="opacity:.8;margin-bottom:24px">Our dedicated team is available Monday–Saturday, 8am–8pm, to assist with appointments, insurance verification, and any questions.</p>
+    <h2 style="margin-bottom:12px" data-i18n={ctaHeading.k}>{ctaHeading.th}</h2>
+    <p style="opacity:.8;margin-bottom:24px" data-i18n={ctaSub.k}>{ctaSub.th}</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="tel:+6623103000" class="btn btn-accent"><Icon name="fa6-solid:phone" /> +66 2-310-3000</a>
-      <a href="mailto:international@medithai.th" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5)"><Icon name="fa6-solid:envelope" /> international@medithai.th</a>
+      <a href={`tel:${ctaPhone.replace(/[\s-]/g, '')}`} class="btn btn-accent"><Icon name="fa6-solid:phone" /> {ctaPhone}</a>
+      <a href={`mailto:${ctaEmail}`} class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5)"><Icon name="fa6-solid:envelope" /> {ctaEmail}</a>
     </div>
   </div>
 </section>

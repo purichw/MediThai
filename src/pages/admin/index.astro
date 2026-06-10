@@ -1499,6 +1499,9 @@ const renderPageCMS = window.renderPageCMS = async function(navId) {
 
   titleEl.textContent = map?.title || navId;
 
+  // fresh editor state per page render
+  _listState = {}; _listSchema = {}; _inlineQuills = {};
+
   if (!map) {
     subEl.textContent = 'หน้านี้ยังไม่มี CMS — เนื้อหา hard-coded ในโค้ด';
     sectEl.innerHTML = `<div class="cms-no-cms-placeholder">
@@ -1537,6 +1540,21 @@ const renderPageCMS = window.renderPageCMS = async function(navId) {
   sectEl.innerHTML = sections.map(sec => renderCMSSection(map.slug, sec, dbSections[sec.key] || null)).join('');
 }
 
+// ── CMS editor state ──────────────────────────────────────────
+let _listState  = {};  // 'secKey::fieldKey' → [items]
+let _listSchema = {};  // 'secKey::fieldKey' → field def
+let _inlineQuills = {}; // 'secKey::fieldKey::lang' → Quill
+
+const FULL_QUILL_TOOLBAR = [
+  [{ header: [2, 3, false] }],
+  ['bold', 'italic', 'underline', 'strike'],
+  [{ color: [] }, { background: [] }],
+  [{ align: [] }],
+  [{ list: 'ordered' }, { list: 'bullet' }],
+  ['blockquote', 'link', 'image'],
+  ['clean'],
+];
+
 // ── Render a single CMS section accordion ────────────────────
 const renderCMSSection = window.renderCMSSection = function(pageSlug, sec, dbData) {
   const isCustomized = !!dbData;
@@ -1552,10 +1570,54 @@ const renderCMSSection = window.renderCMSSection = function(pageSlug, sec, dbDat
     const defEn  = _CMS_DEF_EN[f.key] || '';
     const rows   = (f.type === 'number') ? 1 : 2;
 
+    // ── LIST field: repeating items ──
+    if (f.type === 'list') {
+      const stateKey = sec.key + '::' + f.key;
+      const saved = dbData?.meta?.[f.key];
+      _listState[stateKey]  = JSON.parse(JSON.stringify(
+        (Array.isArray(saved) && saved.length) ? saved : (f.defaults || [])
+      ));
+      _listSchema[stateKey] = f;
+      return `<div class="cms-field cms-field-list" data-key="${f.key}">
+        <div class="cms-field-label">${escH(f.label)} <span class="cms-list-count" id="licount-${cssId(stateKey)}">(${_listState[stateKey].length})</span></div>
+        <div class="cms-list" id="lilist-${cssId(stateKey)}" data-statekey="${escH(stateKey)}">${renderListItems(stateKey)}</div>
+        <button type="button" class="cms-btn cms-btn-add" onclick="liAdd('${escH(stateKey)}')">＋ เพิ่ม${escH(f.itemName || 'รายการ')}</button>
+      </div>`;
+    }
+
+    // ── RICHTEXT field: Quill (init on section open) ──
+    if (f.type === 'richtext' && f.bilingual) {
+      return `<div class="cms-field cms-field-bilingual" data-key="${f.key}">
+        <div class="cms-field-label">${escH(f.label)} <span class="cms-rich-tag">rich text</span></div>
+        <div class="cms-field-langs cms-field-langs-rich">
+          <div class="cms-lang-group">
+            <div class="cms-lang-badge cms-lang-th">TH</div>
+            <div class="cms-quill" data-sec="${sec.key}" data-field="${f.key}" data-lang="th" data-ph="${escH(defTh)}">${thVal}</div>
+          </div>
+          <div class="cms-lang-group">
+            <div class="cms-lang-badge cms-lang-en">EN</div>
+            <div class="cms-quill" data-sec="${sec.key}" data-field="${f.key}" data-lang="en" data-ph="${escH(defEn)}">${enVal}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // ── IMAGE field: URL + upload + preview ──
+    if (f.type === 'image') {
+      const val = metaVal || thVal;
+      return `<div class="cms-field cms-field-mono cms-image-field" data-key="${f.key}">
+        <div class="cms-field-label">${escH(f.label)}</div>
+        <div class="cms-img-row">
+          <input type="text" class="cms-input cms-input-img" data-lang="meta" data-field="${f.key}" value="${escH(val)}" placeholder="วาง URL หรือกดอัปโหลด →" oninput="cmsImgPreview(this)">
+          <button type="button" class="cms-btn cms-btn-upload" onclick="cmsUploadTo(this)">📤 อัปโหลด</button>
+        </div>
+        <img class="cms-img-preview" src="${escH(val)}" style="${val ? '' : 'display:none'}" onerror="this.style.display='none'">
+      </div>`;
+    }
+
     if (f.bilingual) {
       return `<div class="cms-field cms-field-bilingual" data-key="${f.key}">
         <div class="cms-field-label">${escH(f.label)}</div>
-        <div class="cms-field-key-hint">${f.key}</div>
         <div class="cms-field-langs">
           <div class="cms-lang-group">
             <div class="cms-lang-badge cms-lang-th">TH</div>
@@ -1571,7 +1633,6 @@ const renderCMSSection = window.renderCMSSection = function(pageSlug, sec, dbDat
       const val = metaVal || thVal;
       return `<div class="cms-field cms-field-mono" data-key="${f.key}">
         <div class="cms-field-label">${escH(f.label)}</div>
-        <div class="cms-field-key-hint">${f.key}</div>
         <div class="cms-field-mono-wrap">
           <textarea class="cms-textarea cms-textarea-full" data-lang="meta" data-field="${f.key}" rows="${rows}" placeholder="${escH(defTh)}">${escH(val)}</textarea>
         </div>
@@ -1607,6 +1668,204 @@ const renderCMSSection = window.renderCMSSection = function(pageSlug, sec, dbDat
   </div>`;
 }
 
+// ── List editor ───────────────────────────────────────────────
+const cssId = window.cssId = (s) => s.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+const renderListItems = window.renderListItems = function(stateKey) {
+  const items = _listState[stateKey] || [];
+  const f = _listSchema[stateKey];
+  if (!items.length) return '<div class="cms-list-empty">ยังไม่มีรายการ — กด "เพิ่ม" ด้านล่าง</div>';
+  return items.map((item, i) => {
+    const label = (f.itemLabelKey && item[f.itemLabelKey]) || `${f.itemName || 'รายการ'} ${i + 1}`;
+    const fieldsHtml = (f.itemFields || []).map(itf => {
+      if (itf.bilingual) {
+        return `<div class="cms-li-field">
+          <label>${escH(itf.label)}</label>
+          <div class="cms-li-langs">
+            <div><span class="cms-li-lang">TH</span><textarea rows="1" data-ifield="${itf.key}_th" oninput="liInput('${escH(stateKey)}',${i},'${itf.key}_th',this.value)">${escH(item[itf.key + '_th'] || '')}</textarea></div>
+            <div><span class="cms-li-lang cms-li-lang-en">EN</span><textarea rows="1" data-ifield="${itf.key}_en" oninput="liInput('${escH(stateKey)}',${i},'${itf.key}_en',this.value)">${escH(item[itf.key + '_en'] || '')}</textarea></div>
+          </div>
+        </div>`;
+      }
+      if (itf.type === 'image') {
+        const v = item[itf.key] || '';
+        return `<div class="cms-li-field cms-image-field">
+          <label>${escH(itf.label)}</label>
+          <div class="cms-img-row">
+            <input type="text" data-ifield="${itf.key}" value="${escH(v)}" placeholder="URL รูป หรืออัปโหลด →" oninput="liInput('${escH(stateKey)}',${i},'${itf.key}',this.value);cmsImgPreview(this)">
+            <button type="button" class="cms-btn cms-btn-upload" onclick="cmsUploadTo(this,'${escH(stateKey)}',${i},'${itf.key}')">📤</button>
+          </div>
+          <img class="cms-img-preview" src="${escH(v)}" style="${v ? '' : 'display:none'}" onerror="this.style.display='none'">
+        </div>`;
+      }
+      return `<div class="cms-li-field">
+        <label>${escH(itf.label)}</label>
+        <input type="text" data-ifield="${itf.key}" value="${escH(item[itf.key] || '')}" oninput="liInput('${escH(stateKey)}',${i},'${itf.key}',this.value)">
+      </div>`;
+    }).join('');
+    return `<div class="cms-li" data-idx="${i}">
+      <div class="cms-li-head" onclick="liToggle(this)">
+        <span class="cms-li-grip">⠿</span>
+        <span class="cms-li-title" id="lititle-${cssId(stateKey)}-${i}">${escH(label)}</span>
+        <span class="cms-li-actions" onclick="event.stopPropagation()">
+          <button type="button" title="ขึ้น" onclick="liMove('${escH(stateKey)}',${i},-1)" ${i === 0 ? 'disabled' : ''}>↑</button>
+          <button type="button" title="ลง" onclick="liMove('${escH(stateKey)}',${i},1)" ${i === items.length - 1 ? 'disabled' : ''}>↓</button>
+          <button type="button" title="ทำซ้ำ" onclick="liDup('${escH(stateKey)}',${i})">⧉</button>
+          <button type="button" class="cms-li-del" title="ลบ" onclick="liDel('${escH(stateKey)}',${i})">🗑</button>
+        </span>
+        <span class="cms-li-chev">▶</span>
+      </div>
+      <div class="cms-li-body" style="display:none">${fieldsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+const liRepaint = window.liRepaint = function(stateKey) {
+  const wrap = document.getElementById('lilist-' + cssId(stateKey));
+  if (wrap) wrap.innerHTML = renderListItems(stateKey);
+  const count = document.getElementById('licount-' + cssId(stateKey));
+  if (count) count.textContent = '(' + (_listState[stateKey] || []).length + ')';
+  liDirty(stateKey);
+}
+const liDirty = window.liDirty = function(stateKey) {
+  const secKey = stateKey.split('::')[0];
+  const btn = document.getElementById('inline-save-' + secKey);
+  if (btn) btn.classList.add('cms-btn-dirty');
+}
+const liToggle = window.liToggle = function(headEl) {
+  const body = headEl.nextElementSibling;
+  const chev = headEl.querySelector('.cms-li-chev');
+  const open = body.style.display === 'none';
+  body.style.display = open ? 'block' : 'none';
+  if (chev) chev.textContent = open ? '▼' : '▶';
+}
+const liInput = window.liInput = function(stateKey, idx, key, value) {
+  const items = _listState[stateKey];
+  if (!items || !items[idx]) return;
+  items[idx][key] = value;
+  const f = _listSchema[stateKey];
+  if (f.itemLabelKey === key) {
+    const t = document.getElementById(`lititle-${cssId(stateKey)}-${idx}`);
+    if (t) t.textContent = value || `${f.itemName || 'รายการ'} ${idx + 1}`;
+  }
+  liDirty(stateKey);
+}
+const liAdd = window.liAdd = function(stateKey) {
+  const f = _listSchema[stateKey];
+  const item = {};
+  (f.itemFields || []).forEach(itf => {
+    if (itf.bilingual) { item[itf.key + '_th'] = ''; item[itf.key + '_en'] = ''; }
+    else item[itf.key] = '';
+  });
+  (_listState[stateKey] = _listState[stateKey] || []).push(item);
+  liRepaint(stateKey);
+  // open the new item
+  const wrap = document.getElementById('lilist-' + cssId(stateKey));
+  const last = wrap?.querySelector('.cms-li:last-child .cms-li-head');
+  if (last) liToggle(last);
+}
+const liDel = window.liDel = function(stateKey, idx) {
+  if (!confirm('ลบรายการนี้?')) return;
+  _listState[stateKey].splice(idx, 1);
+  liRepaint(stateKey);
+}
+const liDup = window.liDup = function(stateKey, idx) {
+  const copy = JSON.parse(JSON.stringify(_listState[stateKey][idx]));
+  _listState[stateKey].splice(idx + 1, 0, copy);
+  liRepaint(stateKey);
+}
+const liMove = window.liMove = function(stateKey, idx, dir) {
+  const items = _listState[stateKey];
+  const to = idx + dir;
+  if (to < 0 || to >= items.length) return;
+  [items[idx], items[to]] = [items[to], items[idx]];
+  liRepaint(stateKey);
+}
+
+// ── Image upload ──────────────────────────────────────────────
+async function cmsUploadFile(file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch('/api/admin/upload', { method: 'POST', credentials: 'include', body: fd });
+  const d = await res.json();
+  if (!res.ok) throw new Error(d.error || 'upload failed');
+  return d.url;
+}
+const cmsUploadTo = window.cmsUploadTo = function(btn, stateKey, idx, key) {
+  const picker = document.createElement('input');
+  picker.type = 'file';
+  picker.accept = 'image/*';
+  picker.onchange = async () => {
+    const file = picker.files[0];
+    if (!file) return;
+    btn.disabled = true; btn.textContent = '⏳';
+    try {
+      const url = await cmsUploadFile(file);
+      const input = btn.closest('.cms-img-row').querySelector('input');
+      input.value = url;
+      cmsImgPreview(input);
+      if (stateKey != null) liInput(stateKey, idx, key, url);
+      else {
+        const sec = btn.closest('.cms-section');
+        if (sec) liDirtySec(sec.dataset.section);
+      }
+      showSaveBar('✓ อัปโหลดรูปสำเร็จ — อย่าลืมกดบันทึก', 'success');
+    } catch (err) {
+      showSaveBar('❌ อัปโหลดไม่สำเร็จ: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = stateKey != null ? '📤' : '📤 อัปโหลด';
+    }
+  };
+  picker.click();
+}
+const liDirtySec = window.liDirtySec = function(secKey) {
+  const btn = document.getElementById('inline-save-' + secKey);
+  if (btn) btn.classList.add('cms-btn-dirty');
+}
+const cmsImgPreview = window.cmsImgPreview = function(input) {
+  const field = input.closest('.cms-image-field') || input.closest('.cms-li-field');
+  const img = field?.querySelector('.cms-img-preview');
+  if (!img) return;
+  const v = input.value.trim();
+  if (v) { img.src = v; img.style.display = ''; }
+  else img.style.display = 'none';
+}
+
+// ── Quill init (lazy, when section opens) ─────────────────────
+function initInlineQuills(sectionKey) {
+  if (typeof Quill === 'undefined') return;
+  const body = document.getElementById('inline-body-' + sectionKey);
+  if (!body) return;
+  body.querySelectorAll('.cms-quill:not([data-qinit])').forEach(el => {
+    el.dataset.qinit = '1';
+    const qKey = `${el.dataset.sec}::${el.dataset.field}::${el.dataset.lang}`;
+    const q = new Quill(el, {
+      theme: 'snow',
+      modules: { toolbar: FULL_QUILL_TOOLBAR },
+      placeholder: el.dataset.ph || 'พิมพ์เนื้อหา...',
+    });
+    // custom image handler: upload instead of base64
+    q.getModule('toolbar').addHandler('image', () => {
+      const picker = document.createElement('input');
+      picker.type = 'file'; picker.accept = 'image/*';
+      picker.onchange = async () => {
+        const file = picker.files[0];
+        if (!file) return;
+        showSaveBar('⏳ กำลังอัปโหลดรูป...', 'saving');
+        try {
+          const url = await cmsUploadFile(file);
+          const range = q.getSelection(true);
+          q.insertEmbed(range.index, 'image', url);
+          showSaveBar('✓ แทรกรูปแล้ว', 'success');
+        } catch (err) { showSaveBar('❌ ' + err.message, 'error'); }
+      };
+      picker.click();
+    });
+    q.on('text-change', () => liDirtySec(el.dataset.sec));
+    _inlineQuills[qKey] = q;
+  });
+}
+
 // ── Toggle section accordion open/closed ─────────────────────
 const inlineToggleSec = window.inlineToggleSec = function(key) {
   const body = document.getElementById('inline-body-' + key);
@@ -1617,6 +1876,7 @@ const inlineToggleSec = window.inlineToggleSec = function(key) {
   const secEl = document.getElementById('inline-sec-' + key);
   if (secEl) secEl.classList.toggle('open', open);
   if (chev) chev.textContent = open ? '▼' : '▶';
+  if (open) setTimeout(() => initInlineQuills(key), 30);
 }
 
 // ── Save a section ────────────────────────────────────────────
@@ -1625,10 +1885,24 @@ const inlineSaveSec = window.inlineSaveSec = async function(pageSlug, sectionKey
   if (!bodyEl) return;
 
   const content = { th: {}, en: {}, meta: {} };
-  bodyEl.querySelectorAll('textarea[data-field][data-lang]').forEach(el => {
+  // plain textareas + image URL inputs — skip empties (empty = use default)
+  bodyEl.querySelectorAll('textarea[data-field][data-lang], input[data-field][data-lang]').forEach(el => {
     const lang  = el.dataset.lang;
     const field = el.dataset.field;
-    if (lang && field) content[lang][field] = el.value;
+    if (lang && field && el.value.trim()) content[lang][field] = el.value;
+  });
+  // quill editors
+  Object.entries(_inlineQuills).forEach(([qKey, q]) => {
+    const [sec, field, lang] = qKey.split('::');
+    if (sec !== sectionKey) return;
+    const html = q.root.innerHTML;
+    if (html && html !== '<p><br></p>') content[lang][field] = html;
+  });
+  // lists — save the full array (always; an emptied list is intentional)
+  Object.entries(_listState).forEach(([stateKey, items]) => {
+    const [sec, field] = stateKey.split('::');
+    if (sec !== sectionKey) return;
+    content.meta[field] = items;
   });
 
   showSaveBar('กำลังบันทึก...', 'saving');
@@ -1646,6 +1920,7 @@ const inlineSaveSec = window.inlineSaveSec = async function(pageSlug, sectionKey
       const labelEl = document.querySelector(`#inline-sec-${sectionKey} .cms-section-label`);
       labelEl?.insertAdjacentHTML('afterend', '<span class="cms-section-badge">แก้ไขแล้ว</span>');
     }
+    document.getElementById('inline-save-' + sectionKey)?.classList.remove('cms-btn-dirty');
   }
 }
 

@@ -2,13 +2,45 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('executive-health', {
-  pg_title: 'Executive Health Program',
-  pg_desc: 'โปรแกรมตรวจสุขภาพเชิงลึกสำหรับผู้บริหาร ออกแบบมาเพื่อคุณโดยเฉพาะ',
-  pg_title_en: 'Executive Health Program',
-  pg_desc_en: 'In-depth health screening for executives, designed specifically for you',
+import { makePageCms } from '../lib/cmsPage';
+const cms = await makePageCms('executive-health');
+const heroTitle = cms.t('hero', 'pg_title', 'Executive Health Program', 'Executive Health Program');
+const heroDesc  = cms.t('hero', 'pg_desc', 'โปรแกรมตรวจสุขภาพเชิงลึกสำหรับผู้บริหาร ออกแบบมาเพื่อคุณโดยเฉพาะ', 'In-depth health screening for executives, designed specifically for you');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th };
+
+const whyTag     = cms.t('why', 'tag', 'สุขภาพที่ดีคือสินทรัพย์', 'Health is an Asset');
+const whyHeading = cms.t('why', 'heading', 'ทำไมผู้บริหารต้องการ Executive Health', 'Why executives need Executive Health');
+const whyPara    = cms.t('why', 'para', 'สถิติชี้ว่าผู้บริหารระดับสูงมีความเสี่ยงด้านสุขภาพสูงกว่าคนทั่วไป เนื่องจากความเครียดสะสม การนอนไม่หลับ และการดูแลสุขภาพที่ไม่สม่ำเสมอ โปรแกรม Executive Health ของ MediThai ออกแบบมาเพื่อตรวจหาความเสี่ยงเหล่านี้ล่วงหน้า', 'Statistics show senior executives face higher health risks due to accumulated stress, poor sleep, and irregular care. MediThai\'s Executive Health program is designed to detect these risks early.');
+const whyPointsRaw = cms.t('why', 'points', 'ตรวจครบถ้วนใน 1 วัน ไม่เสียเวลาทำงาน\nแพทย์ผู้เชี่ยวชาญ 3–5 ท่าน ดูแลเฉพาะคุณ\nผลตรวจพร้อมพร้อมรายงานโดยละเอียดภายใน 2 ชั่วโมง\nห้องตรวจ VIP ส่วนตัว ไม่ต้องรอคิวรวม\nอาหารมื้อกลางวันคุณภาพพรีเมียมระหว่างรอผล', 'Complete check-up in 1 day — no work time lost\n3–5 specialists dedicated to you\nDetailed results and report within 2 hours\nPrivate VIP exam rooms — no shared queues\nPremium lunch while you wait for results');
+const whyPointLinesTh = whyPointsRaw.th.split('\n').filter(Boolean);
+const whyPointLinesEn = whyPointsRaw.en.split('\n').filter(Boolean);
+const whyPoints = whyPointLinesTh.map((line, i) =>
+  cms.t('why', `point_${i}`, line, whyPointLinesEn[i] ?? line));
+const whyStatHd  = cms.t('why', 'stat_heading', 'ตัวเลขที่น่าตกใจ', 'Alarming Numbers');
+const shockStats = cms.items('why', 'shock_stats').map((it, i) => ({
+  num: it.num,
+  label: cms.li('why', 'shock_stats', i, 'label', it),
+}));
+
+const pgTag     = cms.t('programs', 'tag', 'โปรแกรม', 'Programs');
+const pgHeading = cms.t('programs', 'heading', 'เลือกโปรแกรมที่เหมาะกับคุณ', 'Choose the program that fits you');
+const pgNote    = cms.t('programs', 'note', '* ราคารวม VAT · สามารถใช้สิทธิ์ประกันสุขภาพได้บางส่วน · โทรสอบถาม 02-310-3000', '* Prices include VAT · Partially claimable via health insurance · Call 02-310-3000');
+const checkLis = (text: string, color: string) => (text || '').split('\n').filter(Boolean).map(it =>
+  `<div class="check-item"><span style="color:${color};font-weight:700;flex-shrink:0">✓</span><span>${it}</span></div>`).join('');
+const plans = cms.items('programs', 'plans').map((it, i) => {
+  const color = it.color || '#0891B2';
+  const items = cms.li('programs', 'plans', i, 'items', it);
+  return {
+    name: it.name, price: it.price, color,
+    badge: cms.li('programs', 'plans', i, 'badge', it),
+    itemsHtml: cms.t('programs', `plan${i}_items_html`, checkLis(items.th, color), checkLis(items.en, color)),
+  };
 });
+
+const ctaHeading = cms.t('cta', 'heading', 'โปรแกรมองค์กร — ดูแลทีมผู้บริหารของคุณ', 'Corporate program — care for your executive team');
+const ctaSub     = cms.t('cta', 'sub', 'MediThai มีแพ็กเกจพิเศษสำหรับองค์กรที่ต้องการดูแลสุขภาพพนักงานหรือผู้บริหารเป็นหมู่คณะ ราคาพิเศษสำหรับ 5 ท่านขึ้นไป', 'MediThai offers special group packages for organizations — special pricing for 5+ people.');
+
+const cmsScript = cms.script();
 ---
 <Layout title="Executive Health Program | MediThai" description="โปรแกรมตรวจสุขภาพ VIP สำหรับผู้บริหาร ครบถ้วน แม่นยำ เป็นส่วนตัว"
   extraHead={`${cmsScript}<style>
@@ -35,34 +67,23 @@ const { th, cmsScript } = await loadPageCMS('executive-health', {
   <div class="container">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
       <div class="reveal-left">
-        <span class="tag" style="margin-bottom:16px">สุขภาพที่ดีคือสินทรัพย์</span>
-        <h2 style="margin-bottom:20px">ทำไมผู้บริหารต้องการ Executive Health</h2>
-        <p style="color:var(--gray-700);line-height:1.8;margin-bottom:20px">สถิติชี้ว่าผู้บริหารระดับสูงมีความเสี่ยงด้านสุขภาพสูงกว่าคนทั่วไป เนื่องจากความเครียดสะสม การนอนไม่หลับ และการดูแลสุขภาพที่ไม่สม่ำเสมอ โปรแกรม Executive Health ของ MediThai ออกแบบมาเพื่อตรวจหาความเสี่ยงเหล่านี้ล่วงหน้า</p>
-        {[
-          'ตรวจครบถ้วนใน 1 วัน ไม่เสียเวลาทำงาน',
-          'แพทย์ผู้เชี่ยวชาญ 3–5 ท่าน ดูแลเฉพาะคุณ',
-          'ผลตรวจพร้อมพร้อมรายงานโดยละเอียดภายใน 2 ชั่วโมง',
-          'ห้องตรวจ VIP ส่วนตัว ไม่ต้องรอคิวรวม',
-          'อาหารมื้อกลางวันคุณภาพพรีเมียมระหว่างรอผล',
-        ].map(p => (
+        <span class="tag" style="margin-bottom:16px" data-i18n={whyTag.k}>{whyTag.th}</span>
+        <h2 style="margin-bottom:20px" data-i18n={whyHeading.k}>{whyHeading.th}</h2>
+        <p style="color:var(--gray-700);line-height:1.8;margin-bottom:20px" data-i18n={whyPara.k} set:html={whyPara.th}></p>
+        {whyPoints.map(p => (
           <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
             <Icon name="fa6-solid:circle-check" style="color:var(--secondary);flex-shrink:0" />
-            <span style="font-size:.9rem;color:var(--gray-700)">{p}</span>
+            <span style="font-size:.9rem;color:var(--gray-700)" data-i18n={p.k}>{p.th}</span>
           </div>
         ))}
       </div>
       <div class="reveal-right" style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:24px;padding:40px;color:#fff">
         <div style="font-size:3rem;margin-bottom:16px">👔</div>
-        <h3 style="font-size:1.5rem;margin-bottom:16px">ตัวเลขที่น่าตกใจ</h3>
-        {[
-          { n:'68%', l:'ของผู้บริหารไม่ตรวจสุขภาพครบถ้วนในรอบ 2 ปี' },
-          { n:'43%', l:'มีภาวะความดันโลหิตสูงโดยไม่รู้ตัว' },
-          { n:'31%', l:'มีไขมันในเลือดสูงผิดปกติ' },
-          { n:'1 ใน 5', l:'มีความเสี่ยงโรคหัวใจในอีก 10 ปี' },
-        ].map(s => (
+        <h3 style="font-size:1.5rem;margin-bottom:16px" data-i18n={whyStatHd.k}>{whyStatHd.th}</h3>
+        {shockStats.map(s => (
           <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.15)">
-            <div style="font-size:1.5rem;font-weight:800;color:var(--accent);flex-shrink:0;min-width:60px">{s.n}</div>
-            <div style="font-size:.875rem;opacity:.85">{s.l}</div>
+            <div style="font-size:1.5rem;font-weight:800;color:var(--accent);flex-shrink:0;min-width:60px">{s.num}</div>
+            <div style="font-size:.875rem;opacity:.85" data-i18n={s.label.k}>{s.label.th}</div>
           </div>
         ))}
       </div>
@@ -74,21 +95,14 @@ const { th, cmsScript } = await loadPageCMS('executive-health', {
 <section class="section-pad">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:48px">
-      <span class="tag">โปรแกรม</span>
-      <h2>เลือกโปรแกรมที่เหมาะกับคุณ</h2>
+      <span class="tag" data-i18n={pgTag.k}>{pgTag.th}</span>
+      <h2 data-i18n={pgHeading.k}>{pgHeading.th}</h2>
     </div>
     <div class="exec-grid">
-      {[
-        { name:'Executive Essential', price:'12,900', badge:'', color:'#0891B2',
-          items:['ตรวจเลือดครบ 40+ รายการ','ECG','Chest X-ray','ตรวจสายตา การได้ยิน','BMI และองค์ประกอบร่างกาย','ตรวจปัสสาวะ อุจจาระ','พบแพทย์อายุรกรรมสรุปผล'] },
-        { name:'Executive Premium', price:'24,900', badge:'แนะนำ', color:'#1B3A6B',
-          items:['ทุกอย่างใน Essential','CT Calcium Score (ประเมินหัวใจ)','Echocardiogram','ตรวจมะเร็งลำไส้ใหญ่ (Colonoscopy)','Tumor Markers 8 ชนิด','Brain MRI','พบแพทย์ผู้เชี่ยวชาญ 3 ท่าน','รายงานโดยละเอียด + แผนสุขภาพ 1 ปี'] },
-        { name:'Executive Elite', price:'49,900', badge:'ครบที่สุด', color:'#8B5CF6',
-          items:['ทุกอย่างใน Premium','Full Body MRI','Genomic Risk Assessment (DNA)','Coronary CT Angiography','Functional Medicine Panel','ปรึกษาโภชนาการ + แพลนออกกำลังกาย','ติดตามผลทุก 3 เดือนตลอด 1 ปี','บริการ Concierge ตลอด 24 ชม.'] },
-      ].map((p,i) => (
+      {plans.map((p,i) => (
         <div class={`exec-package reveal${i===1?' reveal-delay-1':i===2?' reveal-delay-2':''}`} style={i===1?`border:2px solid ${p.color}`:''}>
           <div class="exec-pkg-header" style={`background:${p.color}10`}>
-            {p.badge && <span style={`background:${p.color};color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;display:inline-block`}>{p.badge}</span>}
+            {p.badge.th && <span style={`background:${p.color};color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;display:inline-block`} data-i18n={p.badge.k}>{p.badge.th}</span>}
             <h3 style={`font-size:1.1rem;font-weight:700;color:${p.color};margin-bottom:4px`}>{p.name}</h3>
             <div style="display:flex;align-items:baseline;gap:4px">
               <span style="font-size:2rem;font-weight:800;color:var(--primary)">฿{p.price}</span>
@@ -96,12 +110,7 @@ const { th, cmsScript } = await loadPageCMS('executive-health', {
             </div>
           </div>
           <div class="exec-pkg-body">
-            {p.items.map(it => (
-              <div class="check-item">
-                <Icon name="fa6-solid:check" style={`color:${p.color};flex-shrink:0;margin-top:2px`} />
-                <span>{it}</span>
-              </div>
-            ))}
+            <div data-i18n={p.itemsHtml.k} set:html={p.itemsHtml.th}></div>
             <a href="/appointments" class="btn btn-primary" style={`width:100%;justify-content:center;margin-top:20px;background:${p.color};border-color:${p.color}`}>
               จองโปรแกรมนี้
             </a>
@@ -109,17 +118,15 @@ const { th, cmsScript } = await loadPageCMS('executive-health', {
         </div>
       ))}
     </div>
-    <p style="text-align:center;font-size:.875rem;color:var(--gray-500);margin-top:24px">
-      * ราคารวม VAT · สามารถใช้สิทธิ์ประกันสุขภาพได้บางส่วน · โทรสอบถาม 02-310-3000
-    </p>
+    <p style="text-align:center;font-size:.875rem;color:var(--gray-500);margin-top:24px" data-i18n={pgNote.k}>{pgNote.th}</p>
   </div>
 </section>
 
 <!-- Corporate -->
 <section class="section-pad-sm" style="background:var(--primary);color:#fff;text-align:center">
   <div class="container">
-    <h2 style="margin-bottom:12px">โปรแกรมองค์กร — ดูแลทีมผู้บริหารของคุณ</h2>
-    <p style="opacity:.8;margin-bottom:24px">MediThai มีแพ็กเกจพิเศษสำหรับองค์กรที่ต้องการดูแลสุขภาพพนักงานหรือผู้บริหารเป็นหมู่คณะ ราคาพิเศษสำหรับ 5 ท่านขึ้นไป</p>
+    <h2 style="margin-bottom:12px" data-i18n={ctaHeading.k}>{ctaHeading.th}</h2>
+    <p style="opacity:.8;margin-bottom:24px" data-i18n={ctaSub.k}>{ctaSub.th}</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <a href="/corporate" class="btn btn-accent">ดูโปรแกรมองค์กร</a>
       <a href="/contact" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5)">ติดต่อทีมองค์กร</a>

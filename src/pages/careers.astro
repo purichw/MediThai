@@ -2,24 +2,32 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('careers', {
-  pg_title: 'ร่วมเป็นส่วนหนึ่งของ MediThai',
-  pg_desc: 'เราเชื่อว่าบุคลากรที่ดีคือหัวใจของการรักษาพยาบาลที่ดี มาร่วมสร้างอนาคตทางการแพทย์ไปด้วยกัน',
-  pg_title_en: 'Join the MediThai Team',
-  pg_desc_en: 'We believe great people are the heart of great healthcare. Join us in building the future of medicine.',
-});
+import { makePageCms } from '../lib/cmsPage';
 
-const jobs = [
-  { dept:'ศูนย์หัวใจ', title:'พยาบาลวิชาชีพ (ICU หัวใจ)', type:'Full-time', location:'MediThai หัวใจ', color:'#EF4444', urgent:true },
-  { dept:'ศูนย์มะเร็ง', title:'นักรังสีการแพทย์', type:'Full-time', location:'MediThai มะเร็ง', color:'#8B5CF6', urgent:false },
-  { dept:'เทคโนโลยีสารสนเทศ', title:'Full Stack Developer', type:'Full-time', location:'MediThai กรุงเทพ / Remote', color:'#0891B2', urgent:false },
-  { dept:'ศูนย์กระดูกและข้อ', title:'นักกายภาพบำบัด', type:'Full-time', location:'MediThai สมองและกระดูก', color:'#2554A0', urgent:false },
-  { dept:'อายุรกรรม', title:'แพทย์ประจำบ้าน (Resident Doctor)', type:'Full-time', location:'MediThai กรุงเทพ', color:'#16A34A', urgent:true },
-  { dept:'บริหาร', title:'เจ้าหน้าที่ประสานงานผู้ป่วยต่างชาติ (EN/CN/JP)', type:'Full-time', location:'MediThai กรุงเทพ', color:'#F59E0B', urgent:false },
-  { dept:'ศูนย์เด็ก', title:'กุมารแพทย์', type:'Full-time', location:'MediThai เด็ก', color:'#10B981', urgent:false },
-  { dept:'การตลาด', title:'Digital Marketing Specialist', type:'Full-time', location:'MediThai กรุงเทพ', color:'#1B3A6B', urgent:false },
-];
+const cms = await makePageCms('careers');
+
+const heroTitle = cms.t('hero', 'pg_title', 'ร่วมเป็นส่วนหนึ่งของ MediThai', 'Join the MediThai Team');
+const heroDesc  = cms.t('hero', 'pg_desc', 'เราเชื่อว่าบุคลากรที่ดีคือหัวใจของการรักษาพยาบาลที่ดี มาร่วมสร้างอนาคตทางการแพทย์ไปด้วยกัน', 'We believe great people are the heart of great healthcare. Join us in building the future of medicine.');
+
+const bnTag     = cms.t('benefits', 'tag', 'ทำไมต้อง MediThai', 'Why MediThai');
+const bnHeading = cms.t('benefits', 'heading', 'สิทธิประโยชน์ที่คุณจะได้รับ', 'Benefits You\'ll Receive');
+const benefits = cms.items('benefits', 'items').map((it, i) => ({
+  icon: it.icon || 'circle-check', color: it.color || '#0891B2',
+  title: cms.li('benefits', 'items', i, 'title', it),
+  desc:  cms.li('benefits', 'items', i, 'desc', it),
+}));
+
+const jbTag     = cms.t('jobs', 'tag', 'ตำแหน่งที่เปิดรับ', 'Open Positions');
+const jbHeading = cms.t('jobs', 'heading', 'ตำแหน่งงานว่าง', 'Job Openings');
+const jbCta     = cms.t('jobs', 'cta_text', 'ไม่พบตำแหน่งที่ต้องการ? ส่ง Resume มาเพื่อพิจารณาสำหรับตำแหน่งอนาคต', 'Don\'t see the right position? Send us your resume for future consideration.');
+const jobs = cms.items('jobs', 'items').map((it, i) => ({
+  color: it.color || '#0891B2', type: it.type || 'Full-time', urgent: it.urgent === 'yes',
+  title:    cms.li('jobs', 'items', i, 'title', it),
+  dept:     cms.li('jobs', 'items', i, 'dept', it),
+  location: cms.li('jobs', 'items', i, 'location', it),
+}));
+
+const cmsScript = cms.script();
 ---
 <Layout title="ร่วมงานกับเรา | MediThai" description="ร่วมเป็นส่วนหนึ่งของทีม MediThai เปิดรับสมัครงานหลายตำแหน่ง"
   extraHead={`${cmsScript}<style>
@@ -32,9 +40,9 @@ const jobs = [
 
 <section class="page-hero">
   <div class="container">
-    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span>ร่วมงานกับเรา</span></div>
-    <h1 data-i18n="pg_title">{th.pg_title}</h1>
-    <p data-i18n="pg_desc">{th.pg_desc}</p>
+    <div class="breadcrumb"><a href="/">หน้าแรก</a><Icon name="fa6-solid:chevron-right" /><span data-i18n={heroTitle.k}>{heroTitle.th}</span></div>
+    <h1 data-i18n={heroTitle.k}>{heroTitle.th}</h1>
+    <p data-i18n={heroDesc.k} set:html={heroDesc.th}></p>
   </div>
 </section>
 
@@ -42,26 +50,17 @@ const jobs = [
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:48px">
-      <span class="tag">ทำไมต้อง MediThai</span>
-      <h2>สิทธิประโยชน์ที่คุณจะได้รับ</h2>
+      <span class="tag" data-i18n={bnTag.k}>{bnTag.th}</span>
+      <h2 data-i18n={bnHeading.k}>{bnHeading.th}</h2>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
-      {[
-        { icon:'fa6-solid:hand-holding-medical', bg:'#EFF6FF', color:'#0891B2', title:'ตรวจสุขภาพฟรีทุกปี', desc:'พนักงานและครอบครัวได้รับสิทธิ์ตรวจสุขภาพฟรีทุกปี' },
-        { icon:'fa6-solid:graduation-cap', bg:'#F5F3FF', color:'#8B5CF6', title:'ทุนการศึกษา', desc:'ทุนสนับสนุนการอบรมและพัฒนาวิชาชีพต่อเนื่อง' },
-        { icon:'fa6-solid:coins', bg:'#FFFBEB', color:'#F59E0B', title:'โบนัสและสวัสดิการ', desc:'โบนัสประจำปี เบี้ยเลี้ยง และสวัสดิการที่แข่งขันได้' },
-        { icon:'fa6-solid:scale-balanced', bg:'#F0FDF4', color:'#10B981', title:'Work-Life Balance', desc:'วันหยุดพักร้อน ลาป่วย และความยืดหยุ่นในการทำงาน' },
-        { icon:'fa6-solid:users', bg:'#FFF1F2', color:'#EF4444', title:'ทีมที่แข็งแกร่ง', desc:'ทำงานร่วมกับแพทย์และผู้เชี่ยวชาญระดับนานาชาติ' },
-        { icon:'fa6-solid:chart-line', bg:'#EFF6FF', color:'#1B3A6B', title:'ความก้าวหน้าในสายอาชีพ', desc:'เส้นทางอาชีพที่ชัดเจนและโอกาสเติบโต' },
-        { icon:'fa6-solid:building-columns', bg:'#FFF7ED', color:'#EA580C', title:'เทคโนโลยีล้ำสมัย', desc:'ทำงานกับเครื่องมือและเทคโนโลยีการแพทย์ที่ทันสมัยที่สุด' },
-        { icon:'fa6-solid:earth-asia', bg:'#F0FDF4', color:'#059669', title:'เครือข่ายระดับโลก', desc:'โอกาสแลกเปลี่ยนกับโรงพยาบาลชั้นนำต่างประเทศ' },
-      ].map((b,i) => (
+      {benefits.map((b, i) => (
         <div class={`benefit-card reveal${i%4===1?' reveal-delay-1':i%4===2?' reveal-delay-2':i%4===3?' reveal-delay-3':''}`}>
-          <div class="benefit-icon" style={`background:${b.bg}`}>
-            <Icon name={b.icon} style={`color:${b.color};width:1.4rem;height:1.4rem`} />
+          <div class="benefit-icon" style={`background:${b.color}15`}>
+            <Icon name={`fa6-solid:${b.icon}`} style={`color:${b.color};width:1.4rem;height:1.4rem`} />
           </div>
-          <h3 style="font-size:.9rem;font-weight:700;color:var(--primary);margin-bottom:6px">{b.title}</h3>
-          <p style="font-size:.8rem;color:var(--gray-600);line-height:1.6">{b.desc}</p>
+          <h3 style="font-size:.9rem;font-weight:700;color:var(--primary);margin-bottom:6px" data-i18n={b.title.k}>{b.title.th}</h3>
+          <p style="font-size:.8rem;color:var(--gray-600);line-height:1.6" data-i18n={b.desc.k}>{b.desc.th}</p>
         </div>
       ))}
     </div>
@@ -72,24 +71,24 @@ const jobs = [
 <section class="section-pad">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:32px">
-      <span class="tag">ตำแหน่งที่เปิดรับ</span>
-      <h2>ตำแหน่งงานว่าง</h2>
+      <span class="tag" data-i18n={jbTag.k}>{jbTag.th}</span>
+      <h2 data-i18n={jbHeading.k}>{jbHeading.th}</h2>
       <p>{jobs.length} ตำแหน่งที่เปิดรับสมัครในขณะนี้</p>
     </div>
     <div style="display:flex;flex-direction:column;gap:16px;max-width:800px;margin:0 auto">
-      {jobs.map((j,i) => (
+      {jobs.map((j, i) => (
         <div class={`job-card reveal${i%2===1?' reveal-delay-1':''}`}>
           <div style={`width:48px;height:48px;border-radius:12px;background:${j.color}15;display:flex;align-items:center;justify-content:center;flex-shrink:0`}>
             <Icon name="fa6-solid:briefcase-medical" style={`color:${j.color};width:1.2rem;height:1.2rem`} />
           </div>
           <div style="flex:1">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
-              <span style="font-weight:700;color:var(--primary)">{j.title}</span>
+              <span style="font-weight:700;color:var(--primary)" data-i18n={j.title.k}>{j.title.th}</span>
               {j.urgent && <span style="background:#FEE2E2;color:#991B1B;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px">ด่วน</span>}
             </div>
             <div style="font-size:.8rem;color:var(--gray-500);display:flex;gap:16px;flex-wrap:wrap">
-              <span><Icon name="fa6-solid:tag" style={`color:${j.color}`} /> {j.dept}</span>
-              <span><Icon name="fa6-solid:location-dot" /> {j.location}</span>
+              <span><Icon name="fa6-solid:tag" style={`color:${j.color}`} /> <span data-i18n={j.dept.k}>{j.dept.th}</span></span>
+              <span><Icon name="fa6-solid:location-dot" /> <span data-i18n={j.location.k}>{j.location.th}</span></span>
               <span><Icon name="fa6-solid:clock" /> {j.type}</span>
             </div>
           </div>
@@ -98,7 +97,7 @@ const jobs = [
       ))}
     </div>
     <div style="text-align:center;margin-top:32px">
-      <p style="color:var(--gray-600);margin-bottom:16px">ไม่พบตำแหน่งที่ต้องการ? ส่ง Resume มาเพื่อพิจารณาสำหรับตำแหน่งอนาคต</p>
+      <p style="color:var(--gray-600);margin-bottom:16px" data-i18n={jbCta.k}>{jbCta.th}</p>
       <a href="/contact" class="btn btn-primary"><Icon name="fa6-solid:paper-plane" /> ส่ง Resume</a>
     </div>
   </div>

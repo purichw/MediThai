@@ -2,13 +2,28 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('giving', {
-  pg_title: 'ร่วมสร้างสุขภาพที่ดีให้ทุกคน',
-  pg_desc: 'กองทุน MediThai Care Fund ช่วยเหลือผู้ป่วยที่ขาดแคลนและด้อยโอกาสให้เข้าถึงการรักษาพยาบาลที่มีคุณภาพ',
-  pg_title_en: 'Building Better Health for All',
-  pg_desc_en: 'The MediThai Care Fund helps underprivileged patients access quality medical care.',
-});
+import { makePageCms } from '../lib/cmsPage';
+
+const cms = await makePageCms('giving');
+const heroTitle = cms.t('hero', 'pg_title', 'ร่วมสร้างสุขภาพที่ดีให้ทุกคน', 'Building Better Health for All');
+const heroDesc  = cms.t('hero', 'pg_desc', 'กองทุน MediThai Care Fund ช่วยเหลือผู้ป่วยที่ขาดแคลนและด้อยโอกาสให้เข้าถึงการรักษาพยาบาลที่มีคุณภาพ', 'The MediThai Care Fund helps underprivileged patients access quality medical care.');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th };
+
+const impact = cms.items('impact', 'items').map((it, i) => ({
+  num: it.num, icon: it.icon || 'circle-check',
+  label: cms.li('impact', 'items', i, 'label', it),
+}));
+
+const pgTag     = cms.t('programs', 'tag', 'โครงการ', 'Programs');
+const pgHeading = cms.t('programs', 'heading', 'โครงการที่คุณสนับสนุนได้', 'Programs You Can Support');
+const programs = cms.items('programs', 'items').map((it, i) => ({
+  icon: it.icon || 'hand-holding-heart', color: it.color || '#0891B2',
+  funded: parseInt(it.funded || '0', 10) || 0,
+  title: cms.li('programs', 'items', i, 'title', it),
+  desc:  cms.li('programs', 'items', i, 'desc', it),
+}));
+
+const cmsScript = cms.script();
 ---
 <Layout title="ร่วมสนับสนุน | MediThai" description="ร่วมสนับสนุนกองทุนสุขภาพ MediThai เพื่อผู้ป่วยที่ขาดแคลน">
 <Fragment set:html={cmsScript} />
@@ -25,16 +40,11 @@ const { th, cmsScript } = await loadPageCMS('giving', {
 <section style="background:#fff;padding:56px 0">
   <div class="container">
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center">
-      {[
-        { n:'2,400+', l:'ผู้ป่วยได้รับการช่วยเหลือ', icon:'fa6-solid:users' },
-        { n:'฿45M+', l:'มูลค่าความช่วยเหลือรวม', icon:'fa6-solid:hand-holding-heart' },
-        { n:'12', l:'โครงการที่ดำเนินอยู่', icon:'fa6-solid:list-check' },
-        { n:'98%', l:'ของเงินบริจาคถึงผู้รับ', icon:'fa6-solid:circle-check' },
-      ].map(s => (
+      {impact.map(s => (
         <div class="reveal">
-          <Icon name={s.icon} style="font-size:1.5rem;color:var(--accent);margin-bottom:8px" />
-          <div style="font-size:2rem;font-weight:800;color:var(--primary)">{s.n}</div>
-          <div style="font-size:.875rem;color:var(--gray-600)">{s.l}</div>
+          <Icon name={`fa6-solid:${s.icon}`} style="font-size:1.5rem;color:var(--accent);margin-bottom:8px" />
+          <div style="font-size:2rem;font-weight:800;color:var(--primary)">{s.num}</div>
+          <div style="font-size:.875rem;color:var(--gray-600)" data-i18n={s.label.k}>{s.label.th}</div>
         </div>
       ))}
     </div>
@@ -45,24 +55,17 @@ const { th, cmsScript } = await loadPageCMS('giving', {
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="section-header text-center reveal" style="margin-bottom:40px">
-      <span class="tag">โครงการ</span>
-      <h2>โครงการที่คุณสนับสนุนได้</h2>
+      <span class="tag" data-i18n={pgTag.k}>{pgTag.th}</span>
+      <h2 data-i18n={pgHeading.k}>{pgHeading.th}</h2>
     </div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
-      {[
-        { icon:'fa6-solid:child', color:'#10B981', bg:'#F0FDF4', title:'เด็กขาดแคลนเข้าถึงการรักษา', desc:'สนับสนุนค่ารักษาพยาบาลให้เด็กจากครอบครัวรายได้น้อยที่ป่วยด้วยโรคหัวใจ มะเร็ง และโรคเรื้อรัง', funded:68 },
-        { icon:'fa6-solid:person-cane', color:'#0891B2', bg:'#EFF6FF', title:'ผู้สูงอายุขาดแคลน', desc:'ช่วยเหลือผู้สูงอายุที่ไม่มีบัตรประกันสุขภาพหรือมีรายได้ไม่พอค่ารักษาให้เข้าถึงการดูแลสุขภาพ', funded:82 },
-        { icon:'fa6-solid:graduation-cap', color:'#8B5CF6', bg:'#F5F3FF', title:'ทุนการศึกษาพยาบาล', desc:'มอบทุนการศึกษาให้นักศึกษาพยาบาลและแพทย์ที่มีความสามารถแต่ขาดแคลนทุนทรัพย์', funded:45 },
-        { icon:'fa6-solid:earth-asia', color:'#F59E0B', bg:'#FFFBEB', title:'แพทย์อาสาชนบท', desc:'สนับสนุนโครงการส่งแพทย์และพยาบาลอาสาให้บริการประชาชนในพื้นที่ห่างไกล', funded:55 },
-        { icon:'fa6-solid:flask', color:'#EF4444', bg:'#FFF1F2', title:'ทุนวิจัยทางการแพทย์', desc:'สนับสนุนการวิจัยโรคมะเร็งและโรคหัวใจ เพื่อพัฒนาวิธีการรักษาที่ดีขึ้นในอนาคต', funded:30 },
-        { icon:'fa6-solid:house-chimney-medical', color:'#1B3A6B', bg:'#EFF6FF', title:'คลินิกชุมชนฟรี', desc:'สนับสนุนคลินิกตรวจสุขภาพฟรีในชุมชนรายได้น้อย 3 ครั้งต่อปี', funded:72 },
-      ].map((p,i) => (
+      {programs.map((p,i) => (
         <div class={`reveal${i%3===1?' reveal-delay-1':i%3===2?' reveal-delay-2':''}`} style="background:#fff;border-radius:20px;padding:28px;box-shadow:var(--shadow-md)">
-          <div style={`width:56px;height:56px;border-radius:14px;background:${p.bg};display:flex;align-items:center;justify-content:center;margin-bottom:16px`}>
-            <Icon name={p.icon} style={`color:${p.color};width:1.4rem;height:1.4rem`} />
+          <div style={`width:56px;height:56px;border-radius:14px;background:${p.color}15;display:flex;align-items:center;justify-content:center;margin-bottom:16px`}>
+            <Icon name={`fa6-solid:${p.icon}`} style={`color:${p.color};width:1.4rem;height:1.4rem`} />
           </div>
-          <h3 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:8px">{p.title}</h3>
-          <p style="font-size:.85rem;color:var(--gray-600);line-height:1.7;margin-bottom:16px">{p.desc}</p>
+          <h3 style="font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:8px" data-i18n={p.title.k}>{p.title.th}</h3>
+          <p style="font-size:.85rem;color:var(--gray-600);line-height:1.7;margin-bottom:16px" data-i18n={p.desc.k}>{p.desc.th}</p>
           <div style="margin-bottom:4px;display:flex;justify-content:space-between;font-size:.8rem">
             <span style="color:var(--gray-500)">ได้รับทุนแล้ว</span>
             <span style={`font-weight:700;color:${p.color}`}>{p.funded}%</span>
