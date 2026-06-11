@@ -2,30 +2,73 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { createAdminSupabase } from '../lib/supabase-server';
+import { makePageCms } from '../lib/cmsPage';
 
-const supabase = createAdminSupabase();
-const { data: rows } = await supabase
-  .from('site_content').select('section_key, content').eq('page_slug', 'packages');
-const db: Record<string, any> = {};
-for (const row of rows ?? []) db[row.section_key] = row.content;
-const heroDb = db.hero ?? {}; const promoDb = db.promo ?? {};
+const cms = await makePageCms('packages');
+const heroTitle = cms.t('hero', 'pg_title', 'แพ็กเกจสุขภาพ', 'Health Packages');
+const heroDesc  = cms.t('hero', 'pg_desc', 'ดูแลสุขภาพที่นี่ เช็กราคา หาโปรจากโรงพยาบาลในเครือ MediThai', 'Browse health packages & promotions from MediThai hospitals.');
+const promoTitle = cms.t('promo', 'promo_title', 'MediThai Health Pass — ตรวจสุขภาพรายปี ซื้อครั้งเดียวตรวจได้ทั้งปี', 'MediThai Health Pass — Annual check-up, one purchase all year.');
+const promoSub   = cms.t('promo', 'promo_sub', 'เริ่มต้น ฿2,990/ปี · เลือกตรวจได้หลายรายการ · ทุกสาขาในเครือ', 'From ฿2,990/year · Multiple tests available · All branches');
+const promoBtn   = cms.t('promo', 'promo_btn', 'ดูรายละเอียด', 'See details');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th, promo_title: promoTitle.th, promo_sub: promoSub.th, promo_btn: promoBtn.th };
 
-const th = {
-  pg_title:    heroDb.th?.pg_title   ?? 'แพ็กเกจสุขภาพ',
-  pg_desc:     heroDb.th?.pg_desc    ?? 'ดูแลสุขภาพที่นี่ เช็กราคา หาโปรจากโรงพยาบาลในเครือ MediThai',
-  promo_title: promoDb.th?.promo_title ?? 'MediThai Health Pass — ตรวจสุขภาพรายปี ซื้อครั้งเดียวตรวจได้ทั้งปี',
-  promo_sub:   promoDb.th?.promo_sub   ?? 'เริ่มต้น ฿2,990/ปี · เลือกตรวจได้หลายรายการ · ทุกสาขาในเครือ',
-  promo_btn:   promoDb.th?.promo_btn   ?? 'ดูรายละเอียด',
+const HOSP: Record<string, { name: string; color: string }> = {
+  bkk:    { name: 'MediThai กรุงเทพ',        color: '#1B3A6B' },
+  heart:  { name: 'MediThai หัวใจ',           color: '#EF4444' },
+  cancer: { name: 'MediThai มะเร็ง',           color: '#8B5CF6' },
+  spine:  { name: 'MediThai สมองและกระดูก',   color: '#0891B2' },
+  kids:   { name: 'MediThai เด็ก',             color: '#10B981' },
+  chiang: { name: 'MediThai เชียงใหม่',        color: '#F59E0B' },
 };
-const en = {
-  pg_title:    heroDb.en?.pg_title   ?? 'Health Packages',
-  pg_desc:     heroDb.en?.pg_desc    ?? 'Browse health packages & promotions from MediThai hospitals.',
-  promo_title: promoDb.en?.promo_title ?? 'MediThai Health Pass — Annual check-up, one purchase all year.',
-  promo_sub:   promoDb.en?.promo_sub   ?? 'From ฿2,990/year · Multiple tests available · All branches',
-  promo_btn:   promoDb.en?.promo_btn   ?? 'See details',
+const CHIP_CLASS = (label: string) => {
+  if (/ขายดี/.test(label)) return 'bestseller';
+  if (/ถูกที่สุด/.test(label)) return 'cheapest';
+  if (/ใหม่/.test(label)) return 'new';
+  if (/จำกัด/.test(label)) return 'limited';
+  if (/bundle/i.test(label)) return 'bundle';
+  return 'recommended';
 };
-const cmsScript = `<script>window.__CMS_P__=${JSON.stringify({th,en})}<\/script>`;
+const starsFor = (rating: number) => ({ full: Math.floor(rating), half: rating - Math.floor(rating) >= 0.3 });
+const fmtPrice = (n: string) => {
+  const v = parseInt(n || '0', 10);
+  return v ? v.toLocaleString('en-US') : '';
+};
+const incLi = (text: string) => (text || '').split('\n').filter(Boolean).map(l =>
+  `<li><span style="color:var(--secondary);font-weight:700">✓</span>${l}</li>`).join('');
+
+const pkgCards = cms.items('cards', 'items').map((it, i) => {
+  const inc = cms.li('cards', 'items', i, 'includes', it);
+  const hosp = HOSP[it.hospital] || HOSP.bkk;
+  const grad = (it.grad || '#1B3A6B,#2554A0').split(',');
+  return {
+    cat: it.cat || 'checkup', hospital: it.hospital || 'bkk', gender: it.gender || 'all', age: it.age || 'all',
+    price: it.price || '0', priceNow: fmtPrice(it.price), priceWas: fmtPrice(it.price_was),
+    discount: it.discount || '', rating: parseFloat(it.rating || '5'), reviews: it.reviews || '0',
+    icon: it.icon || 'box-open', g1: grad[0], g2: grad[1] || grad[0],
+    hospName: hosp.name, hospColor: hosp.color,
+    chips: (it.chips || '').split(',').map(c => c.trim()).filter(Boolean).map(c => ({ label: c, cls: CHIP_CLASS(c) })),
+    title: cms.li('cards', 'items', i, 'title', it),
+    installment: cms.li('cards', 'items', i, 'installment', it),
+    expires: cms.li('cards', 'items', i, 'expires', it),
+    incHtml: cms.t('cards', `pkg${i}_inc_html`, incLi(inc.th), incLi(inc.en)),
+    stars: starsFor(parseFloat(it.rating || '5')),
+  };
+});
+
+const hpTag     = cms.t('healthpass', 'tag', 'MediThai Health Pass', 'MediThai Health Pass');
+const hpHeading = cms.t('healthpass', 'heading', 'ตรวจสุขภาพรายปี ซื้อครั้งเดียวตรวจได้ทั้งปี', 'Annual check-ups — one purchase, all year');
+const hpSub     = cms.t('healthpass', 'sub', 'เหมือน All You Can Check — เลือกแผนที่ใช่ เพิ่มรายการตรวจได้ตลอดปี ทุกสาขาในเครือ', 'Like All You Can Check — pick a plan, add tests all year, every branch.');
+const hpPlans = cms.items('healthpass', 'plans').map((it, i) => {
+  const feats = cms.li('healthpass', 'plans', i, 'features', it);
+  return {
+    name: it.name, price: it.price, icon: it.icon || 'leaf', color: it.color || '#0891B2',
+    featured: it.featured === 'yes',
+    period: cms.li('healthpass', 'plans', i, 'period', it),
+    featHtml: cms.t('healthpass', `plan${i}_feat_html`, incLi(feats.th), incLi(feats.en)),
+  };
+});
+
+const cmsScript = cms.script();
 ---
 <Layout
   title={`${th.pg_title} | MediThai Hospital Network`}
@@ -237,105 +280,33 @@ const cmsScript = `<script>window.__CMS_P__=${JSON.stringify({th,en})}<\/script>
         </div>
 
         <div class="pkg-grid" id="pkg-grid">
-          <div class="pkg-card" data-cat="checkup" data-hospital="bkk" data-gender="all" data-age="all" data-purpose="executive" data-price="129000">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#1B3A6B,#2554A0)"><Icon name="fa6-solid:user-tie" /><div class="pkg-discount-badge">-11%</div><div class="pkg-trust-chips"><span class="trust-chip bestseller">ขายดี</span><span class="trust-chip recommended">แนะนำ</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#1B3A6B"></div>MediThai กรุงเทพ</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">CEO Check-up Program ตรวจสุขภาพเชิงลึกสำหรับผู้บริหาร</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />ตรวจเลือดครบ 40+ รายการ</li><li><Icon name="fa6-solid:check" />CT Scan ปอด หัวใจ</li><li><Icon name="fa6-solid:check" />พบแพทย์เฉพาะทาง 3 สาขา</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div><span class="rating-score">5.0</span><span class="rating-count">(128 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿129,000</span><span class="pkg-price-was">฿145,000</span></div><div class="pkg-installment"><Icon name="fa6-solid:credit-card" />ผ่อน 0% นาน 10 เดือน ~฿12,900/เดือน</div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />สิ้นสุด 31 ธ.ค. 2569</div><div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div>
+          {pkgCards.map(p => (
+            <div class="pkg-card" data-cat={p.cat} data-hospital={p.hospital} data-gender={p.gender} data-age={p.age} data-price={p.price}>
+              <div class="pkg-thumb" style={`background:linear-gradient(135deg,${p.g1},${p.g2})`}>
+                <Icon name={`fa6-solid:${p.icon}`} />
+                {p.discount && <div class="pkg-discount-badge">{p.discount}</div>}
+                <div class="pkg-trust-chips">{p.chips.map(c => <span class={`trust-chip ${c.cls}`}>{c.label}</span>)}</div>
+              </div>
+              <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style={`background:${p.hospColor}`}></div>{p.hospName}</div>
+              <div class="pkg-card-body">
+                <div class="pkg-card-title" data-i18n={p.title.k}>{p.title.th}</div>
+                <ul class="pkg-includes" data-i18n={p.incHtml.k} set:html={p.incHtml.th}></ul>
+                <div class="pkg-rating">
+                  <div class="stars">
+                    {Array.from({ length: p.stars.full }).map(() => <Icon name="fa6-solid:star" />)}
+                    {p.stars.half && <Icon name="fa6-solid:star-half-stroke" />}
+                  </div>
+                  <span class="rating-score">{p.rating.toFixed(1)}</span><span class="rating-count">({p.reviews} รีวิว)</span>
+                </div>
+                <div class="pkg-price-block">
+                  <div class="pkg-price-row"><span class="pkg-price-now">฿{p.priceNow}</span>{p.priceWas && <span class="pkg-price-was">฿{p.priceWas}</span>}</div>
+                  {p.installment.th && <div class="pkg-installment"><Icon name="fa6-solid:credit-card" /><span data-i18n={p.installment.k}>{p.installment.th}</span></div>}
+                  {p.expires.th && <div class="pkg-expires-row"><Icon name="fa6-regular:clock" /><span data-i18n={p.expires.k}>{p.expires.th}</span></div>}
+                  <div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div class="pkg-card" data-cat="cancer" data-hospital="cancer" data-gender="male" data-age="46-60" data-purpose="annual" data-price="72400">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#8B5CF6,#7C3AED)"><Icon name="fa6-solid:microscope" /><div class="pkg-discount-badge">-60%</div><div class="pkg-trust-chips"><span class="trust-chip cheapest">ถูกที่สุด</span><span class="trust-chip new">ใหม่</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#8B5CF6"></div>MediThai มะเร็ง</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">PET/CT Scan ตรวจคัดกรองมะเร็ง Absolute Early Detection (ชาย)</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />PET/CT Scan ทั้งร่างกาย</li><li><Icon name="fa6-solid:check" />Tumor Marker Panel 20 รายการ</li><li><Icon name="fa6-solid:check" />ตรวจมะเร็ง 15 ชนิด</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div><span class="rating-score">5.0</span><span class="rating-count">(84 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿72,400</span><span class="pkg-price-was">฿181,695</span></div><div class="pkg-installment"><Icon name="fa6-solid:credit-card" />ผ่อน 0% นาน 6 เดือน</div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />สิ้นสุด 31 ธ.ค. 2569</div><div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div>
-            </div>
-          </div>
-
-          <div class="pkg-card" data-cat="heart" data-hospital="heart" data-gender="all" data-age="31-45" data-purpose="annual" data-price="7500">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#EF4444,#DC2626)"><Icon name="fa6-solid:heart-pulse" /><div class="pkg-discount-badge">-40%</div><div class="pkg-trust-chips"><span class="trust-chip bestseller">ขายดี</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#EF4444"></div>MediThai หัวใจ</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">3 โปรแกรมตรวจหัวใจ ออกแบบเพื่อคุณโดยเฉพาะ</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />EKG + Echocardiogram</li><li><Icon name="fa6-solid:check" />Exercise Stress Test</li><li><Icon name="fa6-solid:check" />Coronary CT Angiography</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star-half-stroke" /></div><span class="rating-score">4.8</span><span class="rating-count">(203 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿7,500</span><span class="pkg-price-was">฿12,500</span></div><div class="pkg-installment"><Icon name="fa6-solid:credit-card" />ผ่อน 0% นาน 3 เดือน</div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />สิ้นสุด 31 ธ.ค. 2569</div><div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div>
-            </div>
-          </div>
-
-          <div class="pkg-card" data-cat="checkup" data-hospital="spine" data-gender="all" data-age="31-45" data-purpose="annual" data-price="28000">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#0891B2,#0E7490)"><Icon name="fa6-solid:dna" /><div class="pkg-discount-badge">-9%</div><div class="pkg-trust-chips"><span class="trust-chip new">ใหม่</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#0891B2"></div>MediThai สมองและกระดูก</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">Integrated GenomeXplorer ตรวจสุขภาพระดับ DNA</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />Whole Genome Sequencing</li><li><Icon name="fa6-solid:check" />ความเสี่ยงโรค 500+ รายการ</li><li><Icon name="fa6-solid:check" />รายงานยาที่เหมาะกับ DNA คุณ</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div><span class="rating-score">5.0</span><span class="rating-count">(47 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿28,000</span><span class="pkg-price-was">฿30,800</span></div><div class="pkg-installment"><Icon name="fa6-solid:credit-card" />ผ่อน 0% นาน 6 เดือน</div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />สิ้นสุด 31 ธ.ค. 2569</div><div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div>
-            </div>
-          </div>
-
-          <div class="pkg-card" data-cat="cancer" data-hospital="bkk" data-gender="all" data-age="46-60" data-purpose="annual" data-price="6900">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#10B981,#059669)"><Icon name="fa6-solid:lungs" /><div class="pkg-discount-badge">-27%</div><div class="pkg-trust-chips"><span class="trust-chip cheapest">ถูกที่สุด</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#1B3A6B"></div>MediThai กรุงเทพ</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">Low-dose CT Scan ตรวจคัดกรองมะเร็งปอด</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />Low-dose CT Chest</li><li><Icon name="fa6-solid:check" />รายงานโดยรังสีแพทย์เฉพาะทาง</li><li><Icon name="fa6-solid:check" />ปรึกษาผลกับแพทย์</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star-half-stroke" /></div><span class="rating-score">4.7</span><span class="rating-count">(312 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿6,900</span><span class="pkg-price-was">฿9,440</span></div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />สิ้นสุด 31 ธ.ค. 2569</div><div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div>
-            </div>
-          </div>
-
-          <div class="pkg-card" data-cat="surgery" data-hospital="heart" data-gender="all" data-age="46-60" data-purpose="annual" data-price="54000">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#F59E0B,#D97706)"><Icon name="fa6-solid:heart" /><div class="pkg-discount-badge">-30%</div><div class="pkg-trust-chips"><span class="trust-chip limited">จำนวนจำกัด</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#EF4444"></div>MediThai หัวใจ</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">แพ็กเกจสวนหัวใจและผ่าตัดหัวใจ ราคาพิเศษ</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />Cardiac Catheterization</li><li><Icon name="fa6-solid:check" />PTCA / Stent ราคาพิเศษ</li><li><Icon name="fa6-solid:check" />มีพยาบาลดูแลตลอด</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star-half-stroke" /></div><span class="rating-score">4.9</span><span class="rating-count">(56 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿54,000</span><span class="pkg-price-was">฿78,000</span></div><div class="pkg-installment"><Icon name="fa6-solid:credit-card" />ผ่อน 0% นาน 10 เดือน</div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />สิ้นสุด 31 ธ.ค. 2569</div><div class="pkg-cta-row"><a href="/concierge" class="btn btn-outline btn-sm">ปรึกษาทีม</a><a href="/appointments" class="btn btn-primary btn-sm">จองเลย</a></div></div>
-            </div>
-          </div>
-
-          <div class="pkg-card" data-cat="bundle cancer" data-hospital="bkk" data-gender="female" data-age="31-45" data-purpose="annual" data-price="3900">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#DB2777,#BE185D)"><Icon name="fa6-solid:venus" /><div class="pkg-discount-badge">-74%</div><div class="pkg-trust-chips"><span class="trust-chip bundle">Bundle</span><span class="trust-chip bestseller">ขายดีมาก</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#1B3A6B"></div>MediThai กรุงเทพ</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">มัดรวมโปรตรวจมะเร็งผู้หญิง ราคาดีที่สุด</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />ตรวจมะเร็งปากมดลูก (Pap Smear + HPV)</li><li><Icon name="fa6-solid:check" />Mammogram ตรวจมะเร็งเต้านม</li><li><Icon name="fa6-solid:check" />อัลตราซาวด์มดลูกและรังไข่</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div><span class="rating-score">5.0</span><span class="rating-count">(541 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿3,900</span><span class="pkg-price-was">฿15,000</span></div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />สิ้นสุด 30 มิ.ย. 2569</div><div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div>
-            </div>
-          </div>
-
-          <div class="pkg-card" data-cat="vaccine" data-hospital="bkk" data-gender="all" data-age="16-30" data-purpose="annual" data-price="6100">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#0284C7,#0369A1)"><Icon name="fa6-solid:syringe" /><div class="pkg-discount-badge">-15%</div><div class="pkg-trust-chips"><span class="trust-chip recommended">แนะนำ</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#1B3A6B"></div>MediThai กรุงเทพ</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">วัคซีนป้องกันโรคไข้เลือดออก ชนิดใหม่ 2 เข็ม ครบโดส</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />วัคซีน Dengvaxia รุ่นใหม่ล่าสุด</li><li><Icon name="fa6-solid:check" />ฉีดครบ 2 เข็ม ห่าง 6 เดือน</li><li><Icon name="fa6-solid:check" />รวมค่าแพทย์และบริการแล้ว</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star-half-stroke" /></div><span class="rating-score">4.8</span><span class="rating-count">(289 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿6,100</span><span class="pkg-price-was">฿7,200</span></div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />โปรเฉพาะเดือนนี้</div><div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div>
-            </div>
-          </div>
-
-          <div class="pkg-card" data-cat="checkup" data-hospital="chiang" data-gender="all" data-age="16-30" data-purpose="annual work" data-price="1299">
-            <div class="pkg-thumb" style="background:linear-gradient(135deg,#F59E0B,#D97706)"><Icon name="fa6-solid:clipboard-list" /><div class="pkg-discount-badge">-70%</div><div class="pkg-trust-chips"><span class="trust-chip cheapest">ถูกที่สุด</span><span class="trust-chip bestseller">ขายดี</span></div></div>
-            <div class="pkg-hospital-bar"><div class="pkg-hospital-dot" style="background:#F59E0B"></div>MediThai เชียงใหม่</div>
-            <div class="pkg-card-body">
-              <div class="pkg-card-title">ตรวจสุขภาพ 49 รายการ โปรแกรม Basic สำหรับผู้ที่อายุ 15 ปีขึ้นไป</div>
-              <ul class="pkg-includes"><li><Icon name="fa6-solid:check" />ตรวจเลือด CBC + ชีวเคมี 20 รายการ</li><li><Icon name="fa6-solid:check" />X-ray ปอด + EKG</li><li><Icon name="fa6-solid:check" />ตรวจปัสสาวะและอุจจาระ</li></ul>
-              <div class="pkg-rating"><div class="stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star-half-stroke" /></div><span class="rating-score">4.6</span><span class="rating-count">(1,204 รีวิว)</span></div>
-              <div class="pkg-price-block"><div class="pkg-price-row"><span class="pkg-price-now">฿1,299</span><span class="pkg-price-was">฿4,330</span></div><div class="pkg-expires-row"><Icon name="fa6-regular:clock" />สิ้นสุด 31 ธ.ค. 2569</div><div class="pkg-cta-row"><a href="#" class="btn btn-outline btn-sm">รายละเอียด</a><a href="/appointments" class="btn btn-primary btn-sm">ซื้อเลย</a></div></div>
-            </div>
-          </div>
-
+          ))}
         </div>
 
         <div class="text-center" style="margin-top:36px">
@@ -347,53 +318,21 @@ const cmsScript = `<script>window.__CMS_P__=${JSON.stringify({th,en})}<\/script>
     <!-- HEALTH PASS -->
     <div id="health-pass" style="margin-top:80px">
       <div class="text-center reveal" style="margin-bottom:40px">
-        <div class="tag"><Icon name="fa6-solid:infinity" /> MediThai Health Pass</div>
-        <h2 class="section-heading">ตรวจสุขภาพรายปี ซื้อครั้งเดียวตรวจได้ทั้งปี</h2>
-        <p class="section-sub" style="margin:0 auto">เหมือน All You Can Check — เลือกแผนที่ใช่ เพิ่มรายการตรวจได้ตลอดปี ทุกสาขาในเครือ</p>
+        <div class="tag"><Icon name="fa6-solid:infinity" /> <span data-i18n={hpTag.k}>{hpTag.th}</span></div>
+        <h2 class="section-heading" data-i18n={hpHeading.k}>{hpHeading.th}</h2>
+        <p class="section-sub" style="margin:0 auto" data-i18n={hpSub.k}>{hpSub.th}</p>
       </div>
       <div class="health-pass-cards reveal">
-        <div class="health-pass-card">
-          <div class="pass-icon" style="background:rgba(8,145,178,.1);color:var(--secondary)"><Icon name="fa6-solid:leaf" /></div>
-          <h3>Health Pass Lite</h3>
-          <div class="pass-price">฿2,990</div>
-          <div class="pass-period">/ปี (จ่ายครั้งเดียว)</div>
-          <ul class="pass-features">
-            <li><Icon name="fa6-solid:check" />ตรวจเลือดพื้นฐาน 20 รายการ — ไม่จำกัดครั้ง</li>
-            <li><Icon name="fa6-solid:check" />X-ray ปอด 2 ครั้ง/ปี</li>
-            <li><Icon name="fa6-solid:check" />ส่วนลด 10% แพ็กเกจเพิ่มเติม</li>
-            <li><Icon name="fa6-solid:check" />ใช้ได้ทุกสาขาในเครือ</li>
-          </ul>
-          <a href="/appointments" class="btn btn-outline" style="width:100%;justify-content:center">เลือกแผนนี้</a>
-        </div>
-        <div class="health-pass-card featured">
-          <div class="pass-icon" style="background:rgba(27,58,107,.1);color:var(--primary)"><Icon name="fa6-solid:shield-heart" /></div>
-          <h3>Health Pass Standard</h3>
-          <div class="pass-price">฿7,990</div>
-          <div class="pass-period">/ปี (จ่ายครั้งเดียว)</div>
-          <ul class="pass-features">
-            <li><Icon name="fa6-solid:check" />ตรวจเลือดครบ 40 รายการ — ไม่จำกัดครั้ง</li>
-            <li><Icon name="fa6-solid:check" />X-ray + อัลตราซาวด์ช่องท้อง 2 ครั้ง/ปี</li>
-            <li><Icon name="fa6-solid:check" />เลือกตรวจเฉพาะทาง 4 รายการ/ปี</li>
-            <li><Icon name="fa6-solid:check" />ส่วนลด 20% แพ็กเกจเพิ่มเติม</li>
-            <li><Icon name="fa6-solid:check" />ปรึกษาแพทย์ออนไลน์ 3 ครั้ง/ปี</li>
-          </ul>
-          <a href="/appointments" class="btn btn-primary" style="width:100%;justify-content:center">เลือกแผนนี้</a>
-        </div>
-        <div class="health-pass-card">
-          <div class="pass-icon" style="background:rgba(245,158,11,.1);color:var(--accent)"><Icon name="fa6-solid:crown" /></div>
-          <h3>Health Pass Premium</h3>
-          <div class="pass-price">฿16,990</div>
-          <div class="pass-period">/ปี (จ่ายครั้งเดียว)</div>
-          <ul class="pass-features">
-            <li><Icon name="fa6-solid:check" />ตรวจเลือดและรังสีครบ — ไม่จำกัดครั้ง</li>
-            <li><Icon name="fa6-solid:check" />CT Scan 1 ส่วน + MRI 1 ส่วน</li>
-            <li><Icon name="fa6-solid:check" />เลือกตรวจเฉพาะทาง 8 รายการ/ปี</li>
-            <li><Icon name="fa6-solid:check" />ส่วนลด 30% แพ็กเกจทั้งหมด</li>
-            <li><Icon name="fa6-solid:check" />ปรึกษาแพทย์ออนไลน์ ไม่จำกัดครั้ง</li>
-            <li><Icon name="fa6-solid:check" />Personal Health Manager ดูแลคุณ</li>
-          </ul>
-          <a href="/appointments" class="btn btn-outline" style="width:100%;justify-content:center">เลือกแผนนี้</a>
-        </div>
+        {hpPlans.map(p => (
+          <div class={`health-pass-card${p.featured ? ' featured' : ''}`}>
+            <div class="pass-icon" style={`background:${p.color}1a;color:${p.color}`}><Icon name={`fa6-solid:${p.icon}`} /></div>
+            <h3>{p.name}</h3>
+            <div class="pass-price">{p.price}</div>
+            <div class="pass-period" data-i18n={p.period.k}>{p.period.th}</div>
+            <ul class="pass-features" data-i18n={p.featHtml.k} set:html={p.featHtml.th}></ul>
+            <a href="/appointments" class={`btn ${p.featured ? 'btn-primary' : 'btn-outline'}`} style="width:100%;justify-content:center">เลือกแผนนี้</a>
+          </div>
+        ))}
       </div>
     </div>
 

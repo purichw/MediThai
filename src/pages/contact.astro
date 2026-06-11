@@ -2,13 +2,34 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('contact', {
-  pg_title: 'ติดต่อเรา',
-  pg_desc: 'เราพร้อมตอบทุกคำถามของคุณตลอด 24 ชั่วโมง',
-  pg_title_en: 'Contact Us',
-  pg_desc_en: 'We\'re ready to answer all your questions, 24 hours a day.',
-});
+import { makePageCms } from '../lib/cmsPage';
+
+const cms = await makePageCms('contact');
+const heroTitle = cms.t('hero', 'pg_title', 'ติดต่อเรา', 'Contact Us');
+const heroDesc  = cms.t('hero', 'pg_desc', 'เราพร้อมตอบทุกคำถามของคุณตลอด 24 ชั่วโมง', 'We\'re ready to answer all your questions, 24 hours a day.');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th };
+
+const channels = cms.items('channels', 'items').map((it, i) => ({
+  icon: (it.icon || 'phone').includes(':') ? it.icon : `fa6-solid:${it.icon || 'phone'}`,
+  color: it.color || 'blue', href: it.href || '#',
+  title: cms.li('channels', 'items', i, 'title', it),
+  value: cms.li('channels', 'items', i, 'value', it),
+}));
+
+const infoItems = cms.items('info', 'items').map((it, i) => ({
+  icon: it.icon || 'circle-info',
+  title: cms.li('info', 'items', i, 'title', it),
+  text:  cms.li('info', 'items', i, 'text', it),
+}));
+
+const faqTag     = cms.t('faq', 'tag', 'คำถามที่พบบ่อย', 'FAQ');
+const faqHeading = cms.t('faq', 'heading', 'FAQ', 'FAQ');
+const faqs = cms.items('faq', 'items').map((it, i) => ({
+  q: cms.li('faq', 'items', i, 'q', it),
+  a: cms.li('faq', 'items', i, 'a', it),
+}));
+
+const cmsScript = cms.script();
 ---
 <Layout title="ติดต่อเรา | MediThai Hospital Network" description="เราพร้อมตอบทุกคำถามของคุณตลอด 24 ชั่วโมง"
   extraHead={cmsScript}
@@ -34,22 +55,12 @@ const { th, cmsScript } = await loadPageCMS('contact', {
 <section style="background:var(--white);padding:48px 0">
   <div class="container">
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
-      <a href="tel:1722" class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
-        <div class="qa-icon blue"><Icon name="fa6-solid:phone" /></div>
-        <div class="qa-text"><h4>โทรศัพท์</h4><p>1722 (24 ชม.)</p></div>
-      </a>
-      <a href="https://line.me" target="_blank" class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
-        <div class="qa-icon green"><Icon name="fa6-brands:line" /></div>
-        <div class="qa-text"><h4>LINE Official</h4><p>@medithai</p></div>
-      </a>
-      <a href="mailto:contact@medithai.com" class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
-        <div class="qa-icon teal"><Icon name="fa6-solid:envelope" /></div>
-        <div class="qa-text"><h4>อีเมล</h4><p>contact@medithai.com</p></div>
-      </a>
-      <a href="/appointments" class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
-        <div class="qa-icon amber"><Icon name="fa6-solid:calendar-check" /></div>
-        <div class="qa-text"><h4>นัดหมายออนไลน์</h4><p>24/7 พร้อมให้บริการ</p></div>
-      </a>
+      {channels.map(c => (
+        <a href={c.href} class="qa-item" style="border-radius:var(--radius-lg);border:1px solid var(--gray-200);text-decoration:none">
+          <div class={`qa-icon ${c.color}`}><Icon name={c.icon} /></div>
+          <div class="qa-text"><h4 data-i18n={c.title.k}>{c.title.th}</h4><p data-i18n={c.value.k}>{c.value.th}</p></div>
+        </a>
+      ))}
     </div>
   </div>
 </section>
@@ -101,26 +112,12 @@ const { th, cmsScript } = await loadPageCMS('contact', {
 
       <div class="reveal-right">
         <h3 style="font-size:1.1rem;font-weight:600;color:var(--primary);margin-bottom:28px">ข้อมูลติดต่อ</h3>
-        <div class="contact-info-item">
-          <div class="contact-icon"><Icon name="fa6-solid:building-columns" /></div>
-          <div><h4>สำนักงานใหญ่</h4><p>2 ถนนเพชรบุรีตัดใหม่ แขวงบางกอกน้อย<br>กรุงเทพมหานคร 10700</p></div>
-        </div>
-        <div class="contact-info-item">
-          <div class="contact-icon"><Icon name="fa6-solid:phone" /></div>
-          <div><h4>สายด่วน (24 ชั่วโมง)</h4><p><strong style="font-size:1.1rem;color:var(--primary)">1722</strong></p></div>
-        </div>
-        <div class="contact-info-item">
-          <div class="contact-icon"><Icon name="fa6-solid:envelope" /></div>
-          <div><h4>อีเมล</h4><p>contact@medithai.com<br>international@medithai.com</p></div>
-        </div>
-        <div class="contact-info-item">
-          <div class="contact-icon"><Icon name="fa6-solid:clock" /></div>
-          <div><h4>เวลาทำการ (OPD)</h4><p>ทุกวัน 07:00 – 21:00 น.<br>ห้องฉุกเฉิน: 24 ชั่วโมง</p></div>
-        </div>
-        <div class="contact-info-item">
-          <div class="contact-icon"><Icon name="fa6-solid:globe" /></div>
-          <div><h4>บริการผู้ป่วยต่างชาติ</h4><p>ไทย · English · 中文 · 日本語<br>한국어 · Deutsch · العربية</p></div>
-        </div>
+        {infoItems.map(it => (
+          <div class="contact-info-item">
+            <div class="contact-icon"><Icon name={`fa6-solid:${it.icon}`} /></div>
+            <div><h4 data-i18n={it.title.k}>{it.title.th}</h4><p data-i18n={it.text.k} set:html={it.text.th}></p></div>
+          </div>
+        ))}
         <div style="margin-top:28px;padding-top:28px;border-top:1px solid var(--gray-200)">
           <h4 style="font-size:.85rem;font-weight:600;color:var(--gray-700);margin-bottom:14px">ติดตามเราบนโซเชียล</h4>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -138,34 +135,18 @@ const { th, cmsScript } = await loadPageCMS('contact', {
 <section class="section-pad" style="background:var(--white)">
   <div class="container">
     <div class="text-center reveal" style="margin-bottom:40px">
-      <div class="tag"><Icon name="fa6-solid:circle-question" /> คำถามที่พบบ่อย</div>
-      <h2 class="section-heading">FAQ</h2>
+      <div class="tag"><Icon name="fa6-solid:circle-question" /> <span data-i18n={faqTag.k}>{faqTag.th}</span></div>
+      <h2 class="section-heading" data-i18n={faqHeading.k}>{faqHeading.th}</h2>
     </div>
     <div style="max-width:720px;margin:0 auto">
-      <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
-        <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
-          นัดหมายออนไลน์ต้องทำอย่างไร? <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
-        </summary>
-        <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8">กดปุ่ม "นัดหมาย" บนเว็บไซต์ เลือกโรงพยาบาล สาขาการแพทย์ แพทย์ และวันเวลา กรอกข้อมูลผู้ป่วย และยืนยันการนัดหมาย ระบบจะส่ง SMS และอีเมลยืนยันให้อัตโนมัติ</div>
-      </details>
-      <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
-        <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
-          รองรับประกันสุขภาพจากต่างประเทศหรือไม่? <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
-        </summary>
-        <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8">ใช่ เรารองรับประกันสุขภาพนานาชาติกว่า 30 บริษัท รวมถึง AIA, BUPA, Cigna, AXA, Allianz และอื่น ๆ สอบถามรายละเอียดได้ที่ 1722</div>
-      </details>
-      <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
-        <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
-          Virtual Visit หรือ Telemedicine คืออะไร? <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
-        </summary>
-        <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8">บริการปรึกษาแพทย์ผ่านวิดีโอคอลจากที่บ้าน เหมาะสำหรับการติดตามอาการ ขอใบรับรองแพทย์ หรือปรึกษาเบื้องต้น ไม่ต้องเดินทาง นัดหมายผ่านแอป MediThai ได้เลย</div>
-      </details>
-      <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
-        <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
-          ผู้ป่วยต่างชาติสามารถใช้บริการได้อย่างไร? <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
-        </summary>
-        <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8">เรามีทีม International Patient Services ที่พูดได้หลายภาษา รองรับผู้ป่วยจากทั่วโลก มีบริการล่ามแปลภาษา ช่วยประสานงานที่พัก และจัดทำเอกสารทางการแพทย์เป็นภาษาอังกฤษ ติดต่อ international@medithai.com</div>
-      </details>
+      {faqs.map(f => (
+        <details style="border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:12px;overflow:hidden" class="reveal">
+          <summary style="padding:16px 20px;cursor:pointer;font-weight:600;color:var(--gray-800);display:flex;justify-content:space-between;align-items:center;list-style:none;font-family:var(--font-heading)">
+            <span data-i18n={f.q.k}>{f.q.th}</span> <Icon name="fa6-solid:chevron-down" style="font-size:.8rem;color:var(--gray-400)" />
+          </summary>
+          <div style="padding:0 20px 16px;color:var(--gray-600);font-size:.88rem;line-height:1.8" data-i18n={f.a.k}>{f.a.th}</div>
+        </details>
+      ))}
     </div>
   </div>
 </section>

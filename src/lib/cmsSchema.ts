@@ -931,12 +931,67 @@ const OTHER_PAGES: PageDef[] = [
     ],
   },
   { slug:'locations',       label:'สาขาของเรา',            description:'หน้าแผนที่สาขา',                      icon:'📍',  sections: simpleHero() },
-  { slug:'contact',         label:'ติดต่อเรา',             description:'หน้าติดต่อ',                          icon:'📞',  sections: simpleHero() },
+  {
+    slug: 'contact', label: 'ติดต่อเรา', description: 'หน้าติดต่อ — ช่องทาง ข้อมูลติดต่อ FAQ', icon: '📞',
+    sections: [
+      ...simpleHero(),
+      {
+        key: 'channels', label: 'ช่องทางด่วน 4 ปุ่ม', icon: '⚡',
+        fields: [
+          list('items', 'ช่องทาง', {
+            itemName: 'ช่องทาง', itemLabelKey: 'title_th',
+            itemFields: [
+              mono('icon', 'ไอคอน (fa6-solid หรือ fa6-brands:xxx)'), mono('color', 'สีพื้น (blue/green/teal/amber)'),
+              bi('title', 'หัวข้อ'), bi('value', 'ข้อความ'), mono('href', 'ลิงก์ (tel:/mailto:/URL)'),
+            ],
+            defaults: [
+              { icon: 'phone', color: 'blue', title_th: 'โทรศัพท์', title_en: 'Phone', value_th: '1722 (24 ชม.)', value_en: '1722 (24 hrs)', href: 'tel:1722' },
+              { icon: 'fa6-brands:line', color: 'green', title_th: 'LINE Official', title_en: 'LINE Official', value_th: '@medithai', value_en: '@medithai', href: 'https://line.me' },
+              { icon: 'envelope', color: 'teal', title_th: 'อีเมล', title_en: 'Email', value_th: 'contact@medithai.com', value_en: 'contact@medithai.com', href: 'mailto:contact@medithai.com' },
+              { icon: 'calendar-check', color: 'amber', title_th: 'นัดหมายออนไลน์', title_en: 'Book Online', value_th: '24/7 พร้อมให้บริการ', value_en: 'Available 24/7', href: '/appointments' },
+            ],
+          }),
+        ],
+      },
+      {
+        key: 'info', label: 'ข้อมูลติดต่อ (sidebar)', icon: 'ℹ️',
+        fields: [
+          list('items', 'ข้อมูล', {
+            itemName: 'ข้อมูล', itemLabelKey: 'title_th',
+            itemFields: [mono('icon', 'ไอคอน (fa6-solid)'), bi('title', 'หัวข้อ'), bi('text', 'ข้อความ (ใส่ <br> ขึ้นบรรทัดได้)')],
+            defaults: [
+              { icon: 'building-columns', title_th: 'สำนักงานใหญ่', title_en: 'Head Office', text_th: '2 ถนนเพชรบุรีตัดใหม่ แขวงบางกอกน้อย<br>กรุงเทพมหานคร 10700', text_en: '2 New Phetchaburi Rd, Bangkok Noi<br>Bangkok 10700' },
+              { icon: 'phone', title_th: 'สายด่วน (24 ชั่วโมง)', title_en: 'Hotline (24 hours)', text_th: '<strong style="font-size:1.1rem;color:var(--primary)">1722</strong>', text_en: '<strong style="font-size:1.1rem;color:var(--primary)">1722</strong>' },
+              { icon: 'envelope', title_th: 'อีเมล', title_en: 'Email', text_th: 'contact@medithai.com<br>international@medithai.com', text_en: 'contact@medithai.com<br>international@medithai.com' },
+              { icon: 'clock', title_th: 'เวลาทำการ (OPD)', title_en: 'Opening Hours (OPD)', text_th: 'ทุกวัน 07:00 – 21:00 น.<br>ห้องฉุกเฉิน: 24 ชั่วโมง', text_en: 'Daily 07:00 – 21:00<br>Emergency: 24 hours' },
+              { icon: 'globe', title_th: 'บริการผู้ป่วยต่างชาติ', title_en: 'International Patients', text_th: 'ไทย · English · 中文 · 日本語<br>한국어 · Deutsch · العربية', text_en: 'ไทย · English · 中文 · 日本語<br>한국어 · Deutsch · العربية' },
+            ],
+          }),
+        ],
+      },
+      {
+        key: 'faq', label: 'คำถามที่พบบ่อย (FAQ)', icon: '❓',
+        fields: [
+          bi('tag', 'แท็กหัวข้อ'), bi('heading', 'หัวข้อ'),
+          list('items', 'คำถาม', {
+            itemName: 'คำถาม', itemLabelKey: 'q_th',
+            itemFields: [bi('q', 'คำถาม'), bi('a', 'คำตอบ')],
+            defaults: [
+              { q_th: 'นัดหมายออนไลน์ต้องทำอย่างไร?', q_en: 'How do I book an appointment online?', a_th: 'กดปุ่ม "นัดหมาย" บนเว็บไซต์ เลือกโรงพยาบาล สาขาการแพทย์ แพทย์ และวันเวลา กรอกข้อมูลผู้ป่วย และยืนยันการนัดหมาย ระบบจะส่ง SMS และอีเมลยืนยันให้อัตโนมัติ', a_en: 'Click "Book" on the website, choose a hospital, specialty, doctor, and time, fill in your details, and confirm. You\'ll receive automatic SMS and email confirmation.' },
+              { q_th: 'รองรับประกันสุขภาพจากต่างประเทศหรือไม่?', q_en: 'Do you accept international health insurance?', a_th: 'ใช่ เรารองรับประกันสุขภาพนานาชาติกว่า 30 บริษัท รวมถึง AIA, BUPA, Cigna, AXA, Allianz และอื่น ๆ สอบถามรายละเอียดได้ที่ 1722', a_en: 'Yes — we accept 30+ international insurers including AIA, BUPA, Cigna, AXA, and Allianz. Call 1722 for details.' },
+              { q_th: 'Virtual Visit หรือ Telemedicine คืออะไร?', q_en: 'What is Virtual Visit / Telemedicine?', a_th: 'บริการปรึกษาแพทย์ผ่านวิดีโอคอลจากที่บ้าน เหมาะสำหรับการติดตามอาการ ขอใบรับรองแพทย์ หรือปรึกษาเบื้องต้น ไม่ต้องเดินทาง นัดหมายผ่านแอป MediThai ได้เลย', a_en: 'Video consultations from home — ideal for follow-ups, medical certificates, or initial advice. Book via the MediThai app.' },
+              { q_th: 'ผู้ป่วยต่างชาติสามารถใช้บริการได้อย่างไร?', q_en: 'How can international patients use your services?', a_th: 'เรามีทีม International Patient Services ที่พูดได้หลายภาษา รองรับผู้ป่วยจากทั่วโลก มีบริการล่ามแปลภาษา ช่วยประสานงานที่พัก และจัดทำเอกสารทางการแพทย์เป็นภาษาอังกฤษ ติดต่อ international@medithai.com', a_en: 'Our multilingual International Patient Services team supports patients worldwide — interpreters, accommodation coordination, and English medical documents. Contact international@medithai.com.' },
+            ],
+          }),
+        ],
+      },
+    ],
+  },
   { slug:'concierge',       label:'Surgery Concierge',     description:'หน้า MediCare Concierge',             icon:'🏥',  sections: simpleHero() },
   {
     slug: 'packages',
     label: 'แพ็กเกจสุขภาพ',
-    description: 'หน้ารวมแพ็กเกจ — hero, promo bar, filter labels',
+    description: 'หน้ารวมแพ็กเกจ — hero, promo, การ์ดแพ็กเกจ, Health Pass',
     icon: '📦',
     sections: [
       {
@@ -956,6 +1011,62 @@ const OTHER_PAGES: PageDef[] = [
           bi('promo_title', 'ชื่อ Promo'),
           bi('promo_sub',   'คำอธิบาย Promo'),
           bi('promo_btn',   'ปุ่ม Promo'),
+        ],
+      },
+      {
+        key: 'cards', label: 'การ์ดแพ็กเกจ', icon: '🛍️',
+        fields: [
+          list('items', 'แพ็กเกจ', {
+            itemName: 'แพ็กเกจ', itemLabelKey: 'title_th',
+            itemFields: [
+              bi('title', 'ชื่อแพ็กเกจ'),
+              bi('includes', 'รายการที่รวม (1 บรรทัด = 1 ข้อ)'),
+              mono('price', 'ราคา (ตัวเลข เช่น 7500)'),
+              mono('price_was', 'ราคาเดิม (ตัวเลข, เว้นว่างได้)'),
+              mono('discount', 'ป้ายส่วนลด (เช่น -40%)'),
+              bi('installment', 'ผ่อนชำระ (เว้นว่างได้)'),
+              bi('expires', 'วันสิ้นสุด'),
+              mono('chips', 'ป้าย (คั่น , เช่น ขายดี,แนะนำ)'),
+              mono('rating', 'คะแนน (เช่น 4.8)'),
+              mono('reviews', 'จำนวนรีวิว'),
+              mono('hospital', 'รหัสโรงพยาบาล (bkk/heart/cancer/spine/kids/chiang)'),
+              mono('cat', 'ประเภท (checkup/cancer/heart/surgery/vaccine/bundle)'),
+              mono('gender', 'เพศ (all/male/female)'),
+              mono('age', 'ช่วงอายุ (all/16-30/31-45/46-60/61+)'),
+              mono('icon', 'ไอคอน (fa6-solid)'),
+              mono('grad', 'สีพื้น gradient (เช่น #1B3A6B,#2554A0)'),
+            ],
+            defaults: [
+              { title_th: 'CEO Check-up Program ตรวจสุขภาพเชิงลึกสำหรับผู้บริหาร', title_en: 'CEO Check-up Program — in-depth executive screening', includes_th: 'ตรวจเลือดครบ 40+ รายการ\nCT Scan ปอด หัวใจ\nพบแพทย์เฉพาะทาง 3 สาขา', includes_en: '40+ blood tests\nLung & heart CT scan\n3 specialist consultations', price: '129000', price_was: '145000', discount: '-11%', installment_th: 'ผ่อน 0% นาน 10 เดือน ~฿12,900/เดือน', installment_en: '0% installment, 10 months ~฿12,900/mo', expires_th: 'สิ้นสุด 31 ธ.ค. 2569', expires_en: 'Ends 31 Dec 2026', chips: 'ขายดี,แนะนำ', rating: '5.0', reviews: '128', hospital: 'bkk', cat: 'checkup', gender: 'all', age: 'all', icon: 'user-tie', grad: '#1B3A6B,#2554A0' },
+              { title_th: 'PET/CT Scan ตรวจคัดกรองมะเร็ง Absolute Early Detection (ชาย)', title_en: 'PET/CT Absolute Early Detection cancer screening (Men)', includes_th: 'PET/CT Scan ทั้งร่างกาย\nTumor Marker Panel 20 รายการ\nตรวจมะเร็ง 15 ชนิด', includes_en: 'Whole-body PET/CT\n20 tumor markers\n15 cancer types screened', price: '72400', price_was: '181695', discount: '-60%', installment_th: 'ผ่อน 0% นาน 6 เดือน', installment_en: '0% installment, 6 months', expires_th: 'สิ้นสุด 31 ธ.ค. 2569', expires_en: 'Ends 31 Dec 2026', chips: 'ถูกที่สุด,ใหม่', rating: '5.0', reviews: '84', hospital: 'cancer', cat: 'cancer', gender: 'male', age: '46-60', icon: 'microscope', grad: '#8B5CF6,#7C3AED' },
+              { title_th: '3 โปรแกรมตรวจหัวใจ ออกแบบเพื่อคุณโดยเฉพาะ', title_en: '3 heart check programs designed for you', includes_th: 'EKG + Echocardiogram\nExercise Stress Test\nCoronary CT Angiography', includes_en: 'EKG + echocardiogram\nExercise stress test\nCoronary CT angiography', price: '7500', price_was: '12500', discount: '-40%', installment_th: 'ผ่อน 0% นาน 3 เดือน', installment_en: '0% installment, 3 months', expires_th: 'สิ้นสุด 31 ธ.ค. 2569', expires_en: 'Ends 31 Dec 2026', chips: 'ขายดี', rating: '4.8', reviews: '203', hospital: 'heart', cat: 'heart', gender: 'all', age: '31-45', icon: 'heart-pulse', grad: '#EF4444,#DC2626' },
+              { title_th: 'Integrated GenomeXplorer ตรวจสุขภาพระดับ DNA', title_en: 'Integrated GenomeXplorer — DNA-level health check', includes_th: 'Whole Genome Sequencing\nความเสี่ยงโรค 500+ รายการ\nรายงานยาที่เหมาะกับ DNA คุณ', includes_en: 'Whole genome sequencing\n500+ disease risks\nDNA-matched medication report', price: '28000', price_was: '30800', discount: '-9%', installment_th: 'ผ่อน 0% นาน 6 เดือน', installment_en: '0% installment, 6 months', expires_th: 'สิ้นสุด 31 ธ.ค. 2569', expires_en: 'Ends 31 Dec 2026', chips: 'ใหม่', rating: '5.0', reviews: '47', hospital: 'spine', cat: 'checkup', gender: 'all', age: '31-45', icon: 'dna', grad: '#0891B2,#0E7490' },
+              { title_th: 'Low-dose CT Scan ตรวจคัดกรองมะเร็งปอด', title_en: 'Low-dose CT lung cancer screening', includes_th: 'Low-dose CT Chest\nรายงานโดยรังสีแพทย์เฉพาะทาง\nปรึกษาผลกับแพทย์', includes_en: 'Low-dose chest CT\nSpecialist radiologist report\nDoctor consultation', price: '6900', price_was: '9440', discount: '-27%', installment_th: '', expires_th: 'สิ้นสุด 31 ธ.ค. 2569', expires_en: 'Ends 31 Dec 2026', chips: 'ถูกที่สุด', rating: '4.7', reviews: '312', hospital: 'bkk', cat: 'cancer', gender: 'all', age: '46-60', icon: 'lungs', grad: '#10B981,#059669' },
+              { title_th: 'แพ็กเกจสวนหัวใจและผ่าตัดหัวใจ ราคาพิเศษ', title_en: 'Cardiac catheterization & heart surgery package', includes_th: 'Cardiac Catheterization\nPTCA / Stent ราคาพิเศษ\nมีพยาบาลดูแลตลอด', includes_en: 'Cardiac catheterization\nSpecial PTCA / stent pricing\nDedicated nursing care', price: '54000', price_was: '78000', discount: '-30%', installment_th: 'ผ่อน 0% นาน 10 เดือน', installment_en: '0% installment, 10 months', expires_th: 'สิ้นสุด 31 ธ.ค. 2569', expires_en: 'Ends 31 Dec 2026', chips: 'จำนวนจำกัด', rating: '4.9', reviews: '56', hospital: 'heart', cat: 'surgery', gender: 'all', age: '46-60', icon: 'heart', grad: '#F59E0B,#D97706' },
+              { title_th: 'มัดรวมโปรตรวจมะเร็งผู้หญิง ราคาดีที่สุด', title_en: 'Women\'s cancer screening bundle — best price', includes_th: 'ตรวจมะเร็งปากมดลูก (Pap Smear + HPV)\nMammogram ตรวจมะเร็งเต้านม\nอัลตราซาวด์มดลูกและรังไข่', includes_en: 'Cervical screening (Pap + HPV)\nMammogram\nUterus & ovary ultrasound', price: '3900', price_was: '15000', discount: '-74%', installment_th: '', expires_th: 'สิ้นสุด 30 มิ.ย. 2569', expires_en: 'Ends 30 Jun 2026', chips: 'Bundle,ขายดีมาก', rating: '5.0', reviews: '541', hospital: 'bkk', cat: 'bundle cancer', gender: 'female', age: '31-45', icon: 'venus', grad: '#DB2777,#BE185D' },
+              { title_th: 'วัคซีนป้องกันโรคไข้เลือดออก ชนิดใหม่ 2 เข็ม ครบโดส', title_en: 'New dengue vaccine — full 2-dose course', includes_th: 'วัคซีน Dengvaxia รุ่นใหม่ล่าสุด\nฉีดครบ 2 เข็ม ห่าง 6 เดือน\nรวมค่าแพทย์และบริการแล้ว', includes_en: 'Latest Dengvaxia vaccine\n2 doses, 6 months apart\nDoctor & service fees included', price: '6100', price_was: '7200', discount: '-15%', installment_th: '', expires_th: 'โปรเฉพาะเดือนนี้', expires_en: 'This month only', chips: 'แนะนำ', rating: '4.8', reviews: '289', hospital: 'bkk', cat: 'vaccine', gender: 'all', age: '16-30', icon: 'syringe', grad: '#0284C7,#0369A1' },
+              { title_th: 'ตรวจสุขภาพ 49 รายการ โปรแกรม Basic สำหรับผู้ที่อายุ 15 ปีขึ้นไป', title_en: '49-item Basic health check (age 15+)', includes_th: 'ตรวจเลือด CBC + ชีวเคมี 20 รายการ\nX-ray ปอด + EKG\nตรวจปัสสาวะและอุจจาระ', includes_en: 'CBC + 20 biochemistry tests\nChest X-ray + EKG\nUrine & stool tests', price: '1299', price_was: '4330', discount: '-70%', installment_th: '', expires_th: 'สิ้นสุด 31 ธ.ค. 2569', expires_en: 'Ends 31 Dec 2026', chips: 'ถูกที่สุด,ขายดี', rating: '4.6', reviews: '1,204', hospital: 'chiang', cat: 'checkup', gender: 'all', age: '16-30', icon: 'clipboard-list', grad: '#F59E0B,#D97706' },
+            ],
+          }),
+        ],
+      },
+      {
+        key: 'healthpass', label: 'Health Pass (3 แผน)', icon: '♾️',
+        fields: [
+          bi('tag', 'แท็กหัวข้อ'), bi('heading', 'หัวข้อ'), bi('sub', 'คำอธิบาย'),
+          list('plans', 'แผน', {
+            itemName: 'แผน', itemLabelKey: 'name',
+            itemFields: [
+              mono('name', 'ชื่อแผน'), mono('price', 'ราคา (เช่น ฿2,990)'), bi('period', 'ระยะเวลา'),
+              mono('icon', 'ไอคอน (fa6-solid)'), mono('color', 'สี (hex)'), mono('featured', 'แนะนำ? (yes)'),
+              bi('features', 'สิทธิประโยชน์ (1 บรรทัด = 1 ข้อ)'),
+            ],
+            defaults: [
+              { name: 'Health Pass Lite', price: '฿2,990', period_th: '/ปี (จ่ายครั้งเดียว)', period_en: '/year (one payment)', icon: 'leaf', color: '#0891B2', featured: '', features_th: 'ตรวจเลือดพื้นฐาน 20 รายการ — ไม่จำกัดครั้ง\nX-ray ปอด 2 ครั้ง/ปี\nส่วนลด 10% แพ็กเกจเพิ่มเติม\nใช้ได้ทุกสาขาในเครือ', features_en: '20 basic blood tests — unlimited\nChest X-ray 2x/year\n10% off additional packages\nValid at all branches' },
+              { name: 'Health Pass Standard', price: '฿7,990', period_th: '/ปี (จ่ายครั้งเดียว)', period_en: '/year (one payment)', icon: 'shield-heart', color: '#1B3A6B', featured: 'yes', features_th: 'ตรวจเลือดครบ 40 รายการ — ไม่จำกัดครั้ง\nX-ray + อัลตราซาวด์ช่องท้อง 2 ครั้ง/ปี\nเลือกตรวจเฉพาะทาง 4 รายการ/ปี\nส่วนลด 20% แพ็กเกจเพิ่มเติม\nปรึกษาแพทย์ออนไลน์ 3 ครั้ง/ปี', features_en: '40 blood tests — unlimited\nX-ray + abdominal ultrasound 2x/year\n4 specialty tests/year\n20% off additional packages\n3 online consultations/year' },
+              { name: 'Health Pass Premium', price: '฿16,990', period_th: '/ปี (จ่ายครั้งเดียว)', period_en: '/year (one payment)', icon: 'crown', color: '#F59E0B', featured: '', features_th: 'ตรวจเลือดและรังสีครบ — ไม่จำกัดครั้ง\nCT Scan 1 ส่วน + MRI 1 ส่วน\nเลือกตรวจเฉพาะทาง 8 รายการ/ปี\nส่วนลด 30% แพ็กเกจทั้งหมด\nปรึกษาแพทย์ออนไลน์ ไม่จำกัดครั้ง\nPersonal Health Manager ดูแลคุณ', features_en: 'All blood & imaging tests — unlimited\n1 CT scan + 1 MRI\n8 specialty tests/year\n30% off all packages\nUnlimited online consultations\nPersonal health manager' },
+            ],
+          }),
         ],
       },
     ],
