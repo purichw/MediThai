@@ -2,13 +2,29 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('health-library', {
-  pg_title: 'คลังความรู้สุขภาพ',
-  pg_desc: 'บทความสุขภาพโดยแพทย์ผู้เชี่ยวชาญ',
-  pg_title_en: 'Health Library',
-  pg_desc_en: 'Health articles by specialist doctors',
+import { makePageCms } from '../lib/cmsPage';
+
+const cms = await makePageCms('health-library');
+const heroTitle = cms.t('hero', 'pg_title', 'คลังความรู้สุขภาพ', 'Health Library');
+const heroDesc  = cms.t('hero', 'pg_desc', 'บทความสุขภาพโดยแพทย์ผู้เชี่ยวชาญ', 'Health articles by specialist doctors');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th };
+
+const ftHeading = cms.t('featured', 'heading', 'CKM Syndrome โรคหัวใจ ไต เมตาบอลิก ภัยเงียบของคนยุคใหม่', 'CKM Syndrome — the silent heart-kidney-metabolic threat');
+const ftSub     = cms.t('featured', 'sub', 'CKM Syndrome คืออะไร? ทำไมคนทำงานในยุคนี้ต้องระวัง อ่านบทความโดย นพ.ชยพล ชีถนอม อายุรแพทย์จาก MediThai กรุงเทพ', 'What is CKM Syndrome and why should working people beware? By Dr. Chayapol, internist at MediThai Bangkok.');
+const ftByline  = cms.t('featured', 'byline', 'นพ. ชยพล ชีถนอม · วันนี้', 'Dr. Chayapol Cheethanom · Today');
+const ftBtn     = cms.t('featured', 'btn', 'อ่านบทความ', 'Read Article');
+
+const articles = cms.items('articles', 'items').map((it, i) => {
+  const grad = (it.grad || '#475569,#334155').split(',');
+  return {
+    author: it.author, date: it.date, catkey: it.catkey || 'general', letter: it.letter || 'ก',
+    g1: grad[0], g2: grad[1] || grad[0], href: it.href || '#', img: it.img || '',
+    title: cms.li('articles', 'items', i, 'title', it),
+    cat:   cms.li('articles', 'items', i, 'cat', it),
+  };
 });
+
+const cmsScript = cms.script();
 ---
 <Layout title="คลังความรู้สุขภาพ | MediThai Hospital Network" description="บทความสุขภาพโดยแพทย์ผู้เชี่ยวชาญ"
   extraHead={`${cmsScript}
@@ -119,87 +135,25 @@ const { th, cmsScript } = await loadPageCMS('health-library', {
 
     <div class="featured-article reveal">
       <div class="tag" style="background:rgba(255,255,255,.2);color:#fff"><Icon name="fa6-solid:star" /> บทความแนะนำ</div>
-      <h2 style="font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:700;color:#fff;margin-bottom:12px">CKM Syndrome โรคหัวใจ ไต เมตาบอลิก ภัยเงียบของคนยุคใหม่</h2>
-      <p style="color:rgba(255,255,255,.75);font-size:.9rem;max-width:560px;margin-bottom:20px">CKM Syndrome คืออะไร? ทำไมคนทำงานในยุคนี้ต้องระวัง อ่านบทความโดย นพ.ชยพล ชีถนอม อายุรแพทย์จาก MediThai กรุงเทพ</p>
+      <h2 style="font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:700;color:#fff;margin-bottom:12px" data-i18n={ftHeading.k}>{ftHeading.th}</h2>
+      <p style="color:rgba(255,255,255,.75);font-size:.9rem;max-width:560px;margin-bottom:20px" data-i18n={ftSub.k}>{ftSub.th}</p>
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <a href="#" class="btn btn-white btn-sm"><Icon name="fa6-solid:book-open" /> อ่านบทความ</a>
-        <span style="color:rgba(255,255,255,.6);font-size:.8rem"><Icon name="fa6-solid:user-doctor" style="margin-right:4px" />นพ. ชยพล ชีถนอม · วันนี้</span>
+        <a href="#" class="btn btn-white btn-sm"><Icon name="fa6-solid:book-open" /> <span data-i18n={ftBtn.k}>{ftBtn.th}</span></a>
+        <span style="color:rgba(255,255,255,.6);font-size:.8rem"><Icon name="fa6-solid:user-doctor" style="margin-right:4px" /><span data-i18n={ftByline.k}>{ftByline.th}</span></span>
       </div>
     </div>
 
     <div class="lib-grid">
-      <a href="#" class="article-card reveal" data-letter="ห" data-cat="heart">
-        <div class="article-img" style="background:linear-gradient(135deg,#EF4444,#DC2626)"></div>
-        <div class="article-body">
-          <div class="article-cat">โรคหัวใจ</div>
-          <div class="article-title">MitraClip ซ่อมลิ้นหัวใจไมตรัลรั่วแบบไม่ผ่าตัด</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>นพ. ชาติทนง</span><span>07 ม.ค. 2569</span></div>
-        </div>
-      </a>
-      <a href="#" class="article-card reveal reveal-delay-1" data-letter="ห" data-cat="cancer">
-        <div class="article-img" style="background:linear-gradient(135deg,#8B5CF6,#7C3AED)"></div>
-        <div class="article-body">
-          <div class="article-cat">มะเร็ง</div>
-          <div class="article-title">หุ่นยนต์ da Vinci Xi กับการรักษามะเร็งปอด</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>นพ. ผดุงเกียรติ</span><span>10 ธ.ค. 2568</span></div>
-        </div>
-      </a>
-      <a href="#" class="article-card reveal reveal-delay-2" data-letter="ส" data-cat="neuro">
-        <div class="article-img" style="background:linear-gradient(135deg,#0891B2,#0E7490)"></div>
-        <div class="article-body">
-          <div class="article-cat">ระบบประสาท</div>
-          <div class="article-title">สัญญาณเตือน เยื่อหุ้มสมองอักเสบ Meningitis</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>พญ. ศรินพร</span><span>20 มี.ค. 2569</span></div>
-        </div>
-      </a>
-      <a href="#" class="article-card reveal" data-letter="ก" data-cat="ortho">
-        <div class="article-img" style="background:linear-gradient(135deg,#2554A0,#1B3A6B)"></div>
-        <div class="article-body">
-          <div class="article-cat">กระดูกและข้อ</div>
-          <div class="article-title">ผ่าตัดข้อเข่าด้วยหุ่นยนต์ Robotic UKA ฟื้นตัวเร็วขึ้น</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>นพ. ศริษฏ์</span><span>05 มี.ค. 2569</span></div>
-        </div>
-      </a>
-      <a href="#" class="article-card reveal reveal-delay-1" data-letter="ก" data-cat="heart">
-        <div class="article-img" style="background:linear-gradient(135deg,#10B981,#059669)"></div>
-        <div class="article-body">
-          <div class="article-cat">หัวใจ</div>
-          <div class="article-title">การผ่าตัดหัวใจแผลเล็ก MICS คืออะไร?</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>นพ. ณัฐพล</span><span>02 เม.ย. 2569</span></div>
-        </div>
-      </a>
-      <a href="#" class="article-card reveal reveal-delay-2" data-letter="ม" data-cat="cancer">
-        <div class="article-img" style="background:linear-gradient(135deg,#F59E0B,#D97706)"></div>
-        <div class="article-body">
-          <div class="article-cat">มะเร็งเต้านม</div>
-          <div class="article-title">AI Mammography ตรวจพบมะเร็งเต้านมเร็วขึ้นอย่างไร</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>พญ. ศรัณยา</span><span>10 ธ.ค. 2568</span></div>
-        </div>
-      </a>
-      <a href="#" class="article-card reveal" data-letter="ฝ" data-cat="general">
-        <div class="article-img" style="background:linear-gradient(135deg,#F97316,#EA580C)"></div>
-        <div class="article-body">
-          <div class="article-cat">ทั่วไป</div>
-          <div class="article-title">4 โรคเรื้อรังต้องระวังในช่วงฤดูฝน</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>นพ. ชยพล</span><span>วันนี้</span></div>
-        </div>
-      </a>
-      <a href="#" class="article-card reveal reveal-delay-1" data-letter="ร" data-cat="peds">
-        <div class="article-img" style="background:linear-gradient(135deg,#DB2777,#BE185D)"></div>
-        <div class="article-body">
-          <div class="article-cat">สุขภาพเด็ก</div>
-          <div class="article-title">รวม 6 โรคเด่นที่เด็กเสี่ยงเป็นมากสุดในหน้าฝน</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>นพ. พรเทพ</span><span>วันนี้</span></div>
-        </div>
-      </a>
-      <a href="#" class="article-card reveal reveal-delay-2" data-letter="ฝ" data-cat="general">
-        <div class="article-img" style="background:linear-gradient(135deg,#475569,#334155)"></div>
-        <div class="article-body">
-          <div class="article-cat">ทั่วไป</div>
-          <div class="article-title">ฝุ่น PM2.5 ยิ่งกระตุ้นภูมิแพ้ ป้องกันอย่างไร</div>
-          <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>นพ. จิรวัฒน์</span><span>17 ม.ค. 2569</span></div>
-        </div>
-      </a>
+      {articles.map((a, i) => (
+        <a href={a.href} class={`article-card reveal${i % 3 === 1 ? ' reveal-delay-1' : i % 3 === 2 ? ' reveal-delay-2' : ''}`} data-letter={a.letter} data-cat={a.catkey}>
+          <div class="article-img" style={a.img ? `background:url('${a.img}') center/cover` : `background:linear-gradient(135deg,${a.g1},${a.g2})`}></div>
+          <div class="article-body">
+            <div class="article-cat" data-i18n={a.cat.k}>{a.cat.th}</div>
+            <div class="article-title" data-i18n={a.title.k}>{a.title.th}</div>
+            <div class="article-meta"><span class="article-author"><span class="article-author-avatar"><Icon name="fa6-solid:user-doctor" /></span>{a.author}</span><span>{a.date}</span></div>
+          </div>
+        </a>
+      ))}
     </div>
 
     <div class="text-center" style="margin-top:48px">

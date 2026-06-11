@@ -2,13 +2,43 @@
 export const prerender = false;
 import Layout from '../components/Layout.astro';
 import { Icon } from 'astro-icon/components';
-import { loadPageCMS } from '../lib/cmsPage';
-const { th, cmsScript } = await loadPageCMS('concierge', {
-  pg_title: 'MediCare Concierge',
-  pg_desc: 'ดูแลคุณทุกขั้นตอน ตั้งแต่ปรึกษาจนฟื้นตัว',
-  pg_title_en: 'MediCare Concierge',
-  pg_desc_en: 'We take care of you every step — from consultation to recovery',
+import { makePageCms } from '../lib/cmsPage';
+
+const cms = await makePageCms('concierge');
+const heroTitle = cms.t('hero', 'pg_title', 'MediCare Concierge', 'MediCare Concierge');
+const heroDesc  = cms.t('hero', 'pg_desc', 'ดูแลคุณทุกขั้นตอน ตั้งแต่ปรึกษาจนฟื้นตัว', 'We take care of you every step — from consultation to recovery');
+const th = { pg_title: heroTitle.th, pg_desc: heroDesc.th };
+
+const spTag     = cms.t('steps', 'tag', 'ขั้นตอน', 'How It Works');
+const spHeading = cms.t('steps', 'heading', 'ทำงานอย่างไร?', 'How does it work?');
+const spSub     = cms.t('steps', 'sub', '5 ขั้นตอนง่าย ๆ ที่เราดูแลคุณทุกอย่าง', '5 simple steps — we handle everything');
+const steps = cms.items('steps', 'items').map((it, i) => ({
+  icon: it.icon || 'circle-check',
+  title: cms.li('steps', 'items', i, 'title', it),
+  desc:  cms.li('steps', 'items', i, 'desc', it),
+}));
+
+const bnTag     = cms.t('benefits', 'tag', 'สิทธิพิเศษ', 'Privileges');
+const bnHeading = cms.t('benefits', 'heading', 'ทำไมต้องเลือก MediCare Concierge', 'Why choose MediCare Concierge');
+const benefits = cms.items('benefits', 'items').map((it, i) => ({
+  icon: it.icon || 'circle-check', color: it.color || '#0891B2',
+  title: cms.li('benefits', 'items', i, 'title', it),
+  desc:  cms.li('benefits', 'items', i, 'desc', it),
+}));
+
+const tsTag     = cms.t('testimonials', 'tag', 'รีวิวจากผู้ใช้บริการ Concierge', 'Concierge Reviews');
+const tsHeading = cms.t('testimonials', 'heading', 'เสียงจากผู้ที่ไว้วางใจเรา', 'Voices of those who trust us');
+const testimonials = cms.items('testimonials', 'items').map((it, i) => {
+  const r = parseFloat(it.rating || '5');
+  return {
+    name: it.name, avatar: (it.name || 'ค').charAt(0),
+    full: Math.floor(r), half: r - Math.floor(r) >= 0.3,
+    detail: cms.li('testimonials', 'items', i, 'detail', it),
+    quote:  cms.li('testimonials', 'items', i, 'quote', it),
+  };
 });
+
+const cmsScript = cms.script();
 ---
 <Layout
   title="MediCare Concierge — บริการดูแลผ่าตัดครบวงจร | MediThai"
@@ -46,36 +76,18 @@ const { th, cmsScript } = await loadPageCMS('concierge', {
 <section class="section-pad" style="background:#fff">
   <div class="container">
     <div class="text-center reveal" style="margin-bottom:16px">
-      <div class="tag"><Icon name="fa6-solid:list-ol" /> ขั้นตอน</div>
-      <h2 class="section-heading">ทำงานอย่างไร?</h2>
-      <p class="section-sub" style="margin:0 auto">5 ขั้นตอนง่าย ๆ ที่เราดูแลคุณทุกอย่าง</p>
+      <div class="tag"><Icon name="fa6-solid:list-ol" /> <span data-i18n={spTag.k}>{spTag.th}</span></div>
+      <h2 class="section-heading" data-i18n={spHeading.k}>{spHeading.th}</h2>
+      <p class="section-sub" style="margin:0 auto" data-i18n={spSub.k}>{spSub.th}</p>
     </div>
     <div class="concierge-steps reveal">
-      <div class="concierge-step">
-        <div class="step-circle"><Icon name="fa6-solid:comments" /></div>
-        <h4>1. ปรึกษาฟรี</h4>
-        <p>แชทหรือโทรหาทีม Concierge ของเรา เล่าอาการ อธิบายความต้องการ ไม่มีค่าใช้จ่าย</p>
-      </div>
-      <div class="concierge-step">
-        <div class="step-circle alt"><Icon name="fa6-solid:user-doctor" /></div>
-        <h4>2. จับคู่แพทย์</h4>
-        <p>ทีม Concierge ค้นหาแพทย์เฉพาะทางที่เหมาะสมที่สุดกับเคสของคุณ</p>
-      </div>
-      <div class="concierge-step">
-        <div class="step-circle"><Icon name="fa6-solid:calendar-check" /></div>
-        <h4>3. จองคิว</h4>
-        <p>ช่วยประสานงานจองคิวให้ทันที ได้คิวภายใน 48 ชม. ไม่ต้องรอนาน</p>
-      </div>
-      <div class="concierge-step">
-        <div class="step-circle alt"><Icon name="fa6-solid:user-nurse" /></div>
-        <h4>4. Nurse Coordinator</h4>
-        <p>มีพยาบาลประจำตัวคอยดูแลก่อน-ระหว่าง-หลังผ่าตัด ติดต่อได้ตลอด 24 ชม.</p>
-      </div>
-      <div class="concierge-step">
-        <div class="step-circle"><Icon name="fa6-solid:heart-circle-check" /></div>
-        <h4>5. ติดตามจนฟื้นตัว</h4>
-        <p>ทีม Concierge ติดตามอาการหลังกลับบ้าน จนกว่าคุณจะฟื้นตัวสมบูรณ์</p>
-      </div>
+      {steps.map((st, i) => (
+        <div class="concierge-step">
+          <div class={`step-circle${i % 2 === 1 ? ' alt' : ''}`}><Icon name={`fa6-solid:${st.icon}`} /></div>
+          <h4 data-i18n={st.title.k}>{st.title.th}</h4>
+          <p data-i18n={st.desc.k}>{st.desc.th}</p>
+        </div>
+      ))}
     </div>
   </div>
 </section>
@@ -84,40 +96,17 @@ const { th, cmsScript } = await loadPageCMS('concierge', {
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="text-center reveal" style="margin-bottom:40px">
-      <div class="tag"><Icon name="fa6-solid:gem" /> สิทธิพิเศษ</div>
-      <h2 class="section-heading">ทำไมต้องเลือก MediCare Concierge</h2>
+      <div class="tag"><Icon name="fa6-solid:gem" /> <span data-i18n={bnTag.k}>{bnTag.th}</span></div>
+      <h2 class="section-heading" data-i18n={bnHeading.k}>{bnHeading.th}</h2>
     </div>
     <div class="benefit-cards">
-      <div class="benefit-card reveal">
-        <div class="benefit-icon" style="background:rgba(27,58,107,.1);color:var(--primary)"><Icon name="fa6-solid:phone-volume" /></div>
-        <h4>ปรึกษาฟรี ตลอด 24 ชม.</h4>
-        <p>ทีม Concierge พร้อมรับสายและตอบคำถามทุกวัน ไม่มีวันหยุด ไม่มีค่าใช้จ่าย</p>
-      </div>
-      <div class="benefit-card reveal reveal-delay-1">
-        <div class="benefit-icon" style="background:rgba(8,145,178,.1);color:var(--secondary)"><Icon name="fa6-solid:bolt" /></div>
-        <h4>ได้คิวเร็วกว่าปกติ</h4>
-        <p>ช่องทาง Concierge มีคิวพิเศษ ได้รับการจัดสรรภายใน 48 ชม. เร็วกว่าจองเอง</p>
-      </div>
-      <div class="benefit-card reveal reveal-delay-2">
-        <div class="benefit-icon" style="background:rgba(16,185,129,.1);color:var(--success)"><Icon name="fa6-solid:tag" /></div>
-        <h4>ราคาพิเศษ ประหยัดกว่า</h4>
-        <p>แพ็กเกจผ่าตัดผ่าน Concierge ได้ราคาพิเศษและส่วนลดที่ไม่มีในช่องทางปกติ</p>
-      </div>
-      <div class="benefit-card reveal">
-        <div class="benefit-icon" style="background:rgba(139,92,246,.1);color:#8B5CF6"><Icon name="fa6-solid:credit-card" /></div>
-        <h4>ผ่อน 0% นาน 10 เดือน</h4>
-        <p>แบ่งชำระค่ารักษาได้สูงสุด 10 เดือน โดยไม่มีดอกเบี้ย รองรับทุกบัตรเครดิต</p>
-      </div>
-      <div class="benefit-card reveal reveal-delay-1">
-        <div class="benefit-icon" style="background:rgba(245,158,11,.1);color:var(--accent)"><Icon name="fa6-solid:shield-halved" /></div>
-        <h4>เบิกประกันได้ ไม่ต้องสำรองจ่าย</h4>
-        <p>ประสานงานกับบริษัทประกัน 30+ แห่ง เบิกตรง ไม่ต้องจ่ายเงินสดล่วงหน้า</p>
-      </div>
-      <div class="benefit-card reveal reveal-delay-2">
-        <div class="benefit-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><Icon name="fa6-solid:user-nurse" /></div>
-        <h4>Nurse Coordinator ส่วนตัว</h4>
-        <p>มีพยาบาลประจำตัว 1 คนต่อ 1 เคส ดูแลทุกขั้นตอน ตอบคำถามแทนคุณกับแพทย์ได้</p>
-      </div>
+      {benefits.map((b, i) => (
+        <div class={`benefit-card reveal${i % 3 === 1 ? ' reveal-delay-1' : i % 3 === 2 ? ' reveal-delay-2' : ''}`}>
+          <div class="benefit-icon" style={`background:${b.color}1a;color:${b.color}`}><Icon name={`fa6-solid:${b.icon}`} /></div>
+          <h4 data-i18n={b.title.k}>{b.title.th}</h4>
+          <p data-i18n={b.desc.k}>{b.desc.th}</p>
+        </div>
+      ))}
     </div>
   </div>
 </section>
@@ -175,14 +164,21 @@ const { th, cmsScript } = await loadPageCMS('concierge', {
 <section class="section-pad" style="background:var(--gray-50)">
   <div class="container">
     <div class="text-center reveal" style="margin-bottom:40px">
-      <div class="tag"><Icon name="fa6-solid:comments" /> รีวิวจากผู้ใช้บริการ Concierge</div>
-      <h2 class="section-heading">เสียงจากผู้ที่ไว้วางใจเรา</h2>
+      <div class="tag"><Icon name="fa6-solid:comments" /> <span data-i18n={tsTag.k}>{tsTag.th}</span></div>
+      <h2 class="section-heading" data-i18n={tsHeading.k}>{tsHeading.th}</h2>
     </div>
     <div class="swiper testimonials-swiper" style="padding-bottom:48px">
       <div class="swiper-wrapper">
-        <div class="swiper-slide"><div class="testimonial-card"><div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div><p class="testimonial-text">"ผ่าตัดหัวใจเป็นเรื่องใหญ่มาก กังวลมาก แต่พอติดต่อ Concierge ทีมช่วยทุกอย่างตั้งแต่หาหมอ จองคิว ประสานประกัน จนผ่าตัดเสร็จ ไม่ต้องยุ่งยากเลย ประทับใจมาก"</p><div class="testimonial-author"><div class="testimonial-avatar">ส</div><div><div class="testimonial-name">สมชาย ประเสริฐสุข</div><div class="testimonial-detail">ผ่าตัดหัวใจ MICS · MediThai หัวใจ</div></div></div></div></div>
-        <div class="swiper-slide"><div class="testimonial-card"><div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /></div><p class="testimonial-text">"พยาบาล Coordinator ตอบทุกคำถาม แม้แต่ดึกดื่นก็ยังตอบ ผ่าตัดมะเร็งด้วย da Vinci ผ่านไปด้วยดี ผ่อน 10 เดือนไม่มีดอกเบี้ย คุ้มมากจริงๆ"</p><div class="testimonial-author"><div class="testimonial-avatar">ว</div><div><div class="testimonial-name">วนิดา แสนงาม</div><div class="testimonial-detail">ผ่าตัดมะเร็งปอด · MediThai มะเร็ง</div></div></div></div></div>
-        <div class="swiper-slide"><div class="testimonial-card"><div class="testimonial-stars"><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star" /><Icon name="fa6-solid:star-half-stroke" /></div><p class="testimonial-text">"โทรครั้งเดียว ได้คิวผ่าตัดภายใน 2 วัน เบิกประกันได้ ไม่ต้องจ่ายเงินสดเลย บริการดีมาก จะแนะนำให้ทุกคนที่ต้องผ่าตัดเลยครับ"</p><div class="testimonial-author"><div class="testimonial-avatar">ป</div><div><div class="testimonial-name">ประทีป ชัยสมบัติ</div><div class="testimonial-detail">ผ่าตัดกระดูก Robotic · MediThai สมองฯ</div></div></div></div></div>
+        {testimonials.map(t => (
+          <div class="swiper-slide"><div class="testimonial-card">
+            <div class="testimonial-stars">
+              {Array.from({ length: t.full }).map(() => <Icon name="fa6-solid:star" />)}
+              {t.half && <Icon name="fa6-solid:star-half-stroke" />}
+            </div>
+            <p class="testimonial-text">"<span data-i18n={t.quote.k}>{t.quote.th}</span>"</p>
+            <div class="testimonial-author"><div class="testimonial-avatar">{t.avatar}</div><div><div class="testimonial-name">{t.name}</div><div class="testimonial-detail" data-i18n={t.detail.k}>{t.detail.th}</div></div></div>
+          </div></div>
+        ))}
       </div>
       <div class="swiper-pagination"></div>
     </div>

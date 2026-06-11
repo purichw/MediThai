@@ -619,7 +619,43 @@ const OTHER_PAGES: PageDef[] = [
       },
     ],
   },
-  { slug:'health-library',  label:'คลังความรู้',           description:'หน้าบทความสุขภาพ',                    icon:'📚',  sections: simpleHero() },
+  {
+    slug: 'health-library', label: 'คลังความรู้', description: 'หน้าบทความ — บทความแนะนำ + รายการบทความ', icon: '📚',
+    sections: [
+      ...simpleHero(),
+      {
+        key: 'featured', label: 'บทความแนะนำ (แบนเนอร์)', icon: '⭐',
+        fields: [
+          bi('heading', 'หัวข้อบทความ'), bi('sub', 'คำโปรย'), bi('byline', 'ผู้เขียน · วันที่'), bi('btn', 'ข้อความปุ่ม'),
+        ],
+      },
+      {
+        key: 'articles', label: 'รายการบทความ', icon: '📰',
+        fields: [
+          list('items', 'บทความ', {
+            itemName: 'บทความ', itemLabelKey: 'title_th',
+            itemFields: [
+              bi('title', 'ชื่อบทความ'), bi('cat', 'หมวด (แสดงบนการ์ด)'), mono('author', 'ผู้เขียน'),
+              mono('date', 'วันที่'), mono('catkey', 'หมวด filter (heart/cancer/neuro/ortho/peds/women/general)'),
+              mono('letter', 'ตัวอักษรแรก (สำหรับ A-Z filter)'), mono('grad', 'สีพื้น (เช่น #EF4444,#DC2626)'),
+              mono('href', 'ลิงก์บทความ'), mono('img', 'รูปหน้าปก (URL)', 'image'),
+            ],
+            defaults: [
+              { title_th: 'MitraClip ซ่อมลิ้นหัวใจไมตรัลรั่วแบบไม่ผ่าตัด', title_en: 'MitraClip — repairing mitral valve leaks without surgery', cat_th: 'โรคหัวใจ', cat_en: 'Heart Disease', author: 'นพ. ชาติทนง', date: '07 ม.ค. 2569', catkey: 'heart', letter: 'ห', grad: '#EF4444,#DC2626', href: '#', img: '' },
+              { title_th: 'หุ่นยนต์ da Vinci Xi กับการรักษามะเร็งปอด', title_en: 'da Vinci Xi robot in lung cancer treatment', cat_th: 'มะเร็ง', cat_en: 'Cancer', author: 'นพ. ผดุงเกียรติ', date: '10 ธ.ค. 2568', catkey: 'cancer', letter: 'ห', grad: '#8B5CF6,#7C3AED', href: '#', img: '' },
+              { title_th: 'สัญญาณเตือน เยื่อหุ้มสมองอักเสบ Meningitis', title_en: 'Warning signs of meningitis', cat_th: 'ระบบประสาท', cat_en: 'Neurology', author: 'พญ. ศรินพร', date: '20 มี.ค. 2569', catkey: 'neuro', letter: 'ส', grad: '#0891B2,#0E7490', href: '#', img: '' },
+              { title_th: 'ผ่าตัดข้อเข่าด้วยหุ่นยนต์ Robotic UKA ฟื้นตัวเร็วขึ้น', title_en: 'Robotic UKA knee surgery — faster recovery', cat_th: 'กระดูกและข้อ', cat_en: 'Orthopedics', author: 'นพ. ศริษฏ์', date: '05 มี.ค. 2569', catkey: 'ortho', letter: 'ก', grad: '#2554A0,#1B3A6B', href: '#', img: '' },
+              { title_th: 'การผ่าตัดหัวใจแผลเล็ก MICS คืออะไร?', title_en: 'What is minimally invasive cardiac surgery (MICS)?', cat_th: 'หัวใจ', cat_en: 'Heart', author: 'นพ. ณัฐพล', date: '02 เม.ย. 2569', catkey: 'heart', letter: 'ก', grad: '#10B981,#059669', href: '#', img: '' },
+              { title_th: 'AI Mammography ตรวจพบมะเร็งเต้านมเร็วขึ้นอย่างไร', title_en: 'How AI mammography detects breast cancer earlier', cat_th: 'มะเร็งเต้านม', cat_en: 'Breast Cancer', author: 'พญ. ศรัณยา', date: '10 ธ.ค. 2568', catkey: 'cancer', letter: 'ม', grad: '#F59E0B,#D97706', href: '#', img: '' },
+              { title_th: '4 โรคเรื้อรังต้องระวังในช่วงฤดูฝน', title_en: '4 chronic diseases to watch in the rainy season', cat_th: 'ทั่วไป', cat_en: 'General', author: 'นพ. ชยพล', date: 'วันนี้', catkey: 'general', letter: 'ฝ', grad: '#F97316,#EA580C', href: '#', img: '' },
+              { title_th: 'รวม 6 โรคเด่นที่เด็กเสี่ยงเป็นมากสุดในหน้าฝน', title_en: '6 illnesses children risk most in the rainy season', cat_th: 'สุขภาพเด็ก', cat_en: 'Children\'s Health', author: 'นพ. พรเทพ', date: 'วันนี้', catkey: 'peds', letter: 'ร', grad: '#DB2777,#BE185D', href: '#', img: '' },
+              { title_th: 'ฝุ่น PM2.5 ยิ่งกระตุ้นภูมิแพ้ ป้องกันอย่างไร', title_en: 'PM2.5 dust and allergies — how to protect yourself', cat_th: 'ทั่วไป', cat_en: 'General', author: 'นพ. จิรวัฒน์', date: '17 ม.ค. 2569', catkey: 'general', letter: 'ฝ', grad: '#475569,#334155', href: '#', img: '' },
+            ],
+          }),
+        ],
+      },
+    ],
+  },
   { slug:'calculators',     label:'โปรแกรมคำนวณ',          description:'หน้าเครื่องมือคำนวณสุขภาพ',           icon:'🧮',  sections: simpleHero() },
   {
     slug: 'patient-stories', label: 'เรื่องราวผู้ป่วย', description: 'หน้า Patient Stories — สถิติ + เรื่องราว + CTA', icon: '💬',
@@ -930,7 +966,36 @@ const OTHER_PAGES: PageDef[] = [
       },
     ],
   },
-  { slug:'locations',       label:'สาขาของเรา',            description:'หน้าแผนที่สาขา',                      icon:'📍',  sections: simpleHero() },
+  {
+    slug: 'locations', label: 'สาขาของเรา', description: 'หน้าแผนที่ + การ์ดรายละเอียด 6 สาขา', icon: '📍',
+    sections: [
+      ...simpleHero(),
+      {
+        key: 'branches', label: 'การ์ดสาขา', icon: '🏥',
+        fields: [
+          list('items', 'สาขา', {
+            itemName: 'สาขา', itemLabelKey: 'name_th',
+            itemFields: [
+              bi('name', 'ชื่อสาขา'), mono('subtitle', 'ชื่อรอง (EN)'), mono('badge', 'ป้าย (เช่น ใหม่! เว้นว่างได้)'),
+              mono('grad', 'สีหัวการ์ด (เช่น #991B1B,#EF4444)'),
+              bi('address', 'ที่อยู่'), mono('phone', 'โทรศัพท์'), bi('hours', 'เวลาทำการ (ใส่ <br> ได้)'),
+              bi('extra_label', 'หัวข้อเสริม (เช่น การเดินทาง — เว้นว่างได้)'), bi('extra_text', 'ข้อความเสริม'),
+              bi('services_label', 'หัวข้อบริการ'), bi('services', 'บริการ (คั่นด้วย ,)'),
+              mono('maps', 'ลิงก์ Google Maps'),
+            ],
+            defaults: [
+              { name_th: 'MediThai กรุงเทพ (สำนักงานใหญ่)', name_en: 'MediThai Bangkok (HQ)', subtitle: 'MediThai Bangkok — Headquarters', badge: '', grad: '#0F2447,#1B3A6B', address_th: '2 ถนนเพชรบุรีตัดใหม่ แขวงบางกอกน้อย กรุงเทพมหานคร 10700', address_en: '2 New Phetchaburi Rd, Bangkok Noi, Bangkok 10700', phone: '02-310-3000', hours_th: 'ทุกวัน 06:00 – 22:00 น. (OPD)<br>ฉุกเฉิน 24 ชั่วโมง', hours_en: 'Daily 06:00 – 22:00 (OPD)<br>Emergency 24 hours', extra_label_th: 'การเดินทาง', extra_label_en: 'Getting There', extra_text_th: 'BTS อโศก → รถไฟฟ้า MRT ลงพระราม 9<br>มีที่จอดรถ 500 คัน', extra_text_en: 'BTS Asok → MRT Rama 9<br>500 parking spaces', services_label_th: 'บริการหลัก', services_label_en: 'Main Services', services_th: 'อายุรกรรม,ศัลยกรรม,สูติ-นรีเวช,จักษุ,หู คอ จมูก,ตรวจสุขภาพ,ฉุกเฉิน 24 ชม.,ICU,ห้องผ่าตัด 20 ห้อง,MRI 3T,PET/CT', maps: 'https://maps.google.com' },
+              { name_th: 'MediThai หัวใจ', name_en: 'MediThai Heart', subtitle: 'MediThai Heart Hospital', badge: '', grad: '#991B1B,#EF4444', address_th: '1 ซอยสาทร 15 ถนนสาทรใต้ แขวงยานนาวา สาทร กรุงเทพ 10120', address_en: '1 Soi Sathorn 15, South Sathorn Rd, Bangkok 10120', phone: '02-310-3100', hours_th: 'ทุกวัน 07:00 – 20:00 น.<br>ห้องฉุกเฉินหัวใจ 24 ชั่วโมง', hours_en: 'Daily 07:00 – 20:00<br>Cardiac emergency 24 hours', extra_label_th: '', extra_text_th: '', services_label_th: 'ความเชี่ยวชาญ', services_label_en: 'Specialties', services_th: 'อายุรแพทย์หัวใจ,ผ่าตัดหัวใจ,Electrophysiology,MitraClip,MICS,Cardiac Rehab,Cardiac Cath Lab', maps: 'https://maps.google.com' },
+              { name_th: 'MediThai มะเร็ง (วัฒโนสถ)', name_en: 'MediThai Cancer (Wattanosoth)', subtitle: 'MediThai Cancer Center', badge: '', grad: '#4C1D95,#8B5CF6', address_th: '99 ถนนพระราม 9 แขวงห้วยขวาง กรุงเทพ 10310', address_en: '99 Rama 9 Rd, Huai Khwang, Bangkok 10310', phone: '02-310-3200', hours_th: 'จ-ศ 07:00 – 20:00 น.<br>ส-อา 07:00 – 17:00 น.', hours_en: 'Mon–Fri 07:00 – 20:00<br>Sat–Sun 07:00 – 17:00', extra_label_th: '', extra_text_th: '', services_label_th: 'ความเชี่ยวชาญ', services_label_en: 'Specialties', services_th: 'PET/CT Scan,da Vinci Robot,Chemotherapy,Radiation Therapy,AI Mammography,Immunotherapy,Palliative Care', maps: 'https://maps.google.com' },
+              { name_th: 'MediThai สมองและกระดูก', name_en: 'MediThai Brain & Spine', subtitle: 'MediThai Brain & Spine Hospital', badge: '', grad: '#0C4A6E,#0891B2', address_th: '33 ถนนบางขุนนนท์ แขวงบางขุนนนท์ บางกอกน้อย กรุงเทพ 10700', address_en: '33 Bang Khun Non Rd, Bangkok Noi, Bangkok 10700', phone: '02-310-3300', hours_th: 'ทุกวัน 07:00 – 20:00 น.', hours_en: 'Daily 07:00 – 20:00', extra_label_th: '', extra_text_th: '', services_label_th: 'ความเชี่ยวชาญ', services_label_en: 'Specialties', services_th: 'ศัลยกรรมสมอง,Robotic UKA,Spine Surgery,MRI 3T,Neuro ICU,กายภาพบำบัด', maps: 'https://maps.google.com' },
+              { name_th: 'MediThai เด็ก', name_en: 'MediThai Children', subtitle: "MediThai Children's Hospital", badge: '', grad: '#064E3B,#10B981', address_th: '55 ถนนลาดพร้าว แขวงจตุจักร กรุงเทพ 10900', address_en: '55 Lat Phrao Rd, Chatuchak, Bangkok 10900', phone: '02-310-3400', hours_th: 'ทุกวัน 07:00 – 21:00 น.', hours_en: 'Daily 07:00 – 21:00', extra_label_th: '', extra_text_th: '', services_label_th: 'ความเชี่ยวชาญ', services_label_en: 'Specialties', services_th: 'กุมารแพทย์ทั่วไป,พัฒนาการเด็ก,ทันตกรรมเด็ก,วัคซีน,NICU,PICU', maps: 'https://maps.google.com' },
+              { name_th: 'MediThai เชียงใหม่', name_en: 'MediThai Chiang Mai', subtitle: 'MediThai Chiang Mai — Newly Opened', badge: 'ใหม่!', grad: '#92400E,#F59E0B', address_th: '100 ถนนห้วยแก้ว ตำบลสุเทพ อำเภอเมือง เชียงใหม่ 50200', address_en: '100 Huay Kaew Rd, Suthep, Mueang, Chiang Mai 50200', phone: '053-310-3000', hours_th: 'ทุกวัน 07:00 – 21:00 น.', hours_en: 'Daily 07:00 – 21:00', extra_label_th: 'ภาษาที่ให้บริการ', extra_label_en: 'Languages', extra_text_th: 'ไทย · English · 中文 · 日本語', extra_text_en: 'ไทย · English · 中文 · 日本語', services_label_th: 'บริการหลัก', services_label_en: 'Main Services', services_th: 'อายุรกรรมทั่วไป,ศัลยกรรม,ตรวจสุขภาพ,ฉุกเฉิน,International Patients,Medical Tourism', maps: 'https://maps.google.com' },
+            ],
+          }),
+        ],
+      },
+    ],
+  },
   {
     slug: 'contact', label: 'ติดต่อเรา', description: 'หน้าติดต่อ — ช่องทาง ข้อมูลติดต่อ FAQ', icon: '📞',
     sections: [
@@ -987,7 +1052,62 @@ const OTHER_PAGES: PageDef[] = [
       },
     ],
   },
-  { slug:'concierge',       label:'Surgery Concierge',     description:'หน้า MediCare Concierge',             icon:'🏥',  sections: simpleHero() },
+  {
+    slug: 'concierge', label: 'Surgery Concierge', description: 'หน้า MediCare Concierge — ขั้นตอน สิทธิพิเศษ รีวิว', icon: '🏥',
+    sections: [
+      ...simpleHero(),
+      {
+        key: 'steps', label: 'ขั้นตอน 5 ขั้น', icon: '🔢',
+        fields: [
+          bi('tag', 'แท็กหัวข้อ'), bi('heading', 'หัวข้อ'), bi('sub', 'คำอธิบาย'),
+          list('items', 'ขั้นตอน', {
+            itemName: 'ขั้นตอน', itemLabelKey: 'title_th',
+            itemFields: [mono('icon', 'ไอคอน (fa6-solid)'), bi('title', 'หัวข้อ (รวมเลข)'), bi('desc', 'คำอธิบาย')],
+            defaults: [
+              { icon: 'comments', title_th: '1. ปรึกษาฟรี', title_en: '1. Free Consultation', desc_th: 'แชทหรือโทรหาทีม Concierge ของเรา เล่าอาการ อธิบายความต้องการ ไม่มีค่าใช้จ่าย', desc_en: 'Chat or call our Concierge team — describe your condition and needs, free of charge.' },
+              { icon: 'user-doctor', title_th: '2. จับคู่แพทย์', title_en: '2. Doctor Matching', desc_th: 'ทีม Concierge ค้นหาแพทย์เฉพาะทางที่เหมาะสมที่สุดกับเคสของคุณ', desc_en: 'The team finds the specialist best suited to your case.' },
+              { icon: 'calendar-check', title_th: '3. จองคิว', title_en: '3. Booking', desc_th: 'ช่วยประสานงานจองคิวให้ทันที ได้คิวภายใน 48 ชม. ไม่ต้องรอนาน', desc_en: 'We coordinate your booking immediately — a slot within 48 hours.' },
+              { icon: 'user-nurse', title_th: '4. Nurse Coordinator', title_en: '4. Nurse Coordinator', desc_th: 'มีพยาบาลประจำตัวคอยดูแลก่อน-ระหว่าง-หลังผ่าตัด ติดต่อได้ตลอด 24 ชม.', desc_en: 'A personal nurse cares for you before, during, and after surgery — reachable 24/7.' },
+              { icon: 'heart-circle-check', title_th: '5. ติดตามจนฟื้นตัว', title_en: '5. Follow-up to Recovery', desc_th: 'ทีม Concierge ติดตามอาการหลังกลับบ้าน จนกว่าคุณจะฟื้นตัวสมบูรณ์', desc_en: 'The team follows up after you go home, until you fully recover.' },
+            ],
+          }),
+        ],
+      },
+      {
+        key: 'benefits', label: 'สิทธิพิเศษ 6 ข้อ', icon: '💎',
+        fields: [
+          bi('tag', 'แท็กหัวข้อ'), bi('heading', 'หัวข้อ'),
+          list('items', 'สิทธิพิเศษ', {
+            itemName: 'สิทธิพิเศษ', itemLabelKey: 'title_th',
+            itemFields: [mono('icon', 'ไอคอน (fa6-solid)'), mono('color', 'สี (hex)'), bi('title', 'หัวข้อ'), bi('desc', 'คำอธิบาย')],
+            defaults: [
+              { icon: 'phone-volume', color: '#1B3A6B', title_th: 'ปรึกษาฟรี ตลอด 24 ชม.', title_en: 'Free 24/7 Consultation', desc_th: 'ทีม Concierge พร้อมรับสายและตอบคำถามทุกวัน ไม่มีวันหยุด ไม่มีค่าใช้จ่าย', desc_en: 'The Concierge team answers calls and questions every day, free of charge.' },
+              { icon: 'bolt', color: '#0891B2', title_th: 'ได้คิวเร็วกว่าปกติ', title_en: 'Faster Queue', desc_th: 'ช่องทาง Concierge มีคิวพิเศษ ได้รับการจัดสรรภายใน 48 ชม. เร็วกว่าจองเอง', desc_en: 'Concierge has priority slots — allocated within 48 hours, faster than booking yourself.' },
+              { icon: 'tag', color: '#10B981', title_th: 'ราคาพิเศษ ประหยัดกว่า', title_en: 'Special Pricing', desc_th: 'แพ็กเกจผ่าตัดผ่าน Concierge ได้ราคาพิเศษและส่วนลดที่ไม่มีในช่องทางปกติ', desc_en: 'Surgery packages via Concierge get special prices and exclusive discounts.' },
+              { icon: 'credit-card', color: '#8B5CF6', title_th: 'ผ่อน 0% นาน 10 เดือน', title_en: '0% Installments, 10 Months', desc_th: 'แบ่งชำระค่ารักษาได้สูงสุด 10 เดือน โดยไม่มีดอกเบี้ย รองรับทุกบัตรเครดิต', desc_en: 'Split payments up to 10 months interest-free, all credit cards accepted.' },
+              { icon: 'shield-halved', color: '#F59E0B', title_th: 'เบิกประกันได้ ไม่ต้องสำรองจ่าย', title_en: 'Direct Insurance Billing', desc_th: 'ประสานงานกับบริษัทประกัน 30+ แห่ง เบิกตรง ไม่ต้องจ่ายเงินสดล่วงหน้า', desc_en: 'We coordinate with 30+ insurers — direct billing, no upfront cash.' },
+              { icon: 'user-nurse', color: '#EF4444', title_th: 'Nurse Coordinator ส่วนตัว', title_en: 'Personal Nurse Coordinator', desc_th: 'มีพยาบาลประจำตัว 1 คนต่อ 1 เคส ดูแลทุกขั้นตอน ตอบคำถามแทนคุณกับแพทย์ได้', desc_en: 'One dedicated nurse per case — handles every step and liaises with your doctor.' },
+            ],
+          }),
+        ],
+      },
+      {
+        key: 'testimonials', label: 'รีวิวผู้ใช้บริการ', icon: '💬',
+        fields: [
+          bi('tag', 'แท็กหัวข้อ'), bi('heading', 'หัวข้อ'),
+          list('items', 'รีวิว', {
+            itemName: 'รีวิว', itemLabelKey: 'name',
+            itemFields: [mono('name', 'ชื่อ'), bi('detail', 'รายละเอียด (เคส · รพ.)'), bi('quote', 'คำพูด'), mono('rating', 'ดาว (เช่น 5 หรือ 4.5)')],
+            defaults: [
+              { name: 'สมชาย ประเสริฐสุข', detail_th: 'ผ่าตัดหัวใจ MICS · MediThai หัวใจ', detail_en: 'MICS heart surgery · MediThai Heart', quote_th: 'ผ่าตัดหัวใจเป็นเรื่องใหญ่มาก กังวลมาก แต่พอติดต่อ Concierge ทีมช่วยทุกอย่างตั้งแต่หาหมอ จองคิว ประสานประกัน จนผ่าตัดเสร็จ ไม่ต้องยุ่งยากเลย ประทับใจมาก', quote_en: 'Heart surgery is a huge deal, but the Concierge team handled everything — finding the doctor, booking, insurance — until surgery was done. So impressed.', rating: '5' },
+              { name: 'วนิดา แสนงาม', detail_th: 'ผ่าตัดมะเร็งปอด · MediThai มะเร็ง', detail_en: 'Lung cancer surgery · MediThai Cancer', quote_th: 'พยาบาล Coordinator ตอบทุกคำถาม แม้แต่ดึกดื่นก็ยังตอบ ผ่าตัดมะเร็งด้วย da Vinci ผ่านไปด้วยดี ผ่อน 10 เดือนไม่มีดอกเบี้ย คุ้มมากจริงๆ', quote_en: 'The nurse coordinator answered every question, even late at night. da Vinci surgery went well, and 10-month 0% installments — really worth it.', rating: '5' },
+              { name: 'ประทีป ชัยสมบัติ', detail_th: 'ผ่าตัดกระดูก Robotic · MediThai สมองฯ', detail_en: 'Robotic bone surgery · MediThai Spine', quote_th: 'โทรครั้งเดียว ได้คิวผ่าตัดภายใน 2 วัน เบิกประกันได้ ไม่ต้องจ่ายเงินสดเลย บริการดีมาก จะแนะนำให้ทุกคนที่ต้องผ่าตัดเลยครับ', quote_en: 'One call and I had a surgery slot within 2 days. Insurance covered it directly — excellent service, highly recommended.', rating: '4.5' },
+            ],
+          }),
+        ],
+      },
+    ],
+  },
   {
     slug: 'packages',
     label: 'แพ็กเกจสุขภาพ',

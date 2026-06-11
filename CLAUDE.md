@@ -36,12 +36,22 @@ Supabase SSR — session validated server-side in frontmatter. Protected pages r
 - Safari compat: `overflow-x: hidden` fallback before `clip`; `top/right/bottom/left: 0` fallback before `inset: 0`
 - Touch targets: minimum `padding: 10px` vertical on interactive elements (44px height)
 
-## Current state (as of 2026-06-08)
+## Current state (as of 2026-06-11)
 - All pages built and rendering — 0 JS console errors across site
 - Phase 4–6 complete: appointment booking API live, SEO layer (OG/Schema/sitemap), doctors DB-first
+- **Full CMS live**: every content page (about, careers, patient-stories, telehealth,
+  giving, loyalty, corporate, expat-hub, executive-health, contact, packages,
+  health-library, locations, concierge, 6 hospital pages, home, global) is editable
+  from /admin — including repeating lists (jobs, stories, package cards, timeline,
+  FAQ, branches...) with add/remove/reorder/duplicate, full Quill rich text, and
+  image upload to Supabase Storage (`site-media` bucket, auto-created)
+- CMS architecture: `src/lib/cmsSchema.ts` (schemas + `list()` fields + live-content
+  defaults), `src/lib/cmsPage.ts` (`makePageCms()` — t/m/items/li + auto __CMS_P__),
+  admin inline editor in `src/pages/admin/index.astro`, styles in `public/css/admin-cms.css`
+- To make new content editable: add fields/lists to the page's schema in cmsSchema.ts
+  (defaults = current live content), then render via `cms.t()` / `cms.items()` + `cms.li()`
 - Supabase SQL migrations written (`supabase/migrations/`) — must be run manually in Supabase dashboard
 - `RESEND_API_KEY` not yet added to Vercel env (email confirmation won't send until then)
-- packages.astro still static — DB schema exists but cards have too many visual-only fields
 - No CI/CD — deploys are manual via the commands above
 
 ## What the user prefers
